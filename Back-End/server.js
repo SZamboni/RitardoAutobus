@@ -27,7 +27,7 @@ app.get('/hello', function (req, res) {
 app.get('/index',function(req,res) {
     
     // read the file index.html
-    fs.readFile("../Front End/index.html", function (error, pgResp) {
+    fs.readFile("../Front-End/index.html", function (error, pgResp) {
         // in case of error return 404
         if (error) {
             res.writeHead(404);
@@ -48,7 +48,7 @@ app.get('/index',function(req,res) {
 app.get('/bus-visualization', function (req, res) {
 
     // read the file bus-visualization.html
-    fs.readFile("../Front End/bus-visualization.html", function (error, pgResp) {
+    fs.readFile("../Front-End/bus-visualization.html", function (error, pgResp) {
         // in case of error return 404
         if (error) {
             res.writeHead(404);
@@ -68,7 +68,7 @@ app.get('/bus-visualization', function (req, res) {
  */
 app.get('/segnala/:fermata', function (req, res) {
     // read the file segnala.html
-    fs.readFile("../Front End/segnala.html", function (error, pgResp) {
+    fs.readFile("../Front-End/segnala.html", function (error, pgResp) {
         if (error) {
             // in case of error return 404
             res.writeHead(404);
