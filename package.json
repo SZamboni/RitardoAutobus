@@ -1,16 +1,22 @@
 {
-  "name": "server",
+  "name": "ritardoautobus",
   "version": "1.0.0",
-  "description": "simple test server",
-  "main": "server.js",
+  "description": "Applicazione per la gestione dei ritardi autobus trentini",
+  "main": "webServ.node.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Simone Zamboni",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michelebonapace/RitardoAutobus.git"
+  },
+  "author": "Marcello Gecchele",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michelebonapace/RitardoAutobus/issues"
+  },
+  "homepage": "https://github.com/michelebonapace/RitardoAutobus#readme",
   "dependencies": {
-    "body-parser": "^1.18.2",
     "express": "^4.16.2"
   }
 }
