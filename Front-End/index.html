@@ -25,7 +25,7 @@
            */
           function onSignIn(googleUser) {
 
-            var serverLocation = "http://localhost:3000";  // variable that store the location of the server
+            var serverLocation = "http://localhost:8080";  // variable that store the location of the server
             
             var profile = googleUser.getBasicProfile();   // get the profile that has signed in
 
@@ -43,6 +43,7 @@
 
             // set the cookie to the user
             document.cookie = "email=" + profile.getEmail();
+			document.cookie = "token=" + id_token + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
 
             // information that will be sendt to the server
             var informations = {

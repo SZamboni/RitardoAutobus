@@ -11,8 +11,11 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 var fs = require("fs");     // to read file
 var url = require('url');   // to parse URL
 
+var port = process.env.PORT || 8080;    // the port for heroku
+
+
 // what application use
-app.use(bodyParser.json()); // very important for gettin file in JSON format
+app.use(bodyParser.json()); // very important for gettin the data in JSON format
 
 /**
  * Simple interfce that return a hello world (for test pourpose)
@@ -27,7 +30,7 @@ app.get('/hello', function (req, res) {
 app.get('/index',function(req,res) {
     
     // read the file index.html
-    fs.readFile("../Front-End/index.html", function (error, pgResp) {
+    fs.readFile("./Front-End/index.html", function (error, pgResp) {
         // in case of error return 404
         if (error) {
             res.writeHead(404);
@@ -48,7 +51,7 @@ app.get('/index',function(req,res) {
 app.get('/bus-visualization', function (req, res) {
 
     // read the file bus-visualization.html
-    fs.readFile("../Front-End/bus-visualization.html", function (error, pgResp) {
+    fs.readFile("./Front-End/bus-visualization.html", function (error, pgResp) {
         // in case of error return 404
         if (error) {
             res.writeHead(404);
@@ -68,7 +71,7 @@ app.get('/bus-visualization', function (req, res) {
  */
 app.get('/segnala/:fermata', function (req, res) {
     // read the file segnala.html
-    fs.readFile("../Front-End/segnala.html", function (error, pgResp) {
+    fs.readFile("./Front-End/segnala.html", function (error, pgResp) {
         if (error) {
             // in case of error return 404
             res.writeHead(404);
@@ -167,8 +170,8 @@ app.post('/postsalita', function(req,res) {
 })
 
 /**
- * Start the server on the port 3000
+ * Start the server on the port 8080
  */
-app.listen(3000, function () {
-  console.log('Server listening at port 3000');
+app.listen(port, function () {
+  console.log('Server listening at port ' + port);
 });
