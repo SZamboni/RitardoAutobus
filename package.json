@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/michelebonapace/RitardoAutobus#readme",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "node-mysql": "^0.4.2"
   }
 }
