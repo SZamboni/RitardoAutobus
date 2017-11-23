@@ -1,5 +1,5 @@
 var express = require('express');
-var webServ=express();
+var app=express();
 //pagine statiche
 var opzioni = {
   dotfiles: 'ignore', //ignora i files preceduti dal punto
@@ -15,9 +15,9 @@ var opzioni = {
 //invece che cercare nella root del programma redirigo le pagine statice in Front-End
 //Front-End è un brutto nome per una cartella, la cambierei in webdocs o
 //qualcosa di simile.
-webServ.use(express.static(__dirname + '/Front-End',opzioni));
+app.use(express.static(__dirname + '/Front-End',opzioni));
 //comportamento di default (404)
-webServ.use(function(request,response){
+app.use(function(request,response){
   /*
   response.signal(404);
   response.write('<h1> Pagina non trovata </h1>');
@@ -27,6 +27,8 @@ webServ.use(function(request,response){
   response.status(404).send('<h1> Pagina non trovata </h1>');
 });
 //apro server su porta 7777
-webServ.listen(7777,function(){
+app.listen(7777,function(){
   console.log('Server aperto: http://localhost:7777');
 });
+
+setInterval(function(){console.log('a');},600);
