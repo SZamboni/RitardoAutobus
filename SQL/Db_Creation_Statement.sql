@@ -1,67 +1,71 @@
-CREATE TABLE Utenti
+CREATE TABLE IF NOT EXISTS Utenti
 (
-	UserID INTEGER PRIMARY KEY,
-	User VARCHAR(50),
-	Pass VARCHAR(50),
-	Email VARCHAR(100)
+	UserID INTEGER PRIMARY KEY AUTO_INCREMENT,
+	User VARCHAR(50) NOT NULL,
+	Pass VARCHAR(50) NOT NULL,
+	Email VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Linea
+CREATE TABLE IF NOT EXISTS Linea
 (
-	IdLinea INTEGER PRIMARY KEY,
-    NomeLinea VARCHAR(5)
+	IdLinea INTEGER PRIMARY KEY AUTO_INCREMENT,
+    NomeLinea VARCHAR(5) NOT NULL,
+    Direzione BIT(1) NOT NULL
 );
 
-CREATE TABLE Segnalazioni
+CREATE TABLE IF NOT EXISTS Segnalazioni
 (
-	IdSegnalazione INTEGER PRIMARY KEY,
-	IdSegnalatore INTEGER,
-	DataOra DATETIME,
-	Posizione POINT,
-	Linea INTEGER,
+	IdSegnalazione INTEGER PRIMARY KEY AUTO_INCREMENT,
+	IdSegnalatore INTEGER NOT NULL,
+	DataOra DATETIME NOT NULL,
+    Linea INTEGER NOT NULL,
+	Latitudine DECIMAL(10,8) NOT NULL,
+    Longitudine DECIMAL(11,8) NOT NULL,
 	FOREIGN KEY (IdSegnalatore) REFERENCES Utenti(UserID),
     FOREIGN KEY (Linea) REFERENCES Linea(IdLinea)
 );
 
-CREATE TABLE Fermata
+CREATE TABLE IF NOT EXISTS Fermata
 (
-	IdFermata INTEGER PRIMARY KEY,
+	IdFermata INTEGER PRIMARY KEY AUTO_INCREMENT,
     NomeFermata VARCHAR(50),
-	Posizione POINT
+	Latitudine DECIMAL(10,8) NOT NULL,
+    Longitudine DECIMAL(11,8) NOT NULL,
+    Direzione BIT(1) NOT NULL
 );
 
-CREATE TABLE Linea_Fermata
+CREATE TABLE IF NOT EXISTS Linea_Fermata
 (
-	IdLinea INTEGER,
-	IdFermata INTEGER,
+	IdLinea INTEGER AUTO_INCREMENT,
+	IdFermata INTEGER NOT NULL,
 	FOREIGN KEY (IdLinea) REFERENCES Linea(IdLinea),
 	FOREIGN KEY (IdFermata) REFERENCES Fermata(IdFermata),
     primary key (IdLinea, IdFermata)
 );
 
-CREATE TABLE Autobus
+CREATE TABLE IF NOT EXISTS Corsa
 (
-	IdAutobus INTEGER PRIMARY KEY,
-	IdLinea INTEGER,
+	IdCorsa INTEGER PRIMARY KEY AUTO_INCREMENT,
+	IdLinea INTEGER NOT NULL,
 	FOREIGN KEY (IdLinea) REFERENCES Linea(IdLinea)
 );
 
-CREATE TABLE Autobus_Fermata_Orario
+CREATE TABLE IF NOT EXISTS Corsa_Fermata_Orario
 (
-	IdAutobusFermataOrario INTEGER PRIMARY KEY,
-	IdAutobus INTEGER,
-	IdLinea INTEGER,
-	Orario TIME,
-	IdFermata INTEGER,
-	FOREIGN KEY (IdAutobus) REFERENCES Autobus(IdAutobus),
+	IdCorsaFermataOrario INTEGER PRIMARY KEY AUTO_INCREMENT,
+	IdCorsa INTEGER NOT NULL,
+	IdLinea INTEGER NOT NULL,
+	Orario TIME NOT NULL,
+	IdFermata INTEGER NOT NULL,
+	FOREIGN KEY (IdCorsa) REFERENCES Autobus(IdCorsa),
 	FOREIGN KEY (IdLinea) REFERENCES Autobus(IdLinea),
 	FOREIGN KEY (IdFermata) REFERENCES Fermata(IdFermata)
 );
 
-CREATE TABLE Ritardi
+CREATE TABLE IF NOT EXISTS Ritardi
 (
-	IdRitardo INTEGER PRIMARY KEY,
-	IdAutobusFermataOrario INTEGER,
-	Ritardo TIME,
+	IdRitardo INTEGER PRIMARY KEY AUTO_INCREMENT,
+	IdCorsaFermataOrario INTEGER NOT NULL,
+	Ritardo TIME NOT NULL,
 	FOREIGN KEY (IdAutobusFermataOrario) REFERENCES Autobus_Fermata_Orario(IdAutobusFermataOrario)
 );
