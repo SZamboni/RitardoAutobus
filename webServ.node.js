@@ -30,5 +30,3 @@ app.use(function(request,response){
 app.listen(7777,function(){
   console.log('Server aperto: http://localhost:7777');
 });
-
-setInterval(function(){console.log('a');},600);

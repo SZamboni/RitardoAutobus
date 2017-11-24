@@ -7,7 +7,7 @@
 
     <script type="text/javascript">
         /**
-        * Script javascript che contiene la lattura dei cookie, il reindirizzamento alla visualizzazione dei bus, 
+        * Script javascript che contiene la lattura dei cookie, il reindirizzamento alla visualizzazione dei bus,
         * la funzione di invio dati di salita al server e il caricamento dei bus possibili per quella fermata
         *
         * @author Simone Zamboni
@@ -31,7 +31,7 @@
                     if (fine == -1) {
                         fine = document.cookie.length;
                     }
-                    
+
                     return unescape(document.cookie.substring(inizio,fine));
 
                 }else{
@@ -45,7 +45,7 @@
          * Function that returns to the bus visualization page
          */
         function backToBusVisualization() {
-            var newUrl = serverLocation + "/bus-visualization";
+            var newUrl = serverLocation + "/bus-visualization.html";
             document.location.href = newUrl;
         }
 
@@ -53,17 +53,23 @@
          * Function called when a bus button is pressed and send the data to the server
          */
         var click = function(data) {
-            var date = new Date(Date.now());
-
+            var data = new Date(Date.now());
+            data.setHours(data.getHours()+1); //fix alla timezone
             var url = document.URL;
+            /*
+            ma perchè T_T
             var _fermata = url.substr(30);
+            */
+            //prendo la fermata con get
+            var url = new URL( window.location);
+            var _fermata = url.searchParams.get('fermata');
+            console.log(_fermata);
             var _mail = leggiCookie("email");
 
             // information that will be sent to the server
             var informations = {
-                bus : data,
-                fermata : _fermata,
-                time : date.getTime(),
+                bus : 0,
+                dataOra : data,
                 email : _mail
             }
 
@@ -84,8 +90,8 @@
             .then( (response) => { // function executed when the request is finisced
               //  Redirect the user to the new page
               var newUrl = serverLocation + "/bus-visualization";
-              document.location.href = newUrl; 
-            });    
+              document.location.href = newUrl;
+            });
 
         }
 
@@ -94,9 +100,16 @@
          */
         function load_bus() {
             // extract the bus stop from the URL
-            var url = document.URL;
+            //var url = document.URL;
+            /*
+            Cos'è sta roba?
             var fermata = url.substr(30);
-
+            */
+            //SEGUO LO STANDARD: USO GET NEL MODO IN CUI DEVE ESSERE USATO
+            //prendo la fermata con get
+            var url = new URL( window.location);
+            var fermata = url.searchParams.get('fermata');//<------------così
+            console.log(fermata);
             // get the bus for that bus stop
             fetch(serverLocation + "/get-ritardi/" + fermata)     // get the list of bus and their delay
             .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
@@ -125,9 +138,9 @@
             })
             .catch(error => console.error(error) )
         }
-        
+
     </script>
-        
+
     <body onload="load_bus()">
 
         <h1>Segnalazione salita bus</h1><br>

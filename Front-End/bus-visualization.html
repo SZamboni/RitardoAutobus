@@ -24,7 +24,7 @@
          * Script javascript che contiene la funzione di inizializzazione della mappa,
          * di rilevamento dei cookie, di visualizzazione delle fermate e di visualizzazione di bus e ritardi
          * e di reindirizzamento alla pagina di segnalazione
-         * 
+         *
          * @author Simone Zamboni
          * @date 2017-10-30
          */
@@ -42,6 +42,8 @@
                     // get the coordinates
                     var latitude =  position.coords.latitude;
                     var longitude = position.coords.longitude;
+                    console.log(latitude);
+                    console.log(longitude);
                     var myLatLng = {lat: latitude, lng: longitude};
 
                     // create the map and set the zoom and the center
@@ -58,12 +60,12 @@
 
                     // based on the coordinates load nearby bus stops
                     load_fermate(latitude,longitude);
-                    
+
                 });
             } else {
                 alert("Geolocation is not supported by this browser, all the functions will not be available");
             }
-        }  
+        }
 
         /**
          * Function that returns a value of a defined cookie or undefined if that cookie is not found
@@ -80,7 +82,7 @@
                     if (fine == -1) {
                         fine = document.cookie.length;
                     }
-                    
+
                     return unescape(document.cookie.substring(inizio,fine));
 
                 }else{
@@ -96,9 +98,8 @@
         function load_fermate(latitude,longitude) {
 
             var email = leggiCookie("email");
-            
-            var url_load_fermate = serverLocation + "/get-fermate/?latitude=" + latitude + "&longitude=" + longitude;
 
+            var url_load_fermate = serverLocation + "/get-fermate/?latitude=" + latitude + "&longitude=" + longitude;
             fetch(url_load_fermate)
             .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
                 data = response.json();
@@ -120,7 +121,7 @@
                 selezione_fermate.appendChild(selection);   // append all toghether
             })
             .catch(error => console.error(error) )  // error handling
-        } 
+        }
 
         /**
          * Function that request for a bus stop all the bus with their delay
@@ -128,9 +129,9 @@
         function richiesta_bus() {
             var selection = document.getElementById("selection");
             var selected_item = selection[selection.selectedIndex].value;   // get the selected item
-            
+
             fetch(serverLocation + "/get-ritardi/" + selected_item)     // get the list of bus and their delay
-            .then((response) => {  
+            .then((response) => {
                 data = response.json();
                 return data;
             }).then( function(data) {
@@ -161,10 +162,10 @@
                 intestazione_colonne.appendChild(ritardo);
 
                 table.appendChild(intestazione_colonne);
-                
+
                 // for every bus we create a row in the table wit all the informatio from the server
                 for(var i = 0; i < data.bus.length; i++) {
-                    
+
                     var tr = document.createElement("tr");  // create the row
 
                     var bus = document.createElement("td");
@@ -180,10 +181,10 @@
                     tr.appendChild(delay);
 
                     table.appendChild(tr);  // append the row to the table
-                    
+
                 }
                 bus_e_ritardi.appendChild(table);   // appen the table to the tag
-            }) 
+            })
             .catch(error => console.error(error) )
         }
 
@@ -193,7 +194,7 @@
         function segnala() {
             var selection = document.getElementById("selection");
             var selected_item = selection[selection.selectedIndex].value;   // get the selected item
-            var newUrl = serverLocation + "/segnala/" + selected_item;
+            var newUrl = serverLocation + "/segnala.html?fermata=" + selected_item;
             document.location.href = newUrl;
         }
     </script>
@@ -203,9 +204,9 @@
     </script>
 
    </head>
-    
+
    <body id="body">
-    
+
     <h1>Visualizzazione ritardi Autobus</h1><br><br>
 
     <h2>La tua posizione:</h2>
