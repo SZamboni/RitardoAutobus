@@ -13,19 +13,48 @@ var app=express();
 //Istanza bodyparser per leggere i JSON
 var bodyParser= require('body-parser');
 
-//funzione che manda una query generica
-var eseguiQuery = function(query){
+//funzione per fare una query di inserimento generica
+var insertQuery = function(query,callback){
   connection.connect();
   connection.query(query,function (errore){
-    if(!errore)
-      console.log('Query eseguita con successo');
-    else{
-      console.log('Errore nella query');
-      console.log(errore);
+    if(!errore){
+      //termino la connessione prima di fare altro in modo da poter eseguire altre query
+      connection.end();
+      callback(null);
+    }else{
+      //termino la connessione prima di fare altro in modo da poter eseguire altre query
+      connection.end();
+      callback(errore);
     }
-  })
+  });
 }
 
+/**
+funzione per fare una query di ricerca generica
+callback è una funzione che viene chiamata una volta che ho finito la Query
+è necessaria per via dell'asincronicità di Node.
+la funzione callback è una funzione con 2 parametri, il primo è errore,
+il secondo sono i dati.
+**/
+var selectQuery = function(query,callback){
+  connection.connect();
+  connection.query(query,function (errore,righe, campi){
+    if (!errore){
+      //trasformo l'output in JSON
+      var risultatoJSON= JSON.stringify(righe);
+      var res= JSON.parse(risultatoJSON);//il lettore del risultato
+      //termino la connessione prima di fare altro in modo da poter eseguire altre query
+      connection.end();
+      //chiamo la funzione callback con errore null e il risultato
+      callback(null,res);
+    }else{
+      //termino la connessione prima di fare altro in modo da poter eseguire altre query
+      connection.end();
+      //chiamo la funzione callback non l'errore e nessun risultato
+      callback(errore,null);
+    }
+  });
+}
 /****************
 INIZIO WEBSERVER
 ****************/
@@ -50,15 +79,45 @@ FINE WEBSERVER
 ******************/
 app.use(bodyParser.json());
 
-/*********************
-TTEEEEEEEMMMMPPPPPPPPP
-*********************/
-
-
 //Gestione login
-app.post('/postlogin', function(request,response,next) {
+app.post('/postlogin', function(request,response,next){
     // print the data arrived
-    console.log("JSON received: " + JSON.stringify(request.body));
+    var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='"+
+    request.body.email+"';";
+    selectQuery(query,function(errore,parser){
+      if(errore){
+        console.log("Errore nella ricerca dell'utente.");
+        console.log(errore);
+      }else{
+        console.log(parser);
+        if(parser[0].conteggio===0){
+          console.log("devo fare l'utente");
+          query= "INSERT INTO ritardoautobus.Utente (Nome,Cognome,Email,LinkFoto) VALUES (\'"+
+          request.body.nome+"\',\'"+
+          request.body.cognome+"\',\'"+
+          request.body.email+"\',\'"+
+          request.body.linkFoto+"\');";
+          insertQuery(query,function(errore){
+            if(errore){
+              console.log("Errore nell'inserimento dell'utente.");
+            }
+          });
+          /*
+          connection.query(query, function(err){
+            if(!err){
+              console.log('Inserimento utente eseguito con successo.');
+            }else{
+              console.log("Errore nell'inserimento utente.");
+            }
+          });
+          */
+          //inserimento eseguito
+        }
+      }
+    });
+    //ora che sono sicuro che ho l'utente ottengo l'id partendo dalla email
+    query= "SELECT UserId as id FROM ritardoautobus.Utente where Email=\'"+
+    request.body.email+"\');";
     // send a response
     response.send("OK");
 })
@@ -80,7 +139,11 @@ app.post('/postsalita',function(request,response,next){
     latitudine + "," +
     longitudine + ");";
     //lancio la query
-    eseguiQuery(query);
+    insertQuery(query,function(errore){
+      if(errore){
+        console.log("Errore nell'inserimento della segnalazione.");
+      }
+    });
     response.status(200).send("Segnalazione aggiunta");
 });
 
