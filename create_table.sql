@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS `opendata`.`routes` (
   `agency_id` INT NOT NULL,
   `route_short_name` CHAR(3) NOT NULL,
   `route_long_name` VARCHAR(45) NOT NULL,
-  `route_type` INT NULL,
-  `route_color` VARCHAR(45) NULL,
-  `route_text_color` VARCHAR(45) NULL,
+  `route_type` INT,
+  `route_color` VARCHAR(45),
+  `route_text_color` VARCHAR(45),
   PRIMARY KEY (`route_id`)
 )
 ENGINE = InnoDB;
@@ -52,11 +52,11 @@ CREATE TABLE IF NOT EXISTS `opendata`.`stops` (
   `stop_id` INT NOT NULL,
   `stop_code` VARCHAR(45) NOT NULL,
   `stop_name` VARCHAR(45) NOT NULL,
-  `stop_desc` VARCHAR(45) NULL,
+  `stop_desc` VARCHAR(45),
   `stop_lat` FLOAT(10,7) NOT NULL,
   `stop_lon` FLOAT(10,7) NOT NULL,
   `zone_id` VARCHAR(45) NOT NULL,
-  `wheelchair_boarding` INT NOT NULL,
+  `wheelchair_boarding` VARCHAR(45),
   PRIMARY KEY (`stop_id`))
 ENGINE = InnoDB;
 
@@ -69,8 +69,8 @@ CREATE TABLE IF NOT EXISTS `opendata`.`trips` (
   `trip_id` VARCHAR(45) NOT NULL,
   `trip_headsign` VARCHAR(45) NULL,
   `direction_id` INT NOT NULL,
-  `shape_id` VARCHAR(45) NULL,
-  `wheelchair_accesible` INT NULL,
+  `shape_id` VARCHAR(100),
+  `wheelchair_accesible` VARCHAR(45),
   PRIMARY KEY (`trip_id`),
   FOREIGN KEY (route_id) REFERENCES routes(route_id)
 )
