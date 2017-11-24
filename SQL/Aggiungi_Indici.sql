@@ -1,0 +1,1 @@
+CREATE INDEX mail ON Utentemail (Email) USING btree;
