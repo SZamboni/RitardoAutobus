@@ -16,11 +16,17 @@ VALUES ("Povo Piazza Manci",46.065956 ,11.154595,0);
 INSERT INTO Corsa (IdLinea)
 VALUES (1);
 
+INSERT INTO Corsa (IdLinea) 
+VALUES (2);
+
 INSERT INTO Corsa_Fermata_Orario (IdCorsa,IdLinea,Orario,IdFermata)
 VALUES (1,1,'16:20:00',1);
 
 INSERT INTO Linea_Fermata(IdLinea,IdFermata)
 VALUES (1,1);
+
+INSERT INTO Linea_Fermata(IdLinea,IdFermata)
+VALUES (2,2);
 
 INSERT INTO Segnalazione(IdSegnalatore,DataOra,Linea,Latitudine,Longitudine)
 VALUES (1,'2017-11-24 16:22:27',1,46.065970,11.154700);
