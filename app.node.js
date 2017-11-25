@@ -7,54 +7,15 @@ var connection = mysql.createConnection({
   database : 'ritardoautobus'
 });
 
+//istanza async per waterfall
+var async = require('async');
 //Istanza Express
 var express = require('express');
 var app=express();
 //Istanza bodyparser per leggere i JSON
 var bodyParser= require('body-parser');
+app.use(bodyParser.json());
 
-//funzione per fare una query di inserimento generica
-var insertQuery = function(query,callback){
-  connection.connect();
-  connection.query(query,function (errore){
-    if(!errore){
-      //termino la connessione prima di fare altro in modo da poter eseguire altre query
-      connection.end();
-      callback(null);
-    }else{
-      //termino la connessione prima di fare altro in modo da poter eseguire altre query
-      connection.end();
-      callback(errore);
-    }
-  });
-}
-
-/**
-funzione per fare una query di ricerca generica
-callback è una funzione che viene chiamata una volta che ho finito la Query
-è necessaria per via dell'asincronicità di Node.
-la funzione callback è una funzione con 2 parametri, il primo è errore,
-il secondo sono i dati.
-**/
-var selectQuery = function(query,callback){
-  connection.connect();
-  connection.query(query,function (errore,righe, campi){
-    if (!errore){
-      //trasformo l'output in JSON
-      var risultatoJSON= JSON.stringify(righe);
-      var res= JSON.parse(risultatoJSON);//il lettore del risultato
-      //termino la connessione prima di fare altro in modo da poter eseguire altre query
-      connection.end();
-      //chiamo la funzione callback con errore null e il risultato
-      callback(null,res);
-    }else{
-      //termino la connessione prima di fare altro in modo da poter eseguire altre query
-      connection.end();
-      //chiamo la funzione callback non l'errore e nessun risultato
-      callback(errore,null);
-    }
-  });
-}
 /****************
 INIZIO WEBSERVER
 ****************/
@@ -77,45 +38,107 @@ app.use(express.static(__dirname + '/Front-End',opzioni));
 /*****************
 FINE WEBSERVER
 ******************/
-app.use(bodyParser.json());
+
+/*****************
+INIZIO QUERYS
+*****************/
+
+//funzione per fare una query di inserimento generica
+var insertQuery = function(query,callback){
+  //eseguo l'inserimento solo se la query è diversa da null
+  if(query!=null){
+    connection.query(query,function (errore){
+      if(!errore){
+        callback(null);
+        return;
+      }else{
+        callback(errore);
+      }
+    });
+  }else{
+    callback(null);
+  }
+}
+
+/**
+funzione per fare una query di ricerca generica
+callback è una funzione che viene chiamata una volta che ho finito la Query
+è necessaria per via dell'asincronicità di Node.
+la funzione callback è una funzione con 2 parametri, il primo è errore,
+il secondo sono i dati.
+**/
+var selectQuery = function(query,callback){
+  //eseguo la query solo se è diversa da null
+  if(query!=null){
+    connection.query(query,function (errore,righe, campi){
+      if (!errore){
+        //trasformo l'output in JSON e poi creo il parser
+        var parser= JSON.parse(JSON.stringify(righe));
+        //chiamo la funzione callback con errore null e il parser
+        callback(null,parser);
+        return;
+      }else{
+        //chiamo la funzione callback non l'errore e nessun risultato
+        callback(errore,null);
+      }
+    });
+  }else{
+    callback(null,null);
+  }
+}
+/************
+FINE QUERYS
+***********/
 
 //Gestione login
 app.post('/postlogin', function(request,response,next){
-    // print the data arrived
-    var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='"+
-    request.body.email+"';";
-    selectQuery(query,function(errore,parser){
-      if(errore){
-        console.log("Errore nella ricerca dell'utente.");
-        console.log(errore);
-      }else{
-        console.log(parser);
+    //Async waterfall mi permette di avviare delle funzioni in sequenza passando
+    //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
+    //chiudere le connsessioni ogni volta
+    async.waterfall([
+      function(callback){
+        var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='"+
+        request.body.email+"';";
+        //chiamo la prossima funzione nella sequenza
+        callback(null,query);
+      },
+      selectQuery,
+      function(parser,callback){
         if(parser[0].conteggio===0){
-          console.log("devo fare l'utente");
-          query= "INSERT INTO ritardoautobus.Utente (Nome,Cognome,Email,LinkFoto) VALUES (\'"+
-          request.body.nome+"\',\'"+
-          request.body.cognome+"\',\'"+
-          request.body.email+"\',\'"+
-          request.body.linkFoto+"\');";
-          insertQuery(query,function(errore){
-            if(errore){
-              console.log("Errore nell'inserimento dell'utente.");
-            }
-          });
-          /*
-          connection.query(query, function(err){
-            if(!err){
-              console.log('Inserimento utente eseguito con successo.');
-            }else{
-              console.log("Errore nell'inserimento utente.");
-            }
-          });
-          */
-          //inserimento eseguito
+            //gestione del primo login
+            //la prima volta che un utente si connette al servizio devo inserirlo
+            //nel nostro database.
+            console.log("devo fare l'utente");
+            var query= "INSERT INTO ritardoautobus.Utente (Nome,Cognome,Email,LinkFoto) VALUES (\'"+
+            request.body.nome+"\',\'"+
+            request.body.cognome+"\',\'"+
+            request.body.email+"\',\'"+
+            request.body.linkFoto+"\');";
+            callback(null,query);
+        }else{
+          //non devo fare l'Inserimento
+          //il primo null è per l'errore, il secondo è per la query vuota
+          callback(null,null);
         }
+      },
+      insertQuery,
+      function(callback){
+        /**
+        Ora che sono sicuro che l'utente si trova all'interno del database
+        richiedo al mio database il suo id da salvare in un cookie per
+        semplificare tutte le query successive
+        **/
+        console.log("cerco l'id");
+        callback(null);
+      }
+    ],function (errore){
+      if(!errore){
+        console.log('appost');
+      }else{
+        console.log('Errore nella waterfall.');
+        console.log(errore);
       }
     });
-    //ora che sono sicuro che ho l'utente ottengo l'id partendo dalla email
     query= "SELECT UserId as id FROM ritardoautobus.Utente where Email=\'"+
     request.body.email+"\');";
     // send a response
