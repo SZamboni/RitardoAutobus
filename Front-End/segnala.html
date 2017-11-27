@@ -1,146 +1,12 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title> Segnala</title>
-      <meta charset="utf-8">
+    <head>
+        <title> Segnala</title>
+        <meta charset="utf-8">      
+        <script src="js/segnala-bus.js"></script>
+        <script src="js/map.js"></script>
+        <script src="js/googleLog.js"></script>
     </head>
-
-    <script type="text/javascript">
-        /**
-        * Script javascript che contiene la lattura dei cookie, il reindirizzamento alla visualizzazione dei bus,
-        * la funzione di invio dati di salita al server e il caricamento dei bus possibili per quella fermata
-        *
-        * @author Simone Zamboni
-        * @date 2017-10-30
-        */
-
-        var serverLocation = "http://localhost:8080";  // variable that store the location of the server
-
-        /**
-         * Function that returns a value of a defined cookie or undefined if that cookie is not found
-         */
-         function leggiCookie(nomeCookie) {
-
-            if (document.cookie.length > 0)  {
-                var inizio = document.cookie.indexOf(nomeCookie + "=");
-
-                if (inizio != -1) {
-                    inizio = inizio + nomeCookie.length + 1;
-                    var fine = document.cookie.indexOf(";",inizio);
-
-                    if (fine == -1) {
-                        fine = document.cookie.length;
-                    }
-
-                    return unescape(document.cookie.substring(inizio,fine));
-
-                }else{
-                    return undefined;
-                }
-            }
-            return undefined;
-        }
-
-        /**
-         * Function that returns to the bus visualization page
-         */
-        function backToBusVisualization() {
-            var newUrl = serverLocation + "/bus-visualization.html";
-            document.location.href = newUrl;
-        }
-
-        /**
-         * Function called when a bus button is pressed and send the data to the server
-         */
-        var click = function(data) {
-            var data = new Date(Date.now());
-            data.setHours(data.getHours()+1); //fix alla timezone
-            var url = document.URL;
-            /*
-            ma perchè T_T
-            var _fermata = url.substr(30);
-            */
-            //prendo la fermata con get
-            var url = new URL( window.location);
-            var _fermata = url.searchParams.get('fermata');
-            console.log(_fermata);
-            var _mail = leggiCookie("email");
-
-            // information that will be sent to the server
-            var informations = {
-                bus : 0,
-                dataOra : data,
-                email : _mail
-            }
-
-            console.log(informations);
-
-            var destination_url = serverLocation + "/postsalita";
-
-            // fetch the url
-            fetch(destination_url, {
-              method: "post",   // this is a HTTP POST
-              headers: {
-                'Content-Type': 'application/json'    // the content is a JSON so we must set the Content-Type header
-              },
-
-              // body to send in the request, must convert in string before sending
-              body: JSON.stringify(informations)
-            })
-            .then( (response) => { // function executed when the request is finisced
-              //  Redirect the user to the new page
-              var newUrl = serverLocation + "/bus-visualization";
-              document.location.href = newUrl;
-            });
-
-        }
-
-        /**
-         * Function that load all the bus for this bus stop
-         */
-        function load_bus() {
-            // extract the bus stop from the URL
-            //var url = document.URL;
-            /*
-            Cos'è sta roba?
-            var fermata = url.substr(30);
-            */
-            //SEGUO LO STANDARD: USO GET NEL MODO IN CUI DEVE ESSERE USATO
-            //prendo la fermata con get
-            var url = new URL( window.location);
-            var fermata = url.searchParams.get('fermata');//<------------così
-            console.log(fermata);
-            // get the bus for that bus stop
-            fetch(serverLocation + "/get-ritardi/" + fermata)     // get the list of bus and their delay
-            .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
-                data = response.json();
-                return data;
-            }).then( function(data) {
-                console.log("Bus per fermata selezionata: " + JSON.stringify(data,null,4));
-
-                var selezione = document.getElementById("selezione autobus");
-
-                // for every bus create a button
-                for(var i = 0; i < data.bus.length;i++) {
-                    var button = document.createElement("button");
-                    button.id = data.bus[i].name;
-                    button.innerHTML = data.bus[i].name;
-
-                    button.onclick = function() {   // the function called when the button is press
-                        click(this.id);
-                    };
-
-                    var br =  document.createElement("br");
-
-                    selezione.appendChild(br);
-                    selezione.appendChild(button);
-                }
-            })
-            .catch(error => console.error(error) )
-        }
-
-    </script>
-
     <body onload="load_bus()">
 
         <h1>Segnalazione salita bus</h1><br>
@@ -148,22 +14,13 @@
         <h3 id="selezione autobus">Seleziona Autobus:</h3><br><br>
 
 
-        <button onclick="backToBusVisualization();">Back</button><br><br>
+        <a href="bus-visualization.html"><button> Back</button></a><br><br>
 
-        <button href="http://localhost:8080/index" onclick="signOut();">Sign out</button>
+        <a href="http://localhost:8080/index" onclick="signOut();"><button>Sign out</button></a>        
 
-        <script>
-            /**
-             * Google Sign out function
-             */
-            function signOut() {
-                var auth2 = gapi.auth2.getAuthInstance();
-                auth2.signOut().then(function () {
-                console.log('User signed out.');
-                });
-                document.location.href = serverLocation + "/index";
-            }
-        </script>
+        <div id="footer">
+            <p>Ritardo autobus&#174</p>
+        </div>
 
     </body>
 </html>
