@@ -1,4 +1,4 @@
-Create Procedure Distanza (IN lat DECIMAL(10,8),IN lng DECIMAL(11,8),IN dist FLOAT)
+Create Procedure Nearest (IN lat DECIMAL(10,8),IN lng DECIMAL(11,8),IN dist FLOAT)
 SELECT (
    6366 *
    acos(cos(radians(lat)) * 
