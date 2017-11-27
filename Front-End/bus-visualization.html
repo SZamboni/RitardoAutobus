@@ -24,23 +24,27 @@
 
     </head>
 
-    <body id="body">
+    <body>
 
-        <h1>Visualizzazione ritardi Autobus</h1><br><br>
+        <div class="wrapper">
+            <h1>Visualizzazione ritardi Autobus</h1><br><br>
 
-        <h2>La tua posizione:</h2>
-        <div id="map"></div><br>
+            <h2>La tua posizione:</h2>
+            <div id="map"></div><br>
 
-        <h3 id="selezione-fermate">Seleziona una fermata vicino a te:<br></h3><br>
+            <h3 id="selezione-fermate">Seleziona una fermata vicino a te:<br></h3><br>
 
-        <button id="bottone-richiesta-bus" onclick="richiesta_bus()">Prossimi bus</button> <br>
+            <button id="bottone-richiesta-bus" onclick="richiesta_bus()">Prossimi bus</button> <br>
 
-        <h3 id="bus-e-ritardi"></h3>  <br>
+            <h3 id="bus-e-ritardi"></h3>  <br>
 
-        <button onclick="segnala()">Segnala salita bus</button>
+            <button onclick="segnala()">Segnala salita bus</button>
 
-        <button href="http://localhost:8080/index" onclick="signOut();">Sign out</button>
-        
+            <button href="http://localhost:8080/index" onclick="signOut();">Sign out</button>
 
+            <div id="footer">
+                <p>Ritardo autobus&#174</p>
+            </div>
+        </div>
     </body>
 </html>
