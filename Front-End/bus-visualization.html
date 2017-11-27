@@ -45,8 +45,8 @@
                     console.log(latitude);
                     console.log(longitude);
                     //test params
-                    latitude=46.06597000;
-                    longitude=11.15470000;
+                    //latitude=46.06597000;
+                  //  longitude=11.15470000;
                     var scanRange=0.8;
                     var myLatLng = {lat: latitude, lng: longitude};
 
@@ -118,7 +118,7 @@
                 // create the options of the selection
                 for(var i = 0; i < data.fermate.length; i++) {
                     var option = document.createElement("option");
-                    option.value = data.fermate[i].nomeFermata;
+                    option.value = data.fermate[i].idFermata;
                     option.innerHTML = data.fermate[i].nomeFermata;
                     selection.appendChild(option);
                 }
@@ -134,9 +134,10 @@
          */
         function richiesta_bus() {
             var selection = document.getElementById("selection");
+            console.log(selection[selection.selectedIndex].value);
             var selected_item = selection[selection.selectedIndex].value;   // get the selected item
 
-            fetch(serverLocation + "/get-ritardi/" + selected_item)     // get the list of bus and their delay
+            fetch(serverLocation + "/get-ritardi/?idFermata=" + selected_item+"&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
             .then((response) => {
                 data = response.json();
                 return data;
@@ -170,20 +171,20 @@
                 table.appendChild(intestazione_colonne);
 
                 // for every bus we create a row in the table wit all the informatio from the server
-                for(var i = 0; i < data.bus.length; i++) {
+                for(var i = 0; i < data.lineeRitardi.length; i++) {
 
                     var tr = document.createElement("tr");  // create the row
 
                     var bus = document.createElement("td");
-                    bus.innerHTML = data.bus[i].name;
+                    bus.innerHTML = data.lineeRitardi[i].nomeLinea;
                     tr.appendChild(bus);
 
                     var next = document.createElement("th");
-                    next.innerHTML = data.bus[i].next_bus;
+                    next.innerHTML = data.lineeRitardi[i].orario;
                     tr.appendChild(next);
 
                     var delay = document.createElement("th");
-                    delay.innerHTML = data.bus[i].delay + " min";
+                    delay.innerHTML = data.lineeRitardi[i].ritardo + " min";
                     tr.appendChild(delay);
 
                     table.appendChild(tr);  // append the row to the table

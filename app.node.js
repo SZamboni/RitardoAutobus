@@ -145,7 +145,14 @@ app.post('/postlogin', function(request,response,next){
     response.send("OK");
 })
 
-//funzione che ritorna le fermate più vicine
+/**
+funzione che ritorna le fermate più vicine partendo dalla latitudine e longitudine
+attuale dell'utente + un range che decide lui entro il quale cercare le fermate.
+Tutti i calcoli vengono effettuati su range in linea d'area e vengono eseguiti
+direttamente da MySQL.
+Il JSON uscente avrà i seguenti parametri: idFermata, nomeFermata, latitudine e
+longitudine della fermata.
+**/
 app.get('/get-fermate', function (request, response, next) {
     // permetto CORS
     response.header('Access-Control-Allow-Origin', '*');
@@ -153,8 +160,10 @@ app.get('/get-fermate', function (request, response, next) {
     // preparo l'header json
     response.header('Content-Type', 'application/json');
     //stored procedure che trova le fermate più vicine
-    var query="CALL ritardoautobus.Nearest("+request.query.latitude+", "+
-    request.query.longitude+", "+request.query.scanRange+");";
+    var query="CALL ritardoautobus.Nearest("+
+                request.query.latitude+", "+
+                request.query.longitude+", "+
+                request.query.scanRange+");";
     selectQuery(query,function(errore,parser){
       if(!errore){
         //creo il JSON
@@ -165,10 +174,10 @@ app.get('/get-fermate', function (request, response, next) {
         //per ogni fermata inserisco nel JSON i suoi dati
         for(var i=0;i<parser[0].length;i++){
           fermate.fermate.push({
-            "idFermata": parser[0][i].IdFermata,
-            "nomeFermata": parser[0][i].NomeFermata,
-            "latitudine": parser[0][i].Latitudine,
-            "longitudine": parser[0][i].Longitudine
+            "idFermata":    parser[0][i].IdFermata,
+            "nomeFermata":  parser[0][i].NomeFermata,
+            "latitudine":   parser[0][i].Latitudine,
+            "longitudine":  parser[0][i].Longitudine
           });
         }
         //ritorno le fermate
@@ -176,6 +185,52 @@ app.get('/get-fermate', function (request, response, next) {
       }
       else{
         console.log("Errore nella ricerca delle fermate più vicine.");
+        console.log(errore);
+        response.status(500).send("Errore nel server.");
+      }
+    });
+});
+
+/**
+funzione che ritorna le linee che passano per una fermata con i propri ritardi
+i parametri di questa funzione sono due e passati per get:
+l'id della fermata (idFermata) e il tempo in HH:MM:SS del range che voglio vedere
+(rangeTempo), ad esempio con parametro 00:40:00 vedrò tutti gli autobus che
+passeranno per quella Fermata nei prossimi 40 minuti.
+Di ritorno verrà inviato un JSON con: idLinea, nomeLinea, orario e ritardo.
+**/
+app.get('/get-ritardi', function (request, response, next) {
+    // permetto CORS
+    response.header('Access-Control-Allow-Origin', '*');
+    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    // preparo l'header json
+    response.header('Content-Type', 'application/json');
+    //stored procedure che trova le linee e i ritardi per ogni linea
+    var query="CALL ritardoautobus.Linee_Ritardi("+
+                request.query.idFermata+", "+
+                request.query.rangeTempo+");";
+    //console.log("query: "+query);
+    selectQuery(query,function(errore,parser){
+      if(!errore){
+        //creo il JSON
+        var lineeRitardi = {
+            lineeRitardi : [
+            ]
+        }
+        //per ogni linea inserisco nel JSON i suoi dati
+        for(var i=0;i<parser[0].length;i++){
+          lineeRitardi.lineeRitardi.push({
+            "idLinea":    parser[0][i].IdLinea,
+            "nomeLinea":  parser[0][i].NomeLinea,
+            "orario":     parser[0][i].Orario,
+            "ritardo":    parser[0][i].Ritardo
+          });
+        }
+        //ritorno i ritardi
+        response.send(lineeRitardi);
+      }
+      else{
+        console.log("Errore nella ricerca delle linee e ritardi.");
         console.log(errore);
         response.status(500).send("Errore nel server.");
       }
@@ -205,11 +260,6 @@ app.post('/postsalita',function(request,response,next){
     });
     response.status(200).send("Segnalazione aggiunta");
 });
-
-/*****
-TEEEEEEMPPPPPPPPPP
-*********/
-
 
 /*********************
 TTEEEEEEEMMMMPPPPPPPPP
