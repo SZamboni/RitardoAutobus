@@ -261,45 +261,6 @@ app.post('/postsalita',function(request,response,next){
     response.status(200).send("Segnalazione aggiunta");
 });
 
-/*********************
-TTEEEEEEEMMMMPPPPPPPPP
-*********************/
-
-/**
- * Interface that given a bus stop returns all the bus that can pass to that bus stop,
- * their next arrive and their delay
- */
-app.get('/get-ritardi/:fermata', function (req, res) {
-    // allowing CORS in the response
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    // the content of the response is a JSON so we must set the Content-Type header
-    res.header('Content-Type', 'application/json');
-
-    // print the requested bus stop
-    console.log("Fermata richiesta: " + req.params.fermata);
-
-    // create a simple response, it is an array called bus and objects in the aray have the
-    // attributer name, next_bus and delay
-    var bus = {
-        bus : [
-            {
-                "name":"5",
-                "next_bus":"12:34",
-                "delay":"5"
-            },
-            {
-                "name":"13",
-                "next_bus":"12:57",
-                "delay":"1"
-            }
-        ]
-    }
-    // send the response
-    res.send(bus);
-});
-
-
 //comportamento di default (404)
 app.use(function(request,response){
   /*
