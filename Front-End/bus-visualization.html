@@ -44,6 +44,10 @@
                     var longitude = position.coords.longitude;
                     console.log(latitude);
                     console.log(longitude);
+                    //test params
+                    latitude=46.06597000;
+                    longitude=11.15470000;
+                    var scanRange=0.8;
                     var myLatLng = {lat: latitude, lng: longitude};
 
                     // create the map and set the zoom and the center
@@ -59,7 +63,8 @@
                     });
 
                     // based on the coordinates load nearby bus stops
-                    load_fermate(latitude,longitude);
+                    //parametri: lat, long, range scan in kms
+                    load_fermate(latitude,longitude,scanRange);
 
                 });
             } else {
@@ -95,11 +100,12 @@
         /**
          * Function that request to the server the nearest bus stop
          */
-        function load_fermate(latitude,longitude) {
+        function load_fermate(latitude,longitude,scanRange) {
 
             var email = leggiCookie("email");
 
-            var url_load_fermate = serverLocation + "/get-fermate/?latitude=" + latitude + "&longitude=" + longitude;
+            var url_load_fermate = serverLocation + "/get-fermate/?latitude="
+            + latitude + "&longitude=" + longitude+"&scanRange="+scanRange;
             fetch(url_load_fermate)
             .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
                 data = response.json();
@@ -112,8 +118,8 @@
                 // create the options of the selection
                 for(var i = 0; i < data.fermate.length; i++) {
                     var option = document.createElement("option");
-                    option.value = data.fermate[i].name;
-                    option.innerHTML = data.fermate[i].name;
+                    option.value = data.fermate[i].nomeFermata;
+                    option.innerHTML = data.fermate[i].nomeFermata;
                     selection.appendChild(option);
                 }
 

@@ -145,6 +145,42 @@ app.post('/postlogin', function(request,response,next){
     response.send("OK");
 })
 
+//funzione che ritorna le fermate più vicine
+app.get('/get-fermate', function (request, response, next) {
+    // permetto CORS
+    response.header('Access-Control-Allow-Origin', '*');
+    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    // preparo l'header json
+    response.header('Content-Type', 'application/json');
+    //stored procedure che trova le fermate più vicine
+    var query="CALL ritardoautobus.Nearest("+request.query.latitude+", "+
+    request.query.longitude+", "+request.query.scanRange+");";
+    selectQuery(query,function(errore,parser){
+      if(!errore){
+        //creo il JSON
+        var fermate = {
+            fermate : [
+            ]
+        }
+        //per ogni fermata inserisco nel JSON i suoi dati
+        for(var i=0;i<parser[0].length;i++){
+          fermate.fermate.push({
+            "idFermata": parser[0][i].IdFermata,
+            "nomeFermata": parser[0][i].NomeFermata,
+            "latitudine": parser[0][i].Latitudine,
+            "longitudine": parser[0][i].Longitudine
+          });
+        }
+        //ritorno le fermate
+        response.send(fermate);
+      }
+      else{
+        console.log("Errore nella ricerca delle fermate più vicine.");
+        console.log(errore);
+        response.status(500).send("Errore nel server.");
+      }
+    });
+});
 
 //Segnalazione dei ritardi
 app.post('/postsalita',function(request,response,next){
@@ -174,30 +210,6 @@ app.post('/postsalita',function(request,response,next){
 TEEEEEEMPPPPPPPPPP
 *********/
 
-/**
- * Interface that receive as parameters the latitude and the longitude and return a JSON
- * with the near bus stop to the coordinares
- */
-app.get('/get-fermate', function (request, response) {
-    // permetto CORS
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    // preparo l'header json
-    response.header('Content-Type', 'application/json');
-
-    console.log("Parameters: " + request.query.latitude + " " + request.query.longitude);
-
-    // create a simple response, that is an array called fermate with objects that have the attribute name
-    var fermate = {
-        fermate : [
-            { "name":"Povo-Piazza-Manci"},
-            { "name":"Povo-Valoni"}
-        ]
-    }
-
-    // return the response JSON
-    response.send(fermate);
-});
 
 /*********************
 TTEEEEEEEMMMMPPPPPPPPP
