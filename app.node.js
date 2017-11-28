@@ -222,6 +222,7 @@ app.get('/get-ritardi', function (request, response, next) {
                 lineeRitardi: [
                 ]
             }
+            /*
             //per ogni linea inserisco nel JSON i suoi dati
             for (var i = 0; i < parser[0].length; i++) {
                 lineeRitardi.lineeRitardi.push({
@@ -230,18 +231,20 @@ app.get('/get-ritardi', function (request, response, next) {
                     "orario": parser[0][i].Orario,
                     "ritardo": parser[0][i].Ritardo
                 });
-            }
+                lineeRitardi.idFermata = request.query.idFermata;
+            }*/
 
-            /**
+            
             //dati test
             lineeRitardi.lineeRitardi.push({
                 "idLinea": 1,
                 "nomeLinea": "5 - DirezioneOltrecastello",
                 "orario": "15:00:00",
-                "ritardo": "00:05:00"
+                "ritardo": "00:05:00",
+                "idFermata" : request.query.idFermata
             });
             //console.log(lineeRitardi);
-            **/
+            
 
             //ritorno i ritardi
             response.send(lineeRitardi);
@@ -259,6 +262,7 @@ app.get('/get-ritardi', function (request, response, next) {
  Manca in input idLinea.
  **/
 app.post('/postsalita', function (request, response, next) {
+    console.log(JSON.stringify(request.body,null,4));
     var idUtente = 1; //id utente  del nostro database da prendere dal cookie
     var dataora = request.body.dataOra;
     var idLinea = 1; //id della linea da prendere dal JSON
