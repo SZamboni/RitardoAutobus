@@ -7,7 +7,7 @@ SELECT (
    radians(lng)) + 
    sin(radians(lat)) * 
    sin(radians(Latitudine )))
-) AS distance
+) AS distance, IdFermata, NomeFermata, Latitudine, Longitudine, Direzione
 FROM Fermata 
 HAVING distance < dist
 ORDER BY distance;
