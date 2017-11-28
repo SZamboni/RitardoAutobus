@@ -14,8 +14,8 @@ var serverLocation = "http://localhost:8080";
                     console.log(longitude);
                     //test params
                     //latitude=46.06597000;
-                  //  longitude=11.15470000;
-                    var scanRange=0.8;
+                    //longitude=11.15470000;
+                    var scanRange=0.5;
                     var myLatLng = {lat: latitude, lng: longitude};
                     // create the map and set the zoom and the center
                     var map = new google.maps.Map(document.getElementById('map'), {
