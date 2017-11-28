@@ -123,6 +123,6 @@ function richiesta_bus() {
 function segnala() {
     var selection = document.getElementById("selection");
     var selected_item = selection[selection.selectedIndex].value;   // get the selected item
-    var newUrl = serverLocation + "/segnala.html?fermata=" + selected_item;
+    var newUrl = "segnala.html?fermata=" + selected_item;
     document.location.href = newUrl;
 }
