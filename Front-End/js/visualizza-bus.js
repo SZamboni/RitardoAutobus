@@ -3,39 +3,39 @@
  */
 var serverLocation = "http://localhost:8080";
 
-        function initMap() {
-            // check if the geolocation is enabled
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition( function(position) {
-                    // get the coordinates
-                    var latitude =  position.coords.latitude;
-                    var longitude = position.coords.longitude;
-                    console.log(latitude);
-                    console.log(longitude);
-                    //test params
-                    //latitude=46.06597000;
-                    //longitude=11.15470000;
-                    var scanRange=0.5;
-                    var myLatLng = {lat: latitude, lng: longitude};
-                    // create the map and set the zoom and the center
-                    var map = new google.maps.Map(document.getElementById('map'), {
-                        zoom: 16,
-                        center: myLatLng
-                    });
-                    // create and inizialize the marker
-                    var marker = new google.maps.Marker({
-                        position: myLatLng,
-                        map: map,
-                        title: 'La tua Posizione'
-                    });
-                    // based on the coordinates load nearby bus stops
-                    //parametri: lat, long, range scan in kms
-                    load_fermate(latitude,longitude,scanRange);
-                });
-            } else {
-                alert("Geolocation is not supported by this browser, all the functions will not be available");
-            }
-        }
+function initMap() {
+    // check if the geolocation is enabled
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition( function(position) {
+            // get the coordinates
+            var latitude =  position.coords.latitude;
+            var longitude = position.coords.longitude;
+            console.log(latitude);
+            console.log(longitude);
+            //test params
+            //latitude=46.06597000;
+            //longitude=11.15470000;
+            var scanRange=0.5;
+            var myLatLng = {lat: latitude, lng: longitude};
+            // create the map and set the zoom and the center
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 16,
+                center: myLatLng
+            });
+            // create and inizialize the marker
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: 'La tua Posizione'
+            });
+            // based on the coordinates load nearby bus stops
+            //parametri: lat, long, range scan in kms
+            load_fermate(latitude,longitude,scanRange);
+        });
+    } else {
+        alert("Geolocation is not supported by this browser, all the functions will not be available");
+    }
+}
 
 function leggiCookie(nomeCookie) {
 
@@ -64,15 +64,13 @@ function leggiCookie(nomeCookie) {
  */
 function load_fermate(latitude, longitude, scanRange) {
 
-    var email = leggiCookie("email");
-
     var url_load_fermate = serverLocation + "/get-fermate/?latitude="
             + latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
     fetch(url_load_fermate)
-            .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
+    .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
                 data = response.json();
                 return data;
-            }).then(function (data) {   // elaboro il json
+    }).then(function (data) {   // elaboro il json
         console.log("Data received: " + JSON.stringify(data, 4));
         var selection = document.createElement("select");   // create the selection box
         selection.id = "selection";
@@ -88,7 +86,7 @@ function load_fermate(latitude, longitude, scanRange) {
         var selezione_fermate = document.getElementById("selezione-fermate");
         selezione_fermate.appendChild(selection);   // append all toghether
     })
-            .catch(error => console.error(error))  // error handling
+    .catch(error => console.error(error))  // error handling
 }
 
 /**
