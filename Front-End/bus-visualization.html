@@ -17,26 +17,24 @@
         <meta charset="utf-8">
         <meta name="google-signin-scope" content="profile">
         <meta name="google-signin-client_id" content="357283213666-8s2b8eiguf5abidvemu4f39aucupgggk.apps.googleusercontent.com">
-        <script src="https://apis.google.com/js/platform.js" async defer></script>      
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap"></script>
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
 
         <script type="text/javascript" src="js/visualizza-bus.js"></script>
-        <script type="text/javascript" src="js/map.js"></script>
-
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
+        </script>
     </head>
 
     <body>
 
         <h1>Visualizzazione ritardi Autobus</h1><br><br>
-
         <h2>La tua posizione:</h2>
         <div id="map"></div><br>
-
         <h3 id="selezione-fermate">Seleziona una fermata vicino a te:</h3>
 
         <button id="bottone-richiesta-bus" onclick="richiesta_bus()">Prossimi bus</button> <br>
 
-        <h3 id="bus-e-ritardi"></h3>  <br>
+        <h3 id="bus-e-ritardi"></h3><br>
 
         <button onclick="segnala()">Segnala salita bus</button>
 
