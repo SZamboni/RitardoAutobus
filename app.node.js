@@ -124,12 +124,21 @@ app.post('/postlogin', function (request, response, next) {
         insertQuery,
         function (callback) {
             /**
-             Ora che sono sicuro che l'utente si trova all'interno del database
-             richiedo al mio database il suo id da salvare in un cookie per
-             semplificare tutte le query successive
-             **/
-            console.log("cerco l'id");
-            callback(null);
+            Ora che sono sicuro che l'utente si trova all'interno del database
+            richiedo al mio database il suo id da salvare in un cookie per
+            semplificare tutte le query successive
+            **/
+            query = "SELECT UserId as id FROM ritardoautobus.Utente where Email=\'" +
+                    request.body.email + "\';";
+            callback(null,query);
+        },
+        selectQuery,
+        function(parser,callback){
+          //creo il JSON
+          var data = {
+            'id' : parser[0].id
+          }
+          response.send(JSON.stringify(data));
         }
     ], function (errore) {
         if (!errore) {
@@ -137,12 +146,9 @@ app.post('/postlogin', function (request, response, next) {
         } else {
             console.log('Errore nella waterfall.');
             console.log(errore);
+            response.status(500).send("Internal server error.");
         }
     });
-    query = "SELECT UserId as id FROM ritardoautobus.Utente where Email=\'" +
-            request.body.email + "\');";
-    // send a response
-    response.send("OK");
 })
 
 /**

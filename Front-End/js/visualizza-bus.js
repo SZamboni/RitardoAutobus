@@ -36,6 +36,7 @@ var serverLocation = "http://localhost:8080";
                 alert("Geolocation is not supported by this browser, all the functions will not be available");
             }
         }
+
 function leggiCookie(nomeCookie) {
 
     if (document.cookie.length > 0) {

@@ -21,8 +21,9 @@ function onSignIn(googleUser) {
     //  console.log("ID Token: " + id_token);
 
     // set the cookie to the user
-    document.cookie = "email=" + profile.getEmail();
+    // document.cookie = "email=" + profile.getEmail();
     document.cookie = "token=" + id_token + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+    document.cookie = "linkFoto=" +profile.getImageUrl();
 
     // information that will be sendt to the server
     var informations = {
@@ -48,10 +49,14 @@ function onSignIn(googleUser) {
     })
             .then((response) => { // function executed when the request is finisced
                 //  Redirect the user to the new page
+                var data = response.json();
+                return data;
+              }).then(function(data){
+                console.log(data);
+                document.cookie = "userId=" + data.id;
                 var newUrl = serverLocation + "/bus-visualization.html";
                 document.location.href = newUrl;
-            });
-
+              });
 }
 ;
 
