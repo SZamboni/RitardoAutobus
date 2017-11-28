@@ -1,4 +1,4 @@
-//semplice editor che permette di runnare query mysql
+//Semplice editor Sql in node
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : 'ritardoautobus.c147tajn45vc.us-east-2.rds.amazonaws.com',
@@ -7,6 +7,7 @@ var connection = mysql.createConnection({
   database : 'ritardoautobus'
 });
 
+//Query
 connection.connect();
 
 connection.query('SELECT * from test', function(err, rows, fields) {
