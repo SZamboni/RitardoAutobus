@@ -42,7 +42,9 @@ CREATE TABLE IF NOT EXISTS `opendata`.`calendar_dates` (
   `service_id` VARCHAR(45) NOT NULL,
   `date` DATE NOT NULL,
   `exception_type` INTEGER(1) NOT NULL,
-  PRIMARY KEY (`service_id`,`date`))
+  PRIMARY KEY (`service_id`,`date`),
+  FOREIGN KEY (`service_id`) REFERENCES calendar (`service_id`)
+  )
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
@@ -72,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `opendata`.`trips` (
   `shape_id` VARCHAR(100),
   `wheelchair_accesible` VARCHAR(45),
   PRIMARY KEY (`trip_id`),
-  FOREIGN KEY (route_id) REFERENCES routes(route_id)
+  FOREIGN KEY (`service_id`) REFERENCES calendar (`service_id`)
 )
 ENGINE = InnoDB;
 
@@ -86,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `opendata`.`stop_times` (
   `stop_id` INT NOT NULL,
   `stop_sequence` INT NOT NULL,
   PRIMARY KEY (`trip_id`, `stop_id`, `stop_sequence`),
-  FOREIGN KEY (trip_id) REFERENCES trips(trip_id),
-  FOREIGN KEY (stop_id) REFERENCES stops(stop_id)
+  FOREIGN KEY (`trip_id`) REFERENCES trips(`trip_id`),
+  FOREIGN KEY (`stop_id`) REFERENCES stops(`stop_id`)
 )
 ENGINE = InnoDB;
