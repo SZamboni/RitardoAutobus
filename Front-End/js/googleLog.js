@@ -1,3 +1,6 @@
+/**
+ * Function that is callen on a successful Google Login
+ */
 function onSignIn(googleUser) {
 
     var serverLocation = "http://localhost:8080";  // variable that store the location of the server
@@ -27,7 +30,7 @@ function onSignIn(googleUser) {
         'nome': profile.getGivenName(),
         'cognome': profile.getFamilyName(),
         'linkFoto': profile.getImageUrl()
-    };
+    }
     console.log("Information that will be sent:\n " + JSON.stringify(informations));
 
     // sending the information using a XMLHTTPRequest
@@ -50,8 +53,8 @@ function onSignIn(googleUser) {
             });
 
 }
+;
 
-// the sign out button
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut().then(function () {
