@@ -3,40 +3,88 @@
  */
 var serverLocation = "http://localhost:8080";
 
+/**
+ * Function that init the map with the information of the stops
+ */
 function initMap() {
+
     // check if the geolocation is enabled
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition( function(position) {
+
             // get the coordinates
             var latitude =  position.coords.latitude;
             var longitude = position.coords.longitude;
-            console.log(latitude);
-            console.log(longitude);
-            //test params
-            //latitude=46.06597000;
-            //longitude=11.15470000;
+            //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
+
             var scanRange=0.5;
             var myLatLng = {lat: latitude, lng: longitude};
-            // create the map and set the zoom and the center
-            var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 16,
-                center: myLatLng
-            });
-            // create and inizialize the marker
-            var marker = new google.maps.Marker({
-                position: myLatLng,
-                map: map,
-                title: 'La tua Posizione'
-            });
-            // based on the coordinates load nearby bus stops
-            //parametri: lat, long, range scan in kms
-            load_fermate(latitude,longitude,scanRange);
+
+            var url_load_fermate = serverLocation + "/get-fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
+            // get the stops list
+            fetch(url_load_fermate)
+            .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
+                        data = response.json();
+                        return data;
+            }).then(function (data) {   // elaboro il json
+
+                // create the map and set the zoom and the center
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 16,
+                    center: myLatLng
+                });
+
+                // create and initialize the marker of the stops
+                for(var i = 0; i < data.fermate.length; i++) {
+                    var pos = { lat : parseFloat(data.fermate[i].latitudine), lng : parseFloat(data.fermate[i].longitudine)};
+                    var m = new google.maps.Marker({
+                        position : pos,
+                        map : map,
+                        title : data.fermate[i].nomeFermata,
+                        icon : "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                    })
+                }
+
+                // create and inizialize the position marker
+                var marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map: map,
+                    title: 'La tua Posizione'
+                });
+
+                // go ahead with the elaboration
+                visualizeStops(data);
+
+            })
+            .catch(error => console.error(error))  // error handling
+            
         });
     } else {
         alert("Geolocation is not supported by this browser, all the functions will not be available");
     }
 }
 
+/**
+ * Function that creates the visualization of the stops
+ */
+function visualizeStops(data) {
+    var selection = document.createElement("select");   // create the selection box
+    selection.id = "selection";
+
+    // create the options of the selection
+    for (var i = 0; i < data.fermate.length; i++) {
+        var option = document.createElement("option");
+        option.value = data.fermate[i].idFermata;
+        option.innerHTML = data.fermate[i].nomeFermata;
+        selection.appendChild(option);
+    }
+
+    var selezione_fermate = document.getElementById("selezione-fermate");
+    selezione_fermate.appendChild(selection);   // append all toghether
+}
+/**
+ * Function that given a cookie name controls if there is that cookie
+ */
 function leggiCookie(nomeCookie) {
 
     if (document.cookie.length > 0) {
@@ -57,36 +105,6 @@ function leggiCookie(nomeCookie) {
         }
     }
     return undefined;
-}
-
-/**
- * Function that request to the server the nearest bus stop
- */
-function load_fermate(latitude, longitude, scanRange) {
-
-    var url_load_fermate = serverLocation + "/get-fermate/?latitude="
-            + latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
-    fetch(url_load_fermate)
-    .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
-                data = response.json();
-                return data;
-    }).then(function (data) {   // elaboro il json
-        console.log("Data received: " + JSON.stringify(data, 4));
-        var selection = document.createElement("select");   // create the selection box
-        selection.id = "selection";
-
-        // create the options of the selection
-        for (var i = 0; i < data.fermate.length; i++) {
-            var option = document.createElement("option");
-            option.value = data.fermate[i].idFermata;
-            option.innerHTML = data.fermate[i].nomeFermata;
-            selection.appendChild(option);
-        }
-
-        var selezione_fermate = document.getElementById("selezione-fermate");
-        selezione_fermate.appendChild(selection);   // append all toghether
-    })
-    .catch(error => console.error(error))  // error handling
 }
 
 /**
