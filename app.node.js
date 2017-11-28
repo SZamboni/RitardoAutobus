@@ -13,11 +13,7 @@ var async = require('async');
 var express = require('express');
 var app = express();
 //Istanza bodyparser per leggere i JSON
-<<<<<<< HEAD
-var bodyParser= require('body-parser');
-=======
 var bodyParser = require('body-parser');
->>>>>>> master
 app.use(bodyParser.json());
 
 /****************
@@ -40,64 +36,6 @@ var opzioni = {
 app.use(express.static(__dirname + '/Front-End', opzioni));
 
 /*****************
-<<<<<<< HEAD
-FINE WEBSERVER
-******************/
-
-/*****************
-INIZIO QUERYS
-*****************/
-
-//funzione per fare una query di inserimento generica
-var insertQuery = function(query,callback){
-  //eseguo l'inserimento solo se la query è diversa da null
-  if(query!=null){
-    connection.query(query,function (errore){
-      if(!errore){
-        callback(null);
-        return;
-      }else{
-        callback(errore);
-      }
-    });
-  }else{
-    callback(null);
-  }
-}
-
-/**
-funzione per fare una query di ricerca generica
-callback è una funzione che viene chiamata una volta che ho finito la Query
-è necessaria per via dell'asincronicità di Node.
-la funzione callback è una funzione con 2 parametri, il primo è errore,
-il secondo sono i dati.
-**/
-var selectQuery = function(query,callback){
-  //eseguo la query solo se è diversa da null
-  if(query!=null){
-    connection.query(query,function (errore,righe, campi){
-      if (!errore){
-        //trasformo l'output in JSON e poi creo il parser
-        var parser= JSON.parse(JSON.stringify(righe));
-        //chiamo la funzione callback con errore null e il parser
-        callback(null,parser);
-        return;
-      }else{
-        //chiamo la funzione callback non l'errore e nessun risultato
-        callback(errore,null);
-      }
-    });
-  }else{
-    callback(null,null);
-  }
-}
-/************
-FINE QUERYS
-***********/
-
-//Gestione login
-app.post('/postlogin', function(request,response,next){
-=======
  FINE WEBSERVER
  ******************/
 
@@ -154,58 +92,10 @@ var selectQuery = function (query, callback) {
 
 //Gestione login
 app.post('/postlogin', function (request, response, next) {
->>>>>>> master
     //Async waterfall mi permette di avviare delle funzioni in sequenza passando
     //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
     //chiudere le connsessioni ogni volta
     async.waterfall([
-<<<<<<< HEAD
-      function(callback){
-        var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='"+
-        request.body.email+"';";
-        //chiamo la prossima funzione nella sequenza
-        callback(null,query);
-      },
-      selectQuery,
-      function(parser,callback){
-        if(parser[0].conteggio===0){
-            //gestione del primo login
-            //la prima volta che un utente si connette al servizio devo inserirlo
-            //nel nostro database.
-            console.log("devo fare l'utente");
-            var query= "INSERT INTO ritardoautobus.Utente (Nome,Cognome,Email,LinkFoto) VALUES (\'"+
-            request.body.nome+"\',\'"+
-            request.body.cognome+"\',\'"+
-            request.body.email+"\',\'"+
-            request.body.linkFoto+"\');";
-            callback(null,query);
-        }else{
-          //non devo fare l'Inserimento
-          //il primo null è per l'errore, il secondo è per la query vuota
-          callback(null,null);
-        }
-      },
-      insertQuery,
-      function(callback){
-        /**
-        Ora che sono sicuro che l'utente si trova all'interno del database
-        richiedo al mio database il suo id da salvare in un cookie per
-        semplificare tutte le query successive
-        **/
-        console.log("cerco l'id");
-        callback(null);
-      }
-    ],function (errore){
-      if(!errore){
-        console.log('appost');
-      }else{
-        console.log('Errore nella waterfall.');
-        console.log(errore);
-      }
-    });
-    query= "SELECT UserId as id FROM ritardoautobus.Utente where Email=\'"+
-    request.body.email+"\');";
-=======
         function (callback) {
             var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='" +
                     request.body.email + "';";
@@ -251,43 +141,10 @@ app.post('/postlogin', function (request, response, next) {
     });
     query = "SELECT UserId as id FROM ritardoautobus.Utente where Email=\'" +
             request.body.email + "\');";
->>>>>>> master
     // send a response
     response.send("OK");
 })
 
-<<<<<<< HEAD
-
-//Segnalazione dei ritardi
-app.post('/postsalita',function(request,response,next){
-    var idUtente=1; //id utente  del nostro database da prendere dal cookie
-    var dataora=request.body.dataOra;
-    var idLinea=1; //id della linea da prendere dal JSON
-    var latitudine=46.06580240; //latitudine da prendere dal JSON
-    var longitudine=11.15461478; //longitudine da prendere dal JSON
-    //costruisco la query
-    var query = "INSERT INTO ritardoautobus.Segnalazione "+
-    "(IdSegnalatore,DataOra,Linea,Latitudine,Longitudine) VALUES ("+
-    idUtente + ",\'" +
-    dataora + "\'," +
-    idLinea + "," +
-    latitudine + "," +
-    longitudine + ");";
-    //lancio la query
-    insertQuery(query,function(errore){
-      if(errore){
-        console.log("Errore nell'inserimento della segnalazione.");
-      }
-    });
-    response.status(200).send("Segnalazione aggiunta");
-});
-
-/*****
-TEEEEEEMPPPPPPPPPP
-*********/
-
-=======
->>>>>>> master
 /**
  funzione che ritorna le fermate più vicine partendo dalla latitudine e longitudine
  attuale dell'utente + un range che decide lui entro il quale cercare le fermate.
@@ -368,7 +225,7 @@ app.get('/get-ritardi', function (request, response, next) {
                     "ritardo": parser[0][i].Ritardo
                 });
             }
-            
+
             /**
             //dati test
             lineeRitardi.lineeRitardi.push({
@@ -379,7 +236,7 @@ app.get('/get-ritardi', function (request, response, next) {
             });
             //console.log(lineeRitardi);
             **/
-            
+
             //ritorno i ritardi
             response.send(lineeRitardi);
         } else {
