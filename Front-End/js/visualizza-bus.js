@@ -117,7 +117,7 @@ function initMap() {
 function caricaRitardi(fermate) {
 
     stops = fermate;
-
+    console.log(stops);
     for(var i = 0; i < stops.length; i++) {
         stops[i].lineeRitardi = [];
     }
@@ -131,9 +131,9 @@ function caricaRitardi(fermate) {
         }).then(function (data) {
 
             for(var j = 0; j < stops.length; j++) {
-
                 if(stops[j].idFermata == data.lineeRitardi[0].idFermata) {
                     stops[j].lineeRitardi = data.lineeRitardi;
+                    stops[j].idCorsa = data.lineeRitardi[0].idCorsa;
                 }
             }
 
@@ -148,7 +148,7 @@ function caricaRitardi(fermate) {
 /**
  * Function that segnal the information to the server
  */
-function click(_idFermata,_idLinea) {
+function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
     console.log("fermata: " + _idFermata + " linea: " + _idLinea);
 
     var data = new Date(Date.now());
@@ -160,13 +160,24 @@ function click(_idFermata,_idLinea) {
             // get the coordinates
             var latitude = position.coords.latitude;   //position.coords.latitude
             var longitude = position.coords.longitude;   //position.coords.longitude
-
+            /**
+            //dati test
+            var latitude = 46.06597000 ;
+            var longitude = 11.1547000;
+            //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
+            **/
+            console.log("Coord utente: "+latitude+" "+longitude);
+            console.log("Coord fermata: "+_latFermata+" "+_lonFermata);
+            console.log("Id Corsa: "+_idCorsa);
             var informations = {
                 idLinea: _idLinea,
                 idFermata: _idFermata,
+                idCorsa: _idCorsa,
                 idUtente: leggiCookie("userId"),
-                latitudine : latitude,
-                longitudine : longitude,
+                latUtente : latitude,
+                lonUtente : longitude,
+                latFermata : _latFermata,
+                lonFermata : _lonFermata,
                 dataOra : data
             }
 
@@ -239,8 +250,11 @@ function visualize() {
             var button = document.createElement('button');
             button.idFermata = stops[i].idFermata;
             button.idLinea = stops[i].lineeRitardi[j].idLinea;
+            button.idCorsa = stops[i].idCorsa;
+            button.latFermata = stops[i].latitudine;
+            button.lonFermata = stops[i].longitudine;
             button.onclick = function () {   // the function called when the button is press
-                click(this.idFermata, this.idLinea);
+                click(this.idFermata, this.idLinea, this.idCorsa, this.latFermata, this.lonFermata);
             };
             button.innerHTML = "Segnala Salita";
             buttoncell.appendChild(button);

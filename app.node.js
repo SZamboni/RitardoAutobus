@@ -230,6 +230,7 @@ app.get('/get-ritardi', function (request, response, next) {
                     "nomeLinea": parser[0][i].NomeLinea,
                     "orario": parser[0][i].Orario,
                     "ritardo": parser[0][i].Ritardo,
+                    "idCorsa": parser[0][i].IdCorsa,
                     "idFermata" : request.query.idFermata
                 });
                 lineeRitardi.idFermata = request.query.idFermata;
@@ -242,6 +243,7 @@ app.get('/get-ritardi', function (request, response, next) {
                 "nomeLinea": "5 - DirezioneOltrecastello",
                 "orario": "15:00:00",
                 "ritardo": "00:05:00",
+                "idCorsa": 1,
                 "idFermata" : request.query.idFermata
             });
             //console.log(lineeRitardi);
@@ -267,37 +269,89 @@ app.post('/postsalita', function (request, response, next) {
 
     //Valori di test
     var idUtente = request.body.idUtente;
-    var dataora = request.body.dataOra;
+    var dataOra = request.body.dataOra;
     var idLinea = request.body.idLinea;
+    var idCorsa = request.body.idCorsa;
     var idFermata = request.body.idFermata;
-    //da implementare questo parametro nella query SQL
-    var latitudine = request.body.latitudine;
-    var longitudine = request.body.longitudine;
+    var latUtente = request.body.latUtente;
+    var lonUtente = request.body.lonUtente;
+    var latFermata = request.body.latFermata;
+    var lonFermata = request.body.lonFermata;
+    //assumo che la segnalazione NON sia valida.
+    var segnalazioneValida = 0;
+    // il valore di default del ritardo è 0.
+    // lo calcolo solo se la segnalazione è valida..
+    var ritardo = '00:00:00';
 
     /**
     //Valori di test
     var idUtente = 1; //id utente  del nostro database da prendere dal cookie
     var dataora = request.body.dataOra;
     var idLinea = 1; //id della linea da prendere dal JSON
-    var latitudine = 46.06580240; //latitudine da prendere dal JSON
-    var longitudine = 11.15461478; //longitudine da prendere dal JSON
+    var latUtente = 46.06580240; //latitudine da prendere dal JSON
+    var lonUtente = 11.15461478; //longitudine da prendere dal JSON
     **/
-    //costruisco la query
-    var query = "INSERT INTO ritardoautobus.Segnalazione " +
-            "(IdSegnalatore,DataOra,Linea,Latitudine,Longitudine) VALUES (" +
-            idUtente + ",\'" +
-            dataora + "\'," +
-            idLinea + "," +
-            latitudine + "," +
-            longitudine + ");";
-    //lancio la query
-    insertQuery(query, function (errore) {
-        if (errore) {
-            console.log("Errore nell'inserimento della segnalazione.");
+
+    //funzioni a cascata
+    async.waterfall([
+      function(callback){
+        //Controllo se la segnalazione è valida.
+        //creo la Query
+        var query="CALL ritardoautobus.Distanza (\'"+
+        latUtente+"\',\'"+lonUtente+"\',\'"+
+        latFermata+"\',\'"+lonFermata+"\');";
+        console.log(query);
+        callback(null,query);
+      },
+      selectQuery,
+      function(parser,callback){
+        var query=null;
+        //console.log(parser[0][0].distance);
+        if(parser[0][0].distance<=0.1){
+          //l'utente si trova a meno di 100 metri dalla Fermata
+          //accetto la segnalazione.
+          segnalazioneValida=1;
+          //calcolo il ritardo con la linea e la fermata.
+          query="Select Timediff(Time(addtime(now(),'01:00:00')),Orario) As Ritardo "+
+                "From Corsa_Fermata_Orario "+
+                "Where IdFermata="+idFermata+
+                " and IdLinea="+idLinea+
+                " and IdCorsa="+idCorsa+";";
+          //console.log(query);
+        }
+        callback(null, query);
+      },
+      selectQuery,
+      function(parser,callback){
+          if(parser!==null){
+            //la segnalazione è valida, quindi aggiorno il ritardo
+            //console.log("ritardo: "+parser[0].Ritardo);
+            ritardo=parser[0].Ritardo;
+          }
+          var query = "INSERT INTO ritardoautobus.Segnalazione " +
+                  "(IdSegnalatore,IdFermata,DataOra,Ritardo,Linea,Latitudine,Longitudine,SegnalazioneValida) VALUES (" +
+                  idUtente  + "," +
+                  idFermata + ",\'" +
+                  dataOra   + "\',\'" +
+                  ritardo   + "\',"+
+                  idLinea   + ","   +
+                  latUtente + ","   +
+                  lonUtente + ","+
+                  segnalazioneValida + ");";
+          console.log(query);
+          callback(null,query);
+      },
+      insertQuery,
+    ], function (errore) {
+        if (!errore) {
+            console.log('appost');
+            response.status(200).send("Segnalazione aggiunta");
+        } else {
+            console.log('Errore nella waterfall.');
             console.log(errore);
+            response.status(500).send("Internal server error.");
         }
     });
-    response.status(200).send("Segnalazione aggiunta");
 });
 
 //comportamento di default (404)
