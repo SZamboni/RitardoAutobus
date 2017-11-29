@@ -264,11 +264,24 @@ app.get('/get-ritardi', function (request, response, next) {
  **/
 app.post('/postsalita', function (request, response, next) {
     //console.log(JSON.stringify(request.body,null,4));
+
+    //Valori di test
+    var idUtente = request.body.idUtente;
+    var dataora = request.body.dataOra;
+    var idLinea = request.body.idLinea;
+    var idFermata = request.body.idFermata;
+    //da implementare questo parametro nella query SQL
+    var latitudine = request.body.latitudine;
+    var longitudine = request.body.longitudine;
+
+    /**
+    //Valori di test
     var idUtente = 1; //id utente  del nostro database da prendere dal cookie
     var dataora = request.body.dataOra;
     var idLinea = 1; //id della linea da prendere dal JSON
     var latitudine = 46.06580240; //latitudine da prendere dal JSON
     var longitudine = 11.15461478; //longitudine da prendere dal JSON
+    **/
     //costruisco la query
     var query = "INSERT INTO ritardoautobus.Segnalazione " +
             "(IdSegnalatore,DataOra,Linea,Latitudine,Longitudine) VALUES (" +
@@ -281,6 +294,7 @@ app.post('/postsalita', function (request, response, next) {
     insertQuery(query, function (errore) {
         if (errore) {
             console.log("Errore nell'inserimento della segnalazione.");
+            console.log(errore);
         }
     });
     response.status(200).send("Segnalazione aggiunta");

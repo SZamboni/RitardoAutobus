@@ -54,9 +54,15 @@ function initMap() {
         navigator.geolocation.getCurrentPosition( function(position) {
 
             // get the coordinates
-            var latitude = 46.06597000 ;   //position.coords.latitude
-            var longitude = 11.1547000;   //position.coords.longitude
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            /**
+            //dati test
+            var latitude = 46.06597000 ;
+            var longitude = 11.1547000;
             //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
+            **/
 
             var scanRange=0.5;
             var myLatLng = {lat: latitude, lng: longitude};
@@ -158,7 +164,7 @@ function click(_idFermata,_idLinea) {
             var informations = {
                 idLinea: _idLinea,
                 idFermata: _idFermata,
-                userId: leggiCookie("userId"),
+                idUtente: leggiCookie("userId"),
                 latitudine : latitude,
                 longitudine : longitude,
                 dataOra : data
