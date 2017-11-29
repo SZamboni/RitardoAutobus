@@ -3,6 +3,47 @@
  */
 var serverLocation = "http://localhost:8080";
 
+var stops;
+
+/**
+ * Function that given a cookie name controls if there is that cookie
+ */
+function leggiCookie(nomeCookie) {
+
+    if (document.cookie.length > 0) {
+        var inizio = document.cookie.indexOf(nomeCookie + "=");
+
+        if (inizio != -1) {
+            inizio = inizio + nomeCookie.length + 1;
+            var fine = document.cookie.indexOf(";", inizio);
+
+            if (fine == -1) {
+                fine = document.cookie.length;
+            }
+
+            return unescape(document.cookie.substring(inizio, fine));
+
+        } else {
+            return undefined;
+        }
+    }
+    return undefined;
+}
+
+/**
+ * Function that ckeck if the user is logged in
+ */
+function load() {
+    var id = leggiCookie("userId");
+
+    if(id == undefined) {
+        console.log("User not logged in");;
+        document.location.href = serverLocation;
+    } else {
+        console.log("User logged in");
+    }
+}
+
 /**
  * Function that init the map with the information of the stops
  */
@@ -13,8 +54,8 @@ function initMap() {
         navigator.geolocation.getCurrentPosition( function(position) {
 
             // get the coordinates
-            var latitude =  position.coords.latitude;
-            var longitude = position.coords.longitude;
+            var latitude = 46.06597000 ;   //position.coords.latitude
+            var longitude = 11.1547000;   //position.coords.longitude
             //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
 
             var scanRange=0.5;
@@ -53,11 +94,11 @@ function initMap() {
                 });
 
                 // go ahead with the elaboration
-                visualizeStops(data);
+                caricaRitardi(data.fermate);
 
             })
             .catch(error => console.error(error))  // error handling
-            
+
         });
     } else {
         alert("Geolocation is not supported by this browser, all the functions will not be available");
@@ -67,7 +108,151 @@ function initMap() {
 /**
  * Function that creates the visualization of the stops
  */
-function visualizeStops(data) {
+function caricaRitardi(fermate) {
+
+    stops = fermate;
+
+    for(var i = 0; i < stops.length; i++) {
+        stops[i].lineeRitardi = [];
+    }
+
+    for(var i = 0; i < fermate.length; i++) {
+
+        fetch(serverLocation + "/get-ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
+        .then((response) => {
+            data = response.json();
+            return data;
+        }).then(function (data) {
+
+            for(var j = 0; j < stops.length; j++) {
+
+                if(stops[j].idFermata == data.lineeRitardi[0].idFermata) {
+                    stops[j].lineeRitardi = data.lineeRitardi;
+                }
+            }
+
+            visualize();
+
+        }).catch(error => console.error(error));
+
+    }
+
+}
+
+/**
+ * Function that segnal the information to the server
+ */
+function click(_idFermata,_idLinea) {
+    console.log("fermata: " + _idFermata + " linea: " + _idLinea);
+
+    var data = new Date(Date.now());
+    data.setHours(data.getHours() + 1); //fix alla timezone
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition( function(position) {
+
+            // get the coordinates
+            var latitude = position.coords.latitude;   //position.coords.latitude
+            var longitude = position.coords.longitude;   //position.coords.longitude
+
+            var informations = {
+                idLinea: _idLinea,
+                idFermata: _idFermata,
+                userId: leggiCookie("userId"),
+                latitudine : latitude,
+                longitudine : longitude,
+                dataOra : data
+            }
+
+            //console.log(informations);
+
+            var destination_url = serverLocation + "/postsalita";
+
+            // fetch the url
+            fetch(destination_url, {
+                method: "post", // this is a HTTP POST
+                headers: {
+                    'Content-Type': 'application/json'    // the content is a JSON so we must set the Content-Type header
+                },
+
+                // body to send in the request, must convert in string before sending
+                body: JSON.stringify(informations)
+            })
+            .then((response) => { // function executed when the request is finisced
+
+            });
+        })
+    }
+
+
+}
+
+/**
+ * Function that visualize stops and bus
+ */
+function visualize() {
+
+    // remove the old visualization
+    var old_div = document.getElementById("parent");
+    if(old_div != undefined) {
+        old_div.parentNode.removeChild(old_div);
+    }
+
+    original = document.getElementById("selezione-fermate");
+
+    parent = document.createElement('div');
+    parent.id = "parent";
+
+    for(var i = 0; i < stops.length; i++) {
+
+        var div = document.createElement('div');
+        div.innerHTML = stops[i].nomeFermata;
+        div.id = stops[i].idFermata;
+
+        var table = document.createElement('table');
+
+
+
+        for(var j = 0; j < stops[i].lineeRitardi.length; j++) {
+
+            var tr = document.createElement('tr');
+
+            var bus = document.createElement("td");
+            bus.innerHTML = stops[i].lineeRitardi[j].nomeLinea;
+            tr.appendChild(bus);
+
+            var next = document.createElement("td");
+            next.innerHTML = stops[i].lineeRitardi[j].orario;
+            tr.appendChild(next);
+
+            var delay = document.createElement("td");
+            delay.innerHTML = stops[i].lineeRitardi[j].ritardo + " min";
+            tr.appendChild(delay);
+
+            var buttoncell = document.createElement("td");
+            var button = document.createElement('button');
+            button.idFermata = stops[i].idFermata;
+            button.idLinea = stops[i].lineeRitardi[j].idLinea;
+            button.onclick = function () {   // the function called when the button is press
+                click(this.idFermata, this.idLinea);
+            };
+            button.innerHTML = "Segnala Salita";
+            buttoncell.appendChild(button);
+            tr.appendChild(buttoncell);
+
+            table.appendChild(tr);
+        }
+
+        div.appendChild(table);
+
+        parent.appendChild(div);
+        original.appendChild(parent);
+    }
+
+
+
+    /*
+
     var selection = document.createElement("select");   // create the selection box
     selection.id = "selection";
 
@@ -81,36 +266,39 @@ function visualizeStops(data) {
 
     var selezione_fermate = document.getElementById("selezione-fermate");
     selezione_fermate.appendChild(selection);   // append all toghether
-}
-/**
- * Function that given a cookie name controls if there is that cookie
- */
-function leggiCookie(nomeCookie) {
+    var parte = document.createElement('div');
+    parte.innerHTML = fermate[i].nomeFermata;
+    var table = document.createElement('table');
 
-    if (document.cookie.length > 0) {
-        var inizio = document.cookie.indexOf(nomeCookie + "=");
+    for( var j = 0; j < data.lineeRitardi.length; j++){
+        var tr = document.createElement("tr");  // create the row
 
-        if (inizio != -1) {
-            inizio = inizio + nomeCookie.length + 1;
-            var fine = document.cookie.indexOf(";", inizio);
+        var bus = document.createElement("td");
+        bus.innerHTML = data.lineeRitardi[j].nomeLinea;
+        tr.appendChild(bus);
 
-            if (fine == -1) {
-                fine = document.cookie.length;
-            }
+        var next = document.createElement("td");
+        next.innerHTML = data.lineeRitardi[j].orario;
+        tr.appendChild(next);
 
-            return unescape(document.cookie.substring(inizio, fine));
+        var delay = document.createElement("td");
+        delay.innerHTML = data.lineeRitardi[j].ritardo + " min";
+        tr.appendChild(delay);
 
-        } else {
-            return undefined;
-        }
+        table.appendChild(tr);  // append the row to the table
     }
-    return undefined;
+
+    parte.appendChild(table);
+
+    parent.appendChild(parte);
+    */
 }
 
 /**
  * Function that request for a bus stop all the bus with their delay
  */
 function richiesta_bus() {
+    /*
     var selection = document.getElementById("selection");
     console.log(selection[selection.selectedIndex].value);
     var selected_item = selection[selection.selectedIndex].value;   // get the selected item
@@ -170,7 +358,7 @@ function richiesta_bus() {
         }
         bus_e_ritardi.appendChild(table);   // appen the table to the tag
     })
-            .catch(error => console.error(error));
+    .catch(error => console.error(error)); */
 }
 
 /**
