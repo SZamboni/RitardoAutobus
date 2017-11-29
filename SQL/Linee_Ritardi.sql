@@ -1,6 +1,6 @@
 Create Procedure Linee_Ritardi(IN IdFerm INT,IN Scarto TIME)
 
-Select Linea.IdLinea,NomeLinea,Orario,Ritardo
+Select Linea.IdLinea,NomeLinea,Orario,Ritardo,T1.IdCorsa
 From
 (Select IdLinea,Orario,IdCorsa
 From Corsa_Fermata_Orario
