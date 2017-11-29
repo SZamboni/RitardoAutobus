@@ -229,12 +229,13 @@ app.get('/get-ritardi', function (request, response, next) {
                     "idLinea": parser[0][i].IdLinea,
                     "nomeLinea": parser[0][i].NomeLinea,
                     "orario": parser[0][i].Orario,
-                    "ritardo": parser[0][i].Ritardo
+                    "ritardo": parser[0][i].Ritardo,
+                    "idFermata" : request.query.idFermata
                 });
                 lineeRitardi.idFermata = request.query.idFermata;
             }*/
 
-            
+
             //dati test
             lineeRitardi.lineeRitardi.push({
                 "idLinea": 1,
@@ -244,7 +245,7 @@ app.get('/get-ritardi', function (request, response, next) {
                 "idFermata" : request.query.idFermata
             });
             //console.log(lineeRitardi);
-            
+
 
             //ritorno i ritardi
             response.send(lineeRitardi);
@@ -262,7 +263,7 @@ app.get('/get-ritardi', function (request, response, next) {
  Manca in input idLinea.
  **/
 app.post('/postsalita', function (request, response, next) {
-    console.log(JSON.stringify(request.body,null,4));
+    //console.log(JSON.stringify(request.body,null,4));
     var idUtente = 1; //id utente  del nostro database da prendere dal cookie
     var dataora = request.body.dataOra;
     var idLinea = 1; //id della linea da prendere dal JSON
