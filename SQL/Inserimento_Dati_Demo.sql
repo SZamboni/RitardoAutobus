@@ -28,8 +28,8 @@ VALUES (1,1);
 INSERT INTO Linea_Fermata(IdLinea,IdFermata)
 VALUES (2,2);
 
-INSERT INTO Segnalazione(IdSegnalatore,DataOra,Linea,Latitudine,Longitudine)
-VALUES (1,'2017-11-24 16:22:27',1,46.065970,11.154700);
+INSERT INTO Segnalazione(IdSegnalatore,IdFermata,DataOra,Ritardo,Linea,Latitudine,Longitudine,Elaborato,SegnalazioneValida)
+VALUES (1,2,'2017-11-24 16:22:27','00:00:00',1,46.065970,11.154700,0,0);
 
 INSERT INTO Ritardo(IdCorsa,DataRitardo,Ritardo)
 VALUES (1,'2017-11-24','00:02:27');

@@ -6,3 +6,4 @@ SELECT * FROM Corsa_Fermata_Orario;
 SELECT * FROM Linea_Fermata;
 SELECT * FROM Segnalazione;
 SELECT * FROM Ritardo;
+SELECT * FROM Utenti_Hit_Id;
