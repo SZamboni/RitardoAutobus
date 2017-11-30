@@ -22,6 +22,7 @@
     "express": "^4.16.2",
     "minimatch": "^3.0.4",
     "mysql": "^2.15.0",
+    "node-schedule": "^1.2.5",
     "tern-node-express": "^0.4.0"
   }
 }

@@ -12,9 +12,14 @@ var async = require('async');
 //Istanza Express
 var express = require('express');
 var app = express();
+//Istanza node-schedule
+var schedule= require('node-schedule');
 //Istanza bodyparser per leggere i JSON
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
+
+//Scelgo l'intervallo di aggiornamento automatico dei ritardi.
+var intervalloRitardi = 20000; //20000= 20sec
 
 /****************
  INIZIO WEBSERVER
@@ -402,6 +407,30 @@ app.post('/salita/', function (request, response, next) {
         }
     });
 });
+
+/**
+Funzione che viene avviata ogni giorno alle 3 del mattino.
+Aggiorna la tabella dei ritardi inserendo 0 come ritardo ad ogni corsa.
+Necessaria per poi poter usufruire di UPDATE nel calcolo del ritardo medio.
+**/
+var scheduleRitardi = schedule.schedueleJob({hour: 03, minute: 00},function(){
+
+});
+
+/**
+Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
+la tabella dei ritardi a partire dalla tabella delle segnalazioni.
+**/
+setInterval(function() {
+    //Creo la query da lanciare
+    var query=null;
+    //lancio la Query
+    selectQuery(query,function(errore,parser){
+      if(!errore){
+
+      }
+    });
+},intervalloRitardi);
 
 //comportamento di default (404)
 app.use(function (request, response) {
