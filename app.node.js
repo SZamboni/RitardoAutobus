@@ -91,7 +91,7 @@ var selectQuery = function (query, callback) {
  ***********/
 
 //Gestione login
-app.post('/postlogin', function (request, response, next) {
+app.post('/login/', function (request, response, next) {
     //Async waterfall mi permette di avviare delle funzioni in sequenza passando
     //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
     //chiudere le connsessioni ogni volta
@@ -159,7 +159,7 @@ app.post('/postlogin', function (request, response, next) {
  Il JSON uscente avrà i seguenti parametri: idFermata, nomeFermata, latitudine e
  longitudine della fermata.
  **/
-app.get('/get-fermate', function (request, response, next) {
+app.get('/fermate/', function (request, response, next) {
     // permetto CORS
     response.header('Access-Control-Allow-Origin', '*');
     response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -204,7 +204,7 @@ app.get('/get-fermate', function (request, response, next) {
  passeranno per quella Fermata nei prossimi 40 minuti.
  Di ritorno verrà inviato un JSON con: idLinea, nomeLinea, orario e ritardo.
  **/
-app.get('/get-ritardi', function (request, response, next) {
+app.get('/ritardi/', function (request, response, next) {
     // permetto CORS
     response.header('Access-Control-Allow-Origin', '*');
     response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -264,7 +264,7 @@ app.get('/get-ritardi', function (request, response, next) {
  In input chiede i seguenti parametri: idUtente, dataora, idLinea, latitudine,Longitudine
  Manca in input idLinea.
  **/
-app.post('/postsalita', function (request, response, next) {
+app.post('/salita/', function (request, response, next) {
     //console.log(JSON.stringify(request.body,null,4));
 
     //Valori di test

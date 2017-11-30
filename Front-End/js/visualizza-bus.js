@@ -67,7 +67,7 @@ function initMap() {
             var scanRange=0.5;
             var myLatLng = {lat: latitude, lng: longitude};
 
-            var url_load_fermate = serverLocation + "/get-fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
+            var url_load_fermate = serverLocation + "/fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
             // get the stops list
             fetch(url_load_fermate)
             .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
@@ -124,7 +124,7 @@ function caricaRitardi(fermate) {
 
     for(var i = 0; i < fermate.length; i++) {
 
-        fetch(serverLocation + "/get-ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
+        fetch(serverLocation + "/ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
         .then((response) => {
             data = response.json();
             return data;
@@ -185,7 +185,7 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
 
             //console.log(informations);
 
-            var destination_url = serverLocation + "/postsalita";
+            var destination_url = serverLocation + "/salita/";
 
             // fetch the url
             fetch(destination_url, {
@@ -325,7 +325,7 @@ function richiesta_bus() {
     console.log(selection[selection.selectedIndex].value);
     var selected_item = selection[selection.selectedIndex].value;   // get the selected item
 
-    fetch(serverLocation + "/get-ritardi/?idFermata=" + selected_item + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
+    fetch(serverLocation + "/ritardi/?idFermata=" + selected_item + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
             .then((response) => {
                 data = response.json();
                 return data;
