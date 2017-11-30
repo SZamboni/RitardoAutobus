@@ -57,12 +57,12 @@ function initMap() {
             var latitude = position.coords.latitude;
             var longitude = position.coords.longitude;
 
-            /**
+            /**Mettere // all'inizio di questa linea per attivare i dati test
             //dati test
             var latitude = 46.06597000 ;
             var longitude = 11.1547000;
             //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
-            **/
+            //**/
 
             var scanRange=0.5;
             var myLatLng = {lat: latitude, lng: longitude};
@@ -160,12 +160,14 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
             // get the coordinates
             var latitude = position.coords.latitude;   //position.coords.latitude
             var longitude = position.coords.longitude;   //position.coords.longitude
-            /**
+
+            /**Mettere // all'inizio di questa linea per attivare i dati test
             //dati test
             var latitude = 46.06597000 ;
             var longitude = 11.1547000;
             //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
-            **/
+            //**/
+
             console.log("Coord utente: "+latitude+" "+longitude);
             console.log("Coord fermata: "+_latFermata+" "+_lonFermata);
             console.log("Id Corsa: "+_idCorsa);

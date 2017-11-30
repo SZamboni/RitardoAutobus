@@ -296,6 +296,11 @@ app.post('/postsalita', function (request, response, next) {
     async.waterfall([
       function(callback){
         //Controllo se la segnalazione è valida.
+
+        /**
+        //Chiamare una query per calcolare la distanza è stupido,
+        //considerando che si può direttamente fare in node.
+
         //creo la Query
         var query="CALL ritardoautobus.Distanza (\'"+
         latUtente+"\',\'"+lonUtente+"\',\'"+
@@ -305,9 +310,27 @@ app.post('/postsalita', function (request, response, next) {
       },
       selectQuery,
       function(parser,callback){
+        **/
+
+        //CALCOLO LA DISTANZA TRA I DUE PUNTI
+        //funzione strana, ma funziona #vivaifisici
+
+        var latUtenteRadianti= latUtente*Math.PI/180;
+        var lonUtenteRadianti= lonUtente*Math.PI/180;
+        var latFermataRadianti= latFermata*Math.PI/180;
+        var lonFermataRadianti= lonFermata*Math.PI/180;
+        var distanza = 6366 * Math.acos(
+          Math.cos(latUtenteRadianti) * Math.cos(latFermataRadianti) *
+          Math.cos(lonFermataRadianti - lonUtenteRadianti) +
+          Math.sin(latUtenteRadianti) * Math.sin(latFermataRadianti)
+        );
+
+        //FUNZIONA!!!!!
+        //console.log(distanza);
+
         var query=null;
         //console.log(parser[0][0].distance);
-        if(parser[0][0].distance<=0.1){
+        if(distanza<=0.1){
           //l'utente si trova a meno di 100 metri dalla Fermata
           //accetto la segnalazione.
           segnalazioneValida=1;
@@ -323,28 +346,54 @@ app.post('/postsalita', function (request, response, next) {
       },
       selectQuery,
       function(parser,callback){
-          if(parser!==null){
+        if(parser!==null){
+          //se il parser non è null la segnalazione è valida e devo cambiare il ritardo
+          if(parser.length!==0){
             //la segnalazione è valida, quindi aggiorno il ritardo
             //console.log("ritardo: "+parser[0].Ritardo);
             ritardo=parser[0].Ritardo;
+          }else{
+            /**
+            Qui dentro ci entro SOLO se: la segnalazione è valida
+            (mi trovo entro 100m da una fermata) MA non esiste una corsa che
+            passa di qui. In genere questo errore non si raggiunge, ma è utile
+            loggarlo per vedere se qualcuno si diverte a mandare segnalazioni
+            compilate a mano.
+            -----------------
+            Non ho trovato la corsa e quindi il ritardo.
+            Qualcosa non va con il database e/o con la richiesta dell'utente.
+            **/
+            //Loggo l'errore e chiamo callback con lo stesso.
+            var errore = new Error("Non ho trovato il ritardo con questi parametri:"+
+              "\n\tidUtente: "+ idUtente+
+              "\n\tidFermata: "+ idFermata+
+              "\n\tdataOra: "+ dataOra+
+              "\n\tidLinea: "+ idLinea+
+              "\n\tlatUtente: "+ latUtente+
+              "\n\tlonUtente: "+ lonUtente+
+              "\n\tsegnalazioneValida: "+ segnalazioneValida);
+            callback(errore,null);
+            //fermo la funzione, altrimenti prova lo stesso ad inserire
+            return errore;
           }
-          var query = "INSERT INTO ritardoautobus.Segnalazione " +
-                  "(IdSegnalatore,IdFermata,DataOra,Ritardo,Linea,Latitudine,Longitudine,SegnalazioneValida) VALUES (" +
-                  idUtente  + "," +
-                  idFermata + ",\'" +
-                  dataOra   + "\',\'" +
-                  ritardo   + "\',"+
-                  idLinea   + ","   +
-                  latUtente + ","   +
-                  lonUtente + ","+
-                  segnalazioneValida + ");";
-          console.log(query);
-          callback(null,query);
+        }
+        //inserisco la segnalazione, che sia valida o meno.
+        var query = "INSERT INTO ritardoautobus.Segnalazione " +
+                "(IdSegnalatore,IdFermata,DataOra,Ritardo,Linea,Latitudine,Longitudine,SegnalazioneValida) VALUES (" +
+                idUtente  + "," +
+                idFermata + ",\'" +
+                dataOra   + "\',\'" +
+                ritardo   + "\',"+
+                idLinea   + ","   +
+                latUtente + ","   +
+                lonUtente + ","+
+                segnalazioneValida + ");";
+        callback(null,query);
       },
       insertQuery,
     ], function (errore) {
         if (!errore) {
-            console.log('appost');
+            console.log('Segnalazione eseguita con successo.');
             response.status(200).send("Segnalazione aggiunta");
         } else {
             console.log('Errore nella waterfall.');
@@ -356,12 +405,6 @@ app.post('/postsalita', function (request, response, next) {
 
 //comportamento di default (404)
 app.use(function (request, response) {
-    /*
-     response.signal(404);
-     response.write('<h1> Pagina non trovata </h1>');
-     response.end();
-     */
-    //stesso risultato in una riga soltanto
     response.status(404).send('<h1> Pagina non trovata </h1>');
 });
 //apro server su porta 7777
