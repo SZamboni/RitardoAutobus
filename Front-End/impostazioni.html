@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Visualizzazione ritardo bus </title>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="js/impostazioni.js"></script>
+    </head>
+
+    <body onload = "load()">
+
+        <h1 id = "title">Impostazioni utente </h1>
+
+        <img id = "icona_utente"></img>
+
+        <h3>Modifica le tue impostazioni</h3>
+
+        <div>
+            Modifica raggio di ricerca, da 50m a 5km : <input type="range" id="range"> </input><br>
+            Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
+
+            <button onclick = "myFunction()">Cambia Impostazioni</button>
+        </div>
+
+        <div>
+            <button onclick = "back()">back</button>
+        </div>
+
+
+    </body>
+</html>

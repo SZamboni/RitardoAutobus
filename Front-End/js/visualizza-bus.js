@@ -272,123 +272,12 @@ function visualize() {
     }
 
 
-
-    /*
-
-    var selection = document.createElement("select");   // create the selection box
-    selection.id = "selection";
-
-    // create the options of the selection
-    for (var i = 0; i < data.fermate.length; i++) {
-        var option = document.createElement("option");
-        option.value = data.fermate[i].idFermata;
-        option.innerHTML = data.fermate[i].nomeFermata;
-        selection.appendChild(option);
-    }
-
-    var selezione_fermate = document.getElementById("selezione-fermate");
-    selezione_fermate.appendChild(selection);   // append all toghether
-    var parte = document.createElement('div');
-    parte.innerHTML = fermate[i].nomeFermata;
-    var table = document.createElement('table');
-
-    for( var j = 0; j < data.lineeRitardi.length; j++){
-        var tr = document.createElement("tr");  // create the row
-
-        var bus = document.createElement("td");
-        bus.innerHTML = data.lineeRitardi[j].nomeLinea;
-        tr.appendChild(bus);
-
-        var next = document.createElement("td");
-        next.innerHTML = data.lineeRitardi[j].orario;
-        tr.appendChild(next);
-
-        var delay = document.createElement("td");
-        delay.innerHTML = data.lineeRitardi[j].ritardo + " min";
-        tr.appendChild(delay);
-
-        table.appendChild(tr);  // append the row to the table
-    }
-
-    parte.appendChild(table);
-
-    parent.appendChild(parte);
-    */
 }
 
 /**
  * Function that request for a bus stop all the bus with their delay
  */
-function richiesta_bus() {
-    /*
-    var selection = document.getElementById("selection");
-    console.log(selection[selection.selectedIndex].value);
-    var selected_item = selection[selection.selectedIndex].value;   // get the selected item
-
-    fetch(serverLocation + "/get-ritardi/?idFermata=" + selected_item + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
-            .then((response) => {
-                data = response.json();
-                return data;
-            }).then(function (data) {
-        console.log("Bus per fermata selezionata: " + JSON.stringify(data, null, 4));
-
-        var bus_e_ritardi = document.getElementById("bus-e-ritardi");   // tha tag where the table will be attached
-
-        var old_table = document.getElementById("table");   // delete the old table if there is any
-        if (old_table != undefined) {
-            old_table.parentNode.removeChild(old_table);
-        }
-
-        var table = document.createElement("table");    // create the table
-        table.id = "table";
-
-        var intestazione_colonne = document.createElement("tr");    // the description of the columns
-
-        var codice_bus = document.createElement("th");  // first column: the code of the bus
-        codice_bus.innerHTML = "Autobus";
-        intestazione_colonne.appendChild(codice_bus);
-
-        var prossimo_bus = document.createElement("th"); // second column: the next bus of that kind
-        prossimo_bus.innerHTML = "Prossimo";
-        intestazione_colonne.appendChild(prossimo_bus);
-
-        var ritardo = document.createElement("th"); // third column: the delay of the next bus of that kind
-        ritardo.innerHTML = "Ritardo";
-        intestazione_colonne.appendChild(ritardo);
-
-        table.appendChild(intestazione_colonne);
-
-        // for every bus we create a row in the table wit all the informatio from the server
-        for (var i = 0; i < data.lineeRitardi.length; i++) {
-
-            var tr = document.createElement("tr");  // create the row
-
-            var bus = document.createElement("td");
-            bus.innerHTML = data.lineeRitardi[i].nomeLinea;
-            tr.appendChild(bus);
-
-            var next = document.createElement("th");
-            next.innerHTML = data.lineeRitardi[i].orario;
-            tr.appendChild(next);
-
-            var delay = document.createElement("th");
-            delay.innerHTML = data.lineeRitardi[i].ritardo + " min";
-            tr.appendChild(delay);
-
-            table.appendChild(tr);  // append the row to the table
-
-        }
-        bus_e_ritardi.appendChild(table);   // appen the table to the tag
-    })
-    .catch(error => console.error(error)); */
-}
-
-/**
- * Function that redirect the user to the signal page
- */
-function segnala() {
-    var selection = document.getElementById("selection");
-    var selected_item = selection[selection.selectedIndex].value;   // get the selected item
-    var newUrl = serverLocation + "/segnala.html?fermata=" + selected_item;
-    document.location.href = newUrl;
+function clickImpostazioni() {
+    var impostazioniUrl = serverLocation + "/impostazioni.html";
+    document.location.href = impostazioniUrl;
 }
