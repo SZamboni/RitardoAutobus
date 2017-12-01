@@ -413,10 +413,9 @@ Funzione che viene avviata ogni giorno alle 3 del mattino.
 Aggiorna la tabella dei ritardi inserendo 0 come ritardo ad ogni corsa.
 Necessaria per poi poter usufruire di UPDATE nel calcolo del ritardo medio.
 **/
-var scheduleRitardi = schedule.schedueleJob({hour: 03, minute: 00},function(){
+var scheduleRitardi = schedule.scheduleJob({hour: 03, minute: 00},function(){
 
 });
-
 /**
 Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
 la tabella dei ritardi a partire dalla tabella delle segnalazioni.
@@ -427,10 +426,69 @@ setInterval(function() {
     //lancio la Query
     selectQuery(query,function(errore,parser){
       if(!errore){
-
       }
     });
 },intervalloRitardi);
+
+//Easter egg
+app.get("/some",function(request,response){
+  var shrek="<body style=\"background-image: url(\'"+
+  "https://vignette.wikia.nocookie.net/trollpasta/images/5/5c/"+
+  "The_hansom_shrek.jpg/revision/latest?cb=20140418120336\');"+
+  "background-size:100% 100%;\">"+
+  "<h1 style=\"color: #ff3399;\">body once told me the world is gonna roll me "+
+  "I ain't the sharpest tool in the shed "+
+  "She was looking kind of dumb with her finger and her thumb "+
+  "In the shape of an \"L\" on her forehead "+
+  "Well the years start coming and they don't stop coming "+
+  "Fed to the rules and I hit the ground running "+
+  "Didn't make sense not to live for fun "+
+  "Your brain gets smart but your head gets dumb "+
+  "So much to do, so much to see "+
+  "So what's wrong with taking the back streets? "+
+  "You'll never know if you don't go "+
+  "You'll never shine if you don't glow "+
+  "Hey now, you're an all-star, get your game on, go play "+
+  "Hey now, you're a rock star, get the show on, get paid "+
+  "And all that glitters is gold "+
+  "Only shooting stars break the mold "+
+  "It's a cool place and they say it gets colder "+
+  "You're bundled up now, wait till you get older "+
+  "But the meteor men beg to differ "+
+  "Judging by the hole in the satellite picture "+
+  "The ice we skate is getting pretty thin "+
+  "The water's getting warm so you might as well swim "+
+  "My world's on fire, how about yours? "+
+  "That's the way I like it and I never get bored "+
+  "Hey now, you're an all-star, get your game on, go play "+
+  "Hey now, you're a rock star, get the show on, get paid "+
+  "All that glitters is gold "+
+  "Only shooting stars break the mold "+
+  "Hey now, you're an all-star, get your game on, go play "+
+  "Hey now, you're a rock star, get the show, on get paid "+
+  "And all that glitters is gold "+
+  "Only shooting stars "+
+  "Somebody once asked could I spare some change for gas? "+
+  "I need to get myself away from this place "+
+  "I said yep what a concept "+
+  "I could use a little fuel myself "+
+  "And we could all use a little change "+
+  "Well, the years start coming and they don't stop coming "+
+  "Fed to the rules and I hit the ground running "+
+  "Didn't make sense not to live for fun "+
+  "Your brain gets smart but your head gets dumb "+
+  "So much to do, so much to see "+
+  "So what's wrong with taking the back streets? "+
+  "You'll never know if you don't go (go!) "+
+  "You'll never shine if you don't glow "+
+  "Hey now, you're an all-star, get your game on, go play "+
+  "Hey now, you're a rock star, get the show on, get paid "+
+  "And all that glitters is gold "+
+  "Only shooting stars break the mold "+
+  "And all that glitters is gold "+
+  "Only shooting stars break the mold</h1></body>";
+  response.status(200).send(shrek);
+});
 
 //comportamento di default (404)
 app.use(function (request, response) {
