@@ -64,7 +64,7 @@ function initMap() {
             //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
             //**/
 
-            var scanRange=0.5;
+            var scanRange= leggiCookie("range");
             var myLatLng = {lat: latitude, lng: longitude};
 
             var url_load_fermate = serverLocation + "/get-fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;

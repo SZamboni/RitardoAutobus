@@ -69,6 +69,7 @@ function myFunction() {
     var range = document.getElementById("range");
     console.log(range.value);
     var range_km = range.value * 0.05 + 0.05 // il range in kilometri
+    document.cookie = "range" + range_km;
     var id_turk = document.getElementById("id_turk");
     console.log(id_turk.value);
 
