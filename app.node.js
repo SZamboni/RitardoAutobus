@@ -18,8 +18,11 @@ var schedule= require('node-schedule');
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
+//IMPOSTAZIONI AGGIORNAMENTO RITARDI
 //Scelgo l'intervallo di aggiornamento automatico dei ritardi.
 var intervalloRitardi = 20000; //20000= 20sec
+//Scelgo il p per la media ponderata che voglio utilizzare per il calcolo dei ritardi
+var pMedia=0.5;
 
 /****************
  INIZIO WEBSERVER
@@ -421,13 +424,83 @@ Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
 la tabella dei ritardi a partire dalla tabella delle segnalazioni.
 **/
 setInterval(function() {
-    //Creo la query da lanciare
-    var query=null;
-    //lancio la Query
-    selectQuery(query,function(errore,parser){
-      if(!errore){
+  //questa variabile sarà la mia struttura dati
+  //guardare sotto per dettagli.
+  var corse = {};
+  async.waterfall([
+      function(callback){
+        //PROBLEMIIIIASAASFDSJFHSDJGSFDGSFGTR
+                    var test="-00:02:12";
+                    var split=test.split(':');
+                    var secondi=split[0]*60*60+split[1]*60+split[2]*1;
+                    if(test[0]=='-'){
+                      secondi = secondi*-1;
+                    }
+                    console.log("test "+test+" convers "+secondi);
+                    console.log(new Date(secondi*1000).toISOString().substr(11,8));
+                    //PERCHEEEEEEEEE
+        //Creo la query da lanciare
+        //Cerco inanzitutto gli id delle corse che dovrò aggiornare.
+        var query="Select distinct Ritardo.IdCorsa,Ritardo From Ritardo, "+
+                  "(Select IdCorsa "+
+                  "From "+
+                  "(Select * "+
+                  "From Segnalazione "+
+                  "Where Elaborato=0 and SegnalazioneValida=1) As S1, "+
+                  "(Select IdCorsa,IdLinea,IdFermata "+
+                  "From Corsa_Fermata_Orario) As Id "+
+                  "Where Id.IdLinea=S1.Linea and Id.IdFermata=S1.IdFermata) As T1 "+
+                  "Where Ritardo.IdCorsa=T1.IdCorsa;";
+        //console.log(query);
+        callback(null,query);
+      },selectQuery,
+      function(parser,callback){
+        /**
+        creo una struttura dati corse che fungerà da dizionario.
+        corse.IdCorsa accederà al ritardo della stessa.
+        In questo modo potrò aggiornare la media direttamente da node e
+        eseguirò solo un update per corsa.
+        **/
+        corse={};//reinizializzo il dizionario.
+        for(i = 0;i<parser.length;i++){
+          //per ogni corsa da aggiornare la inserisco nel dizionario sotto forma di int
+          var split=parser[i].Ritardo.split(':');
+          var secondi=split[0]*60*60+split[1]*60+split[2]*1;
+          corse[parser[i].IdCorsa]=secondi;
+        }
+        //console.log(corse);
+        //ora che ho le corse mi servono i ritardi in modo da aggiornare le stesse
+        var query="Select Dataora, S1.Ritardo, IdCorsa, IdSegnalazione "+
+                    "From "+
+                    "(Select * "+
+                    "From Segnalazione "+
+                    "Where Elaborato=0 and SegnalazioneValida=1) As S1, "+
+                    "(Select IdCorsa,IdLinea,IdFermata "+
+                    "From Corsa_Fermata_Orario) As Id "+
+                    "Where Id.IdLinea=S1.Linea and Id.IdFermata=S1.IdFermata "+
+                    "Order by DataOra;";
+        //console.log(query);
+        callback(null,query);
+      },selectQuery,
+      function(parser,callback){
+        for(i=0;i<parser.length;i++){
+          //per oggni segnalazione aggiorno il ritardo medio;
+          console.log(corse[parser[i].IdCorsa]);
+          console.log(secondi);
+          console.log(new Date(corse[parser[i].IdCorsa]*1000).toISOString().substr(11,8));
+          console.log(parser[i].Ritardo);
+          var split=parser[i].Ritardo.split(':');
+          var secondi=split[0]*60*60+split[1]*60+split[2]*1;
+          corse[parser[i].IdCorsa]=
+            pMedia*corse[parser[i].IdCorsa]+
+            (1-pMedia)*secondi;
+          console.log(new Date(corse[parser[i].IdCorsa]*1000).toISOString().substr(11,8));
+        }
+        //console.log(parser);
       }
-    });
+  ],function(errore){
+
+  });
 },intervalloRitardi);
 
 //Easter egg
