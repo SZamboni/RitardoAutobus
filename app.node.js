@@ -21,8 +21,20 @@ app.use(bodyParser.json());
 //IMPOSTAZIONI AGGIORNAMENTO RITARDI
 //Scelgo l'intervallo di aggiornamento automatico dei ritardi.
 var intervalloRitardi = 20000; //20000= 20sec
-//Scelgo il p per la media ponderata che voglio utilizzare per il calcolo dei ritardi
-var pMedia=0.5;
+/**
+Scelgo il p per la media ponderata che voglio utilizzare per il calcolo dei ritardi
+Il p indica il peso che voglio assegnare ad ogni nuova segnalazione:
+p alto significa che valuto più importanti i valori che ho già calcolato rispetto
+alle nuove segnalazioni, mentre un p basso indica che valuto più importanti le
+nuove segnalazioni rispetto a quelle vecchie.
+Per evitare valori incredibilmente falsati da alcune segnalazioni fasulle che
+potrebbero passare il filtro è opportuno dare meno peso alle nuove segnalazioni,
+quindi scegliere un p alto. Un p alto funzionerà meglio con un afflusso elevato
+di segnalazioni, quindi nel caso ideale di utilizzo della nostra app.
+P ideale: sui 0.8/0.9.
+Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
+**/
+var pMedia=0.2;
 
 /****************
  INIZIO WEBSERVER
@@ -429,19 +441,10 @@ setInterval(function() {
   var corse = {};
   async.waterfall([
       function(callback){
-        //PROBLEMIIIIASAASFDSJFHSDJGSFDGSFGTR
-                    var test="-00:02:12";
-                    var split=test.split(':');
-                    var secondi=split[0]*60*60+split[1]*60+split[2]*1;
-                    if(test[0]=='-'){
-                      secondi = secondi*-1;
-                    }
-                    console.log("test "+test+" convers "+secondi);
-                    console.log(new Date(secondi*1000).toISOString().substr(11,8));
-                    //PERCHEEEEEEEEE
         //Creo la query da lanciare
         //Cerco inanzitutto gli id delle corse che dovrò aggiornare.
-        var query="Select distinct Ritardo.IdCorsa,Ritardo From Ritardo, "+
+        //Mi salvo anche il ritardo attuale in secondi.
+        var query="Select distinct Ritardo.IdCorsa,time_to_sec(Ritardo) as Ritardo From Ritardo, "+
                   "(Select IdCorsa "+
                   "From "+
                   "(Select * "+
@@ -464,13 +467,11 @@ setInterval(function() {
         corse={};//reinizializzo il dizionario.
         for(i = 0;i<parser.length;i++){
           //per ogni corsa da aggiornare la inserisco nel dizionario sotto forma di int
-          var split=parser[i].Ritardo.split(':');
-          var secondi=split[0]*60*60+split[1]*60+split[2]*1;
-          corse[parser[i].IdCorsa]=secondi;
+          corse[parser[i].IdCorsa]=parser[i].Ritardo;
         }
         //console.log(corse);
         //ora che ho le corse mi servono i ritardi in modo da aggiornare le stesse
-        var query="Select Dataora, S1.Ritardo, IdCorsa, IdSegnalazione "+
+        var query="Select Dataora, time_to_sec(S1.Ritardo) as Ritardo, IdCorsa, IdSegnalazione "+
                     "From "+
                     "(Select * "+
                     "From Segnalazione "+
@@ -483,20 +484,40 @@ setInterval(function() {
         callback(null,query);
       },selectQuery,
       function(parser,callback){
-        for(i=0;i<parser.length;i++){
-          //per oggni segnalazione aggiorno il ritardo medio;
-          console.log(corse[parser[i].IdCorsa]);
-          console.log(secondi);
-          console.log(new Date(corse[parser[i].IdCorsa]*1000).toISOString().substr(11,8));
-          console.log(parser[i].Ritardo);
-          var split=parser[i].Ritardo.split(':');
-          var secondi=split[0]*60*60+split[1]*60+split[2]*1;
-          corse[parser[i].IdCorsa]=
-            pMedia*corse[parser[i].IdCorsa]+
-            (1-pMedia)*secondi;
-          console.log(new Date(corse[parser[i].IdCorsa]*1000).toISOString().substr(11,8));
+        var query=null;
+        //aggiorno la query solo se devo
+        if(parser.length!=0){
+          query="update Segnalazione set Elaborato=1 where";
+          var indTemp=0;
+          for(i=0;i<parser.length;i++){
+            //per oggni segnalazione aggiorno il ritardo medio;
+            //console.log("Vecchio ritardo: "+corse[parser[i].IdCorsa]);
+            //console.log("Segnalazione : "+parser[i].Ritardo);
+            corse[parser[i].IdCorsa]=
+              pMedia*corse[parser[i].IdCorsa]+
+              (1-pMedia)*parser[i].Ritardo;
+            //devo aggiornare i record settando le segnalazioni come elaborate  +
+            if(indTemp!==0){
+              query=query+" OR";
+            }
+            query=query+" IdSegnalazione = "+parser[i].IdSegnalazione;
+            indTemp++;
+            //console.log("Nuovo ritardo: "+corse[parser[i].IdCorsa]);
+          }
+          query=query+";\n";
+          //console.log(query);
+          //console.log("Ritardi da inserire:");
+          //console.log(corse);
+          var chiavi=Object.keys(corse);//accedo alle chiavi di corse.
+          //le chiavi di corse sono gli idCorsa.
+          for(i=0;i<chiavi.length;i++){
+            //aggiungo alla query la query di update del ritardo.
+            query=query+"update Ritardo set Ritardo=sec_to_time("+corse[chiavi[i]]+
+                        ") where Ritardo.IdCorsa="+chiavi[i]+";\n";
+          }
+          //console.log(query);
         }
-        //console.log(parser);
+        console.log("Query update: "+query);
       }
   ],function(errore){
 
