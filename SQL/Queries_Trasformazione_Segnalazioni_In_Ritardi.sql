@@ -22,3 +22,7 @@ Where Ritardo.IdCorsa=T1.IdCorsa;
 update Ritardo
 set Ritardo='00:00:00'
 where Ritardo.IdCorsa=IdCorsa;
+
+Update Segnalazione
+set Elaborato=1
+where IdSegnalazione=1;
