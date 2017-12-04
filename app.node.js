@@ -487,7 +487,8 @@ setInterval(function() {
         var query=null;
         //aggiorno la query solo se devo
         if(parser.length!=0){
-          query="update Segnalazione set Elaborato=1 where";
+          query= new Array(Object.keys(corse)+1);
+          query[0]="update Segnalazione set Elaborato=1 where";
           var indTemp=0;
           for(i=0;i<parser.length;i++){
             //per oggni segnalazione aggiorno il ritardo medio;
@@ -498,13 +499,13 @@ setInterval(function() {
               (1-pMedia)*parser[i].Ritardo;
             //devo aggiornare i record settando le segnalazioni come elaborate  +
             if(indTemp!==0){
-              query=query+" OR";
+              query[0]=query[0]+" OR";
             }
-            query=query+" IdSegnalazione = "+parser[i].IdSegnalazione;
+            query[0]=query[0]+" IdSegnalazione = "+parser[i].IdSegnalazione;
             indTemp++;
             //console.log("Nuovo ritardo: "+corse[parser[i].IdCorsa]);
           }
-          query=query+";\n";
+          query[0]=query[0]+";";
           //console.log(query);
           //console.log("Ritardi da inserire:");
           //console.log(corse);
@@ -512,15 +513,35 @@ setInterval(function() {
           //le chiavi di corse sono gli idCorsa.
           for(i=0;i<chiavi.length;i++){
             //aggiungo alla query la query di update del ritardo.
-            query=query+"update Ritardo set Ritardo=sec_to_time("+corse[chiavi[i]]+
-                        ") where Ritardo.IdCorsa="+chiavi[i]+";\n";
+            query[i+1]="update Ritardo set Ritardo=sec_to_time("+corse[chiavi[i]]+
+                        ") where IdCorsa="+chiavi[i]+";";
           }
           //console.log(query);
         }
-        console.log("Query update: "+query);
+        //console.log("Query update: "+query);
+        callback(null,query);
+      },function(query,callback){
+        var err=null;
+        if(query!==null){
+          for(i=0;i<query.length&err===null;i++){
+            //eseguo le query finchè ne ho o finchè una di essee non ritorna errore
+            //console.log(query[i]);
+            connection.query(query[i],function(errore){
+              if(errore){
+                err=errore;
+              }
+            });
+          }
+        }
+        callback(err);
       }
   ],function(errore){
-
+    if(!errore){
+      console.log("Aggiornamento ritardi eseguito con successo.");
+    }else{
+      console.log("Errore nell'aggiornamento dei ritardi:");
+      console.log(errore);
+    }
   });
 },intervalloRitardi);
 
