@@ -677,6 +677,21 @@ INIZIO AMAZON MECHANICAL TURK
 
 //legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
 var j = schedule.scheduleJob('0 0 1 * *', function() {
+  var query = "Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome" +
+  "From Segnalazione,Utente" +
+  "Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1))" +
+  "Group by IdSegnalatore;";
+
+  selectQuery(query, function(errore, utenti) {
+    if (errore) {
+      console.log(err);
+    } else {
+
+      fs.readFile('amt-question.xml', 'utf8', function(err, amt-question) {
+
+      });
+    }
+  });
 
   fs.readFile('amt-question.xml', 'utf8', function (err, myQuestion) {
       var myHITTypeId;
