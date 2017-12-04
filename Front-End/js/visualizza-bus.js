@@ -64,7 +64,11 @@ function initMap() {
             //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
             //**/
 
-            var scanRange= leggiCookie("range");
+            var scanRange= leggiCookie("scanRange");
+            if(scanRange==null){
+              scanRange=0.5;//il range di default è 500m
+            }
+            console.log(scanRange);
             var myLatLng = {lat: latitude, lng: longitude};
 
             var url_load_fermate = serverLocation + "/get-fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
@@ -115,7 +119,20 @@ function initMap() {
  * Function that creates the visualization of the stops
  */
 function caricaRitardi(fermate) {
-
+    var timeRange= leggiCookie('timeRange');
+    if(timeRange==null){
+      timeRange=40;//il delayRange di default è 40m
+    }
+    var min=timeRange%60;
+    var hrs=(timeRange-min)/60;
+    if(min<10){
+      min="0"+min;
+    }
+    if(hrs<10){
+      hrs="0"+hrs;
+    }
+    delayRange=hrs+":"+min+":00";
+    console.log(delayRange);
     stops = fermate;
     console.log(stops);
     for(var i = 0; i < stops.length; i++) {
@@ -124,7 +141,7 @@ function caricaRitardi(fermate) {
 
     for(var i = 0; i < fermate.length; i++) {
 
-        fetch(serverLocation + "/get-ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
+        fetch(serverLocation + "/get-ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'"+delayRange+"\'")     // get the list of bus and their delay
         .then((response) => {
             data = response.json();
             return data;

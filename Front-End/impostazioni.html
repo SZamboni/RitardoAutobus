@@ -15,7 +15,10 @@
         <h3>Modifica le tue impostazioni</h3>
 
         <div>
-            Modifica raggio di ricerca, da 50m a 5km : <input type="range" id="range"> </input><br>
+            Modifica raggio di ricerca (metri)<br>
+            <input type="range" min=50 max=1000 id="scanSlider"> </input> <label id="scanRangeLabel"></label><br>
+            Modifica range temporale di ricerca (minuti)<br>
+            <input type="range" min=5 max=120 id="timeSlider"> </input> <label id="timeRangeLabel"></label><br>
             Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
 
             <button onclick = "myFunction()">Cambia Impostazioni</button>

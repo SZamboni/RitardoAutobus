@@ -50,6 +50,34 @@ function load() {
     var title = document.getElementById("title");
     title.innerHTML += leggiCookie("email");
 
+    //scanrange
+    var scanRange = leggiCookie("scanRange");
+    if(scanRange==null){
+      scanRange=500;
+    }else{
+      scanRange=scanRange*1000;
+    }
+    var scanSlider = document.getElementById("scanSlider");
+    scanSlider.value=scanRange;
+    var scanRangeLabel= document.getElementById("scanRangeLabel");
+    scanRangeLabel.innerHTML=scanRange;
+    scanSlider.oninput = function(){
+      scanRangeLabel.innerHTML=this.value;
+    };
+
+    //timerange
+    var timeRange = leggiCookie("timeRange");
+    if(timeRange==null){
+      timeRange=40;
+    }
+    var timeSlider = document.getElementById("timeSlider");
+    timeSlider.value=timeRange;
+    var timeRangeLabel= document.getElementById("timeRangeLabel");
+    timeRangeLabel.innerHTML=timeRange;
+    timeSlider.oninput = function(){
+      timeRangeLabel.innerHTML=this.value;
+    };
+
     var image = document.getElementById("icona_utente");
     image.src = leggiCookie("linkFoto");
 }
@@ -58,7 +86,7 @@ function load() {
  * Function called when the user click the button
  */
 function click() {
-    
+
 }
 
 /**
@@ -66,18 +94,21 @@ function click() {
  */
 function myFunction() {
     console.log("click");
-    var range = document.getElementById("range");
-    console.log(range.value);
-    var range_km = range.value * 0.05 + 0.05 // il range in kilometri
-    document.cookie = "range" + range_km;
+    var scanSlider = document.getElementById("scanSlider");
+    console.log(scanSlider.value);
+    var range_km = scanSlider.value /1000.0 // il range in kilometri
+    document.cookie = "scanRange=" + range_km;
+    var timeSlider = document.getElementById("timeSlider");
+    console.log(timeSlider.value);
+    document.cookie = "timeRange="+ timeSlider.value;
     var id_turk = document.getElementById("id_turk");
     console.log(id_turk.value);
 
     // information that will be sendt to the server
     var informations = {
         'id': leggiCookie("userId"),
-        'range': range_km,
-        'id_turk': id_turk.value,
+        //'scanRange': range_km, //non mi interessa il range lato server
+        'id_turk': id_turk.value
     }
     console.log("Information that will be sent:\n " + JSON.stringify(informations));
 
