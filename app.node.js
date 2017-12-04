@@ -429,7 +429,16 @@ Aggiorna la tabella dei ritardi inserendo 0 come ritardo ad ogni corsa.
 Necessaria per poi poter usufruire di UPDATE nel calcolo del ritardo medio.
 **/
 var scheduleRitardi = schedule.scheduleJob({hour: 03, minute: 00},function(){
-
+  var query="Insert Into Ritardo (IdCorsa,DataRitardo,Ritardo) "+
+              "Select IdCorsa,curdate(),'00:00:00' From Corsa;";
+  insertQuery(query,function(errore){
+    if(!errore){
+      console.log("Azzeramento dei ritardi per la giornata eseguito con successo.");
+    }else{
+      console.log("Errore nell'azzeramento dei ritardi per la giornata: ");
+      console.log(errore);
+    }
+  })
 });
 /**
 Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
@@ -514,7 +523,7 @@ setInterval(function() {
           for(i=0;i<chiavi.length;i++){
             //aggiungo alla query la query di update del ritardo.
             query[i+1]="update Ritardo set Ritardo=sec_to_time("+corse[chiavi[i]]+
-                        ") where IdCorsa="+chiavi[i]+";";
+                        ") where DataRitardo=curdate() AND IdCorsa="+chiavi[i]+";";
           }
           //console.log(query);
         }
