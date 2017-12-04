@@ -45,12 +45,14 @@ function load() {
     } else {
         console.log("User logged in");
     }
+
+    load_info();
 }
 
 /**
  * Function called when the page is loaded
  */
-function load() {
+function load_info() {
     var title = document.getElementById("title");
     title.innerHTML += leggiCookie("email");
 

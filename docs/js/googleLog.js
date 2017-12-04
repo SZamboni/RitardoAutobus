@@ -2,6 +2,7 @@
  * Function that is callen on a successful Google Login
  */
 function onSignIn(googleUser) {
+    var alreadyIn = leggiCookie("userId");
 
     /*
     var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
@@ -9,7 +10,7 @@ function onSignIn(googleUser) {
     */
     var serverLocation = "http://localhost:8080/";
     var nodeLocation = "http://localhost:8080/";
-    
+
     var profile = googleUser.getBasicProfile();   // get the profile that has signed in
 
     // The ID token you need to pass to your backend:
@@ -56,8 +57,17 @@ function onSignIn(googleUser) {
 ;
 
 function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
-    });
+    delete_cookie("token");
+    delete_cookie("linkFoto");
+    delete_cookie("email");
+    delete_cookie("userId");
+
+    console.log(leggiCookie("userId"));
+
+    var newUrl = serverLocation;
+    document.location.href = newUrl;
 }
+
+var delete_cookie = function(name) {
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
