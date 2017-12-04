@@ -2,6 +2,7 @@
  * Function that is callen on a successful Google Login
  */
 function onSignIn(googleUser) {
+    var alreadyIn = leggiCookie("userId");
 
     var serverLocation = "http://localhost:8080";  // variable that store the location of the server
 
@@ -37,22 +38,34 @@ function onSignIn(googleUser) {
         // body to send in the request, must convert in string before sending
         body: JSON.stringify(informations)
     })
-            .then((response) => { // function executed when the request is finisced
-                //  Redirect the user to the new page
-                var data = response.json();
-                return data;
-              }).then(function(data){
-                console.log(data);
-                document.cookie = "userId=" + data.id;
-                var newUrl = serverLocation + "/bus-visualization.html";
-                document.location.href = newUrl;
-              });
-}
-;
+    .then((response) => { // function executed when the request is finisced
+        //  Redirect the user to the new page
+        var data = response.json();
+        return data;
+        }).then(function(data){
+        console.log(data);
+        document.cookie = "userId=" + data.id;
+        if(alreadyIn != undefined) {
+            var newUrl = serverLocation + "/bus-visualization.html";
+            document.location.href = newUrl;
+        }
+        
+        
+    });
+};
 
 function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
-    });
+    delete_cookie("token");
+    delete_cookie("linkFoto");
+    delete_cookie("email");
+    delete_cookie("userId");
+
+    console.log(leggiCookie("userId"));
+
+    var newUrl = serverLocation;
+    document.location.href = newUrl;
 }
+
+var delete_cookie = function(name) {
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
