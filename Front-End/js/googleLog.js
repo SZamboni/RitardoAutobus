@@ -7,23 +7,13 @@ function onSignIn(googleUser) {
 
     var profile = googleUser.getBasicProfile();   // get the profile that has signed in
 
-    /*
-     // display the information about the user
-     console.log("ID: " + profile.getId());
-     console.log('Full Name: ' + profile.getName());
-     console.log('Given Name: ' + profile.getGivenName());
-     console.log('Family Name: ' + profile.getFamilyName());
-     console.log("Image URL: " + profile.getImageUrl());
-     console.log("Email: " + profile.getEmail());
-     */
     // The ID token you need to pass to your backend:
     var id_token = "" + googleUser.getAuthResponse().id_token;
-    //  console.log("ID Token: " + id_token);
 
     // set the cookie to the user
-    // document.cookie = "email=" + profile.getEmail();
     document.cookie = "token=" + id_token + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
     document.cookie = "linkFoto=" +profile.getImageUrl();
+    document.cookie = "email=" +profile.getEmail();
 
     // information that will be sendt to the server
     var informations = {
