@@ -2,7 +2,7 @@ Select Dataora, S1.Ritardo, IdCorsa, IdSegnalazione
 From 
 (Select * 
 From Segnalazione
-Where Elaborato=0 and SegnalazioneValida=1) As S1,
+Where Elaborato=0 and SegnalazioneValida=1 and Date(curdate())=Date(DataOra)) As S1,
 (Select IdCorsa,IdLinea,IdFermata
 From Corsa_Fermata_Orario) As Id
 Where Id.IdLinea=S1.Linea and Id.IdFermata=S1.IdFermata
