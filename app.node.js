@@ -428,7 +428,7 @@ Funzione che viene avviata ogni giorno alle 3 del mattino.
 Aggiorna la tabella dei ritardi inserendo 0 come ritardo ad ogni corsa.
 Necessaria per poi poter usufruire di UPDATE nel calcolo del ritardo medio.
 **/
-var scheduleRitardi = schedule.scheduleJob({hour: 03, minute: 00},function(){
+var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},function(){
   var query="Insert Into Ritardo (IdCorsa,DataRitardo,Ritardo) "+
               "Select IdCorsa,curdate(),'00:00:00' From Corsa;";
   insertQuery(query,function(errore){
@@ -484,7 +484,7 @@ setInterval(function() {
                     "From "+
                     "(Select * "+
                     "From Segnalazione "+
-                    "Where Elaborato=0 and SegnalazioneValida=1) As S1, "+
+                    "Where Elaborato=0 and SegnalazioneValida=1 and Date(curdate())=Date(DataOra)) As S1, "+
                     "(Select IdCorsa,IdLinea,IdFermata "+
                     "From Corsa_Fermata_Orario) As Id "+
                     "Where Id.IdLinea=S1.Linea and Id.IdFermata=S1.IdFermata "+
