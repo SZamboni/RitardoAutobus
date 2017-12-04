@@ -18,12 +18,14 @@ app.use(bodyParser.json());
 //Istanze per Amazon Mechanical Turk
 var util = require('util');
 var AWS = require('aws-sdk');
-AWS.config.loadFromPath('./config.json');
+AWS.config.loadFromPath('./amt-config.json');
 fs = require('fs');
 //URL della sandbox di AWSMechTurk
 var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
 //Connessione alla requester sandbox
 var mturk = new AWS.MTurk({ endpoint: endpoint });
+//
+var schedule = require('node-schedule');
 
 /****************
 INIZIO WEBSERVER
@@ -155,14 +157,16 @@ app.post('/postlogin', function(request,response,next){
 });
 
 //funzione che aggiunge il WorkerId al database se è la prima volta che l'utente effettua il login
-app.post('/postworker', function (request, response, next) {
+app.post('/worker', function (request, response, next) {
     /**
     QualificationType personalizzata per l'utente per accettare le HIT, la qualification permette di restringere chi
     può accettareuna HIT in modo che un utente può accettare solo le HITs create per lui e non le HITs create per altri utenti
     **/
     var myQualType = {
-      Name: 'Qualification for ' + request.body.nome + ' ' + request.body.cognome,
-      Description: 'Qualifica per accettare le HIT personalizzate di ' + request.body.nome + ' ' + request.body.cognome,
+      //Name: 'Qualification for ' + request.body.nome + ' ' + request.body.cognome,
+      //Description: 'Qualifica per accettare le HIT personalizzate di ' + request.body.nome + ' ' + request.body.cognome,
+      Name: 'Qualification for ',
+      Description: 'Qualifica per accettare le HIT personalizzate di ',
       QualificationTypeStatus: 'Active',
     };
     var qualTypeId;
@@ -312,46 +316,97 @@ app.post('/postsalita',function(request,response,next){
     response.status(200).send("Segnalazione aggiunta");
 });
 
+
 /*****************************
 INIZIO AMAZON MECHANICAL TURK
 *****************************/
-/*
-//legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT
-fs.readFile('amt-question.xml', 'utf8', function (err, myQuestion) {
-    if (err) {
-        return console.log(err);
-    }
 
-    //costruzione dell'HIT
-    var myHIT = {
-        Title: 'Conferma segnalazioni di ',
-        Description: 'HIT per la conferma delle segnalazioni di ',
-        MaxAssignments: 1,
-        LifetimeInSeconds: 604800, //l'utente ha una settimana di tempo per accettare l'HIT
-        AssignmentDurationInSeconds: 30,
-        Reward: '0.20', //da modificare con il reward basato dal conto delle segnalazioni effettuate
-        Question: myQuestion,
-        //l'HIT è accettabile solo se si possiede la qualificazione giusta
-        QualificationRequirements: [
-            {
-                QualificationTypeId: '00000000000000000071', // da modificare con QualificationTypeId dell'utente
-                Comparator: 'Exists',
-            },
-        ],
-    };
+//legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
+var j = schedule.scheduleJob('0 0 1 * *', function() {
 
-    //creazione dell'HIT su AMechTurk workersandbox
-    mturk.createHIT(myHIT, function (err, data) {
+
+
+  fs.readFile('amt-question.xml', 'utf8', function (err, myQuestion) {
+      var myHITTypeId;
+      var myHITId;
+
+      if (err) {
+          return console.log(err);
+      }
+
+      //costruzione dell'HIT
+      var myHIT = {
+          Title: 'Conferma segnalazioni di ',
+          Description: 'HIT per la conferma delle segnalazioni di ',
+          MaxAssignments: 1,
+          LifetimeInSeconds: 604800, //l'utente ha una settimana di tempo per accettare l'HIT
+          AssignmentDurationInSeconds: 30,
+          Reward: '0.20', //da modificare con il reward basato dal conto delle segnalazioni effettuate
+          Question: myQuestion,
+          //l'HIT è accettabile solo se si possiede la qualificazione giusta
+          QualificationRequirements: [
+              {
+                  QualificationTypeId: '00000000000000000071', // da modificare con QualificationTypeId dell'utente
+                  Comparator: 'Exists',
+              },
+          ],
+      };
+
+      //creazione dell'HIT su AMechTurk workersandbox
+      mturk.createHIT(myHIT, function (err, data) {
+          if (err) {
+              console.log(err.message);
+          } else {
+              myHITTypeId = data.HIT.HITTypeId;
+              myHITId = data.HIT.HITId;
+
+              console.log(data);
+
+              console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + data.HIT.HITTypeId + ' with this HITId: ' + data.HIT.HITId);
+          }
+      });
+
+      var notifica = {
+        Subject: 'Creazione HIT',
+        MessageText: 'Grazie per le tue segnalazioni! Al seguente link potrai accettare https://workersandbox.mturk.com/mturk/preview?groupId=' + myHITTypeId,
+        WorkerId: '',
+      };
+
+      mturk.NotifyWorkers(notifica, function(err, data) {
         if (err) {
-            console.log(err.message);
+          console.log(err.message);
         } else {
-            console.log(data);
-
-            console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + data.HIT.HITTypeId + ' with this HITId: ' + data.HIT.HITId);
+          console.log(data);
         }
-    })
+      });
+  });
 });
-*/
+
+var y = schedule.scheduleJob('0 0 8 * *', function(){
+
+  mturk.listAssignmentsForHIT({HITId: myHITId}, function (err, assignmentsForHIT) {
+    if (err) {
+      console.log(err.message);
+    } else {
+      console.log('Completed Assignments found: ' + assignmentsForHIT.NumResults);
+      for (var i = 0; i < assignmentsForHIT.NumResults; i++) {
+        console.log('Risposta del Worker con ID - ' + assignmentsForHIT.Assignments[i].WorkerId + ': ', assignmentsForHIT.Assignments[i].Answer);
+
+        if (assignmentsForHIT.Assignments[i].WorkerId == 'WorkerId') { // modificare con WorkerId dell'utente
+          //approva l'assignment fatto dall'utente per inviare il pagamento
+          mturk.approveAssignment({
+            AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
+            RequesterFeedback: 'Grazie per le segnalazioni!',
+          }, function (err) {
+            console.log(err, err.stack);
+          });
+        }
+      }
+    }
+  });
+
+});
+
 /***************************
 FINE AMAZON MECHANICAL TURK
 ***************************/
