@@ -37,21 +37,35 @@ function load() {
     var id = leggiCookie("userId");
 
     if(id == undefined) {
-        console.log("User not logged in");;
-        var old_button = document.getElementById("logoutbutton");
-        if(old_button != undefined) {
-            old_button.parentNode.removeChild(old_button);
-        }
+        console.log("User not logged in");
+
+        //creo login button
+        var loginbtn = document.createElement("BUTTON");        // Create a <button> element
+        var t = document.createTextNode("LOG IN");
+        loginbtn.appendChild(t);
+        loginbtn.onclick = openLogin;
+        document.getElementById("logDiv").appendChild(loginbtn);
+        /*
         old_button = document.getElementById("impostazioni");
         if(old_button != undefined) {
             old_button.parentNode.removeChild(old_button);
-        }
+        }*/
     } else {
-        console.log("User logged in");
-        var old_button = document.getElementById("loginbutton");
-        if(old_button != undefined) {
-            old_button.parentNode.removeChild(old_button);
-        }
+      console.log("User not logged in");
+
+      //creo logout button
+      var logoutbtn = document.createElement("BUTTON");        // Create a <button> element
+      var t = document.createTextNode("LOG OUT");
+      logoutbtn.appendChild(t);
+      logoutbtn.onclick = signOut;
+      document.getElementById("logDiv").appendChild(logoutbtn);
+
+      //creo pulsante impostazioni
+      var impostazionibtn = document.createElement("BUTTON");        // Create a <button> element
+      var t = document.createTextNode("impostazioni");
+      impostazionibtn.appendChild(t);
+      impostazionibtn.onclick = clickImpostazioni;
+      document.getElementById("impostazioniDiv").appendChild(impostazionibtn);
     }
 
 }

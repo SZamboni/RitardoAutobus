@@ -52,7 +52,6 @@ function onSignIn(googleUser) {
               }).then(function(data){
                 console.log(data);
                 document.cookie = "userId=" + data.id;
-                var newUrl = serverLocation + "/index.html";
                 window.opener.location.reload();
                 window.opener.closeWin();
               });
@@ -68,7 +67,7 @@ function signOut() {
     console.log(leggiCookie("userId"));
 
     var newUrl = serverLocation;
-    document.location.href = newUrl;
+    window.location.reload();
 }
 
 var delete_cookie = function(name) {
