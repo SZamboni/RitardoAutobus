@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
         <title> Visualizzazione ritardo bus </title>
@@ -19,16 +20,18 @@
         <meta name="google-signin-client_id" content="357283213666-8s2b8eiguf5abidvemu4f39aucupgggk.apps.googleusercontent.com">
         <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+        <script type="text/javascript" src="js/googleLog.js"></script>
         <script type="text/javascript" src="js/visualizza-bus.js"></script>
 
         <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
         </script>
-        
+
     </head>
 
     <body onload="load()">
-        
+
+        <div id="logDiv"></div>
 
         <h1>Visualizzazione ritardi Autobus</h1><br>
         <h2>La tua posizione:</h2>
@@ -37,13 +40,10 @@
 
         <h3 id="bus-e-ritardi"></h3><br>
 
-        <div>
-            <button onclick="clickImpostazioni()">Vai a impostazioni</button>
-        </div>
-        <a href="index.html" onclick="signOut();"><button>Sign out</button></a>
+        <div id="impostazioniDiv"></div>
 
         <div id="footer">
-            <p>Ritardo autobus&#174</p>
+            <p>Ritardo autobus &#174;</p>
         </div>
 
     </body>

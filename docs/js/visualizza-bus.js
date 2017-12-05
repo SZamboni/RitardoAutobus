@@ -37,11 +37,37 @@ function load() {
     var id = leggiCookie("userId");
 
     if(id == undefined) {
-        console.log("User not logged in");;
-        document.location.href = serverLocation;
+        console.log("User not logged in");
+
+        //creo login button
+        var loginbtn = document.createElement("BUTTON");        // Create a <button> element
+        var t = document.createTextNode("LOG IN");
+        loginbtn.appendChild(t);
+        loginbtn.onclick = openLogin;
+        document.getElementById("logDiv").appendChild(loginbtn);
+        /*
+        old_button = document.getElementById("impostazioni");
+        if(old_button != undefined) {
+            old_button.parentNode.removeChild(old_button);
+        }*/
     } else {
-        console.log("User logged in");
+      console.log("User not logged in");
+
+      //creo logout button
+      var logoutbtn = document.createElement("BUTTON");        // Create a <button> element
+      var t = document.createTextNode("LOG OUT");
+      logoutbtn.appendChild(t);
+      logoutbtn.onclick = signOut;
+      document.getElementById("logDiv").appendChild(logoutbtn);
+
+      //creo pulsante impostazioni
+      var impostazionibtn = document.createElement("BUTTON");        // Create a <button> element
+      var t = document.createTextNode("impostazioni");
+      impostazionibtn.appendChild(t);
+      impostazionibtn.onclick = clickImpostazioni;
+      document.getElementById("impostazioniDiv").appendChild(impostazionibtn);
     }
+
 }
 
 /**
@@ -265,19 +291,21 @@ function visualize() {
             delay.innerHTML = stops[i].lineeRitardi[j].ritardo + " min";
             tr.appendChild(delay);
 
-            var buttoncell = document.createElement("td");
-            var button = document.createElement('button');
-            button.idFermata = stops[i].idFermata;
-            button.idLinea = stops[i].lineeRitardi[j].idLinea;
-            button.idCorsa = stops[i].idCorsa;
-            button.latFermata = stops[i].latitudine;
-            button.lonFermata = stops[i].longitudine;
-            button.onclick = function () {   // the function called when the button is press
-                click(this.idFermata, this.idLinea, this.idCorsa, this.latFermata, this.lonFermata);
-            };
-            button.innerHTML = "Segnala Salita";
-            buttoncell.appendChild(button);
-            tr.appendChild(buttoncell);
+            if(leggiCookie("userId") != undefined) {
+              var buttoncell = document.createElement("td");
+              var button = document.createElement('button');
+              button.idFermata = stops[i].idFermata;
+              button.idLinea = stops[i].lineeRitardi[j].idLinea;
+              button.idCorsa = stops[i].idCorsa;
+              button.latFermata = stops[i].latitudine;
+              button.lonFermata = stops[i].longitudine;
+              button.onclick = function () {   // the function called when the button is press
+                  click(this.idFermata, this.idLinea, this.idCorsa, this.latFermata, this.lonFermata);
+              };
+              button.innerHTML = "Segnala Salita";
+              buttoncell.appendChild(button);
+              tr.appendChild(buttoncell);
+            }
 
             table.appendChild(tr);
         }
