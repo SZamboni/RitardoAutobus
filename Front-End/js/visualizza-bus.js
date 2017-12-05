@@ -38,10 +38,22 @@ function load() {
 
     if(id == undefined) {
         console.log("User not logged in");;
-        document.location.href = serverLocation;
+        var old_button = document.getElementById("logoutbutton");
+        if(old_button != undefined) {
+            old_button.parentNode.removeChild(old_button);
+        }
+        old_button = document.getElementById("impostazioni");
+        if(old_button != undefined) {
+            old_button.parentNode.removeChild(old_button);
+        }
     } else {
         console.log("User logged in");
+        var old_button = document.getElementById("loginbutton");
+        if(old_button != undefined) {
+            old_button.parentNode.removeChild(old_button);
+        }
     }
+
 }
 
 /**
@@ -265,19 +277,21 @@ function visualize() {
             delay.innerHTML = stops[i].lineeRitardi[j].ritardo + " min";
             tr.appendChild(delay);
 
-            var buttoncell = document.createElement("td");
-            var button = document.createElement('button');
-            button.idFermata = stops[i].idFermata;
-            button.idLinea = stops[i].lineeRitardi[j].idLinea;
-            button.idCorsa = stops[i].idCorsa;
-            button.latFermata = stops[i].latitudine;
-            button.lonFermata = stops[i].longitudine;
-            button.onclick = function () {   // the function called when the button is press
-                click(this.idFermata, this.idLinea, this.idCorsa, this.latFermata, this.lonFermata);
-            };
-            button.innerHTML = "Segnala Salita";
-            buttoncell.appendChild(button);
-            tr.appendChild(buttoncell);
+            if(leggiCookie("userId") != undefined) {
+              var buttoncell = document.createElement("td");
+              var button = document.createElement('button');
+              button.idFermata = stops[i].idFermata;
+              button.idLinea = stops[i].lineeRitardi[j].idLinea;
+              button.idCorsa = stops[i].idCorsa;
+              button.latFermata = stops[i].latitudine;
+              button.lonFermata = stops[i].longitudine;
+              button.onclick = function () {   // the function called when the button is press
+                  click(this.idFermata, this.idLinea, this.idCorsa, this.latFermata, this.lonFermata);
+              };
+              button.innerHTML = "Segnala Salita";
+              buttoncell.appendChild(button);
+              tr.appendChild(buttoncell);
+            }
 
             table.appendChild(tr);
         }

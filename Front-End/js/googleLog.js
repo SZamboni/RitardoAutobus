@@ -1,6 +1,13 @@
 /**
  * Function that is callen on a successful Google Login
  */
+function openW(){
+          var myWindow = window.open(serverLocation +"/login.html", "login", "width=200,height=100");
+}
+function closeWin() {
+    myWindow.close();   // Closes the new window
+}
+
 function onSignIn(googleUser) {
 
     var serverLocation = "http://localhost:8080";  // variable that store the location of the server
@@ -44,15 +51,24 @@ function onSignIn(googleUser) {
               }).then(function(data){
                 console.log(data);
                 document.cookie = "userId=" + data.id;
-                var newUrl = serverLocation + "/bus-visualization.html";
+                var newUrl = serverLocation + "/index.html";
                 document.location.href = newUrl;
               });
 }
 ;
 
 function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
-    });
+    delete_cookie("token");
+    delete_cookie("linkFoto");
+    delete_cookie("email");
+    delete_cookie("userId");
+
+    console.log(leggiCookie("userId"));
+
+    var newUrl = serverLocation;
+    document.location.href = newUrl;
 }
+
+var delete_cookie = function(name) {
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
