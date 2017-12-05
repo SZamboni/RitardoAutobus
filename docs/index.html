@@ -6,9 +6,10 @@
         <style>
             /* Always set the map height explicitly to define the size of the div element that contains the map. */
             #map {
-                height: 50%;
+                height: 100%;
+                z-index: -1;
             }
-            /* Optional: Makes the sample page fill the window. */
+            /* Optional: Makes the sample page fill the window.*/
             html, body {
                 height: 100%;
                 margin: 0;
@@ -22,16 +23,18 @@
 
         <script type="text/javascript" src="js/googleLog.js"></script>
         <script type="text/javascript" src="js/visualizza-bus.js"></script>
+        <script type="text/javascript" src="js/impostazioni.js"></script>
 
         <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
         </script>
+        <link href="style.css" rel="stylesheet" type="text/css"/>
 
     </head>
 
     <body onload="load()">
 
-        <div id="logDiv"></div>
+        <!--<div id="logDiv"></div>
 
         <h1>Visualizzazione ritardi Autobus</h1><br>
         <h2>La tua posizione:</h2>
@@ -44,7 +47,80 @@
 
         <div id="footer">
             <p>Ritardo autobus &#174;</p>
-        </div>
+        </div>-->
 
+
+
+        <!--________________________________________________________________________-->
+        <div class="container">
+            <div class="containerHeader">
+                <!--<div class="menu">
+                    <a href="#menu">MENU</a>
+                </div>-->
+                <div id="mySidenav" class="sidenav">
+                    <a onclick="closeNav()">&times;</a>
+                    <p></p>
+                    <p></p>
+                    <h1 id = "title">Impostazioni utente </h1>
+
+                    <img id = "icona_utente"></img>
+
+                    <h3>Modifica le tue impostazioni</h3>
+
+                    <div>
+                        Modifica raggio di ricerca (metri)<br>
+                        <input type="range" min=50 max=1000 id="scanSlider"> </input> <label id="scanRangeLabel"></label><br>
+                        Modifica range temporale di ricerca (minuti)<br>
+                        <input type="range" min=5 max=120 id="timeSlider"> </input> <label id="timeRangeLabel"></label><br>
+                        Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
+
+                        <a onclick = "myFunction()">Cambia Impostazioni</a>
+                    </div>
+                    <div id="footer">
+                        <p>Ritardo autobus &#174;</p>
+                    </div>
+                </div>
+                <!--style="font-size:30px;cursor:pointer"-->
+                <div class="menu"><a onclick="openNav()">&#9776; impostazioni</a></div>
+                <div class="titolo">
+                    WHERE'S MY BUSS!
+                </div>
+                <div class="searchbar">
+                    <a href="#bot1">login</a>
+                </div>
+            </div>
+            <div class="mapp">
+              <!--<div id="logDiv"></div>-->
+
+              <h1>Visualizzazione ritardi Autobus</h1><br>
+              <h2>La tua posizione:</h2>
+              <div id="map"></div><br>
+            </div>
+            <div class="stops">
+              <h3 id="selezione-fermate">Fermate vicino a te:</h3>
+              <h3 id="bus-e-ritardi"></h3><br>
+              <div id="impostazioniDiv"></div>
+              <div id="footer">
+                  <p>Ritardo autobus &#174;</p>
+              </div>
+            </div>
+
+
+        </div>
+        <!--<div class="navbar" id="myNavbar">
+            <a href="#bot1">bot1</a>
+            <a href="#bot2">bot2</a>
+        </div>-->
+
+        <script>
+            function openNav() {
+                document.getElementById("mySidenav").style.width = "500px";
+            }
+
+            function closeNav() {
+                document.getElementById("mySidenav").style.width = "0";
+            }
+        </script>
+        <!--________________________________________________________________________-->
     </body>
 </html>
