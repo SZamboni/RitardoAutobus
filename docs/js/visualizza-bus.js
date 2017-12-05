@@ -72,7 +72,7 @@ function initMap() {
             console.log(scanRange);
             var myLatLng = {lat: latitude, lng: longitude};
 
-            var url_load_fermate = nodeLocation + "/fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
+            var url_load_fermate = nodeLocation + "fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
             // get the stops list
             fetch(url_load_fermate)
             .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
@@ -152,7 +152,7 @@ function caricaRitardi(fermate) {
 
     for(var i = 0; i < fermate.length; i++) {
 
-        fetch(nodeLocation + "/ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
+        fetch(nodeLocation + "ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
         .then((response) => {
             data = response.json();
             return data;
@@ -213,7 +213,7 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
 
             //console.log(informations);
 
-            var destination_url = nodeLocation + "/salita/";
+            var destination_url = nodeLocation + "salita/";
 
             // fetch the url
             fetch(destination_url, {

@@ -25,7 +25,7 @@ function onSignIn(googleUser) {
     console.log("Information that will be sent:\n " + JSON.stringify(informations));
 
     // sending the information using a XMLHTTPRequest
-    var url = nodeLocation + "/login/";
+    var url = nodeLocation + "login/";
 
     // fetch the url
     fetch(url, {

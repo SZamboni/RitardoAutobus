@@ -55,7 +55,7 @@ var click = function (data) {
 
     console.log(informations);
 
-    var destination_url = nodeLocation + "/salita/";
+    var destination_url = nodeLocation + "salita/";
 
     // fetch the url
     fetch(destination_url, {
@@ -91,7 +91,7 @@ function load_bus() {
     var fermata = url.searchParams.get('fermata');//<------------così
     console.log(fermata);
     // get the bus for that bus stop
-    fetch(nodeLocation + "/ritardi/" + fermata)     // get the list of bus and their delay
+    fetch(nodeLocation + "ritardi/" + fermata)     // get the list of bus and their delay
             .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
                 data = response.json();
                 return data;
