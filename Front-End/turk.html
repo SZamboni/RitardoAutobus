@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title> Inserimento informazioni Amazon Mechanical Turk</title>
+      <meta charset="utf-8">
+    </head>
+
+    <script type="text/javascript">
+        var serverLocation = "http://localhost:8080";
+        /**
+         * Function that returns a value of a defined cookie or undefined if that cookie is not found
+         */
+        function leggiCookie(nomeCookie) {
+            if (document.cookie.length > 0) {
+                var inizio = document.cookie.indexOf(nomeCookie + "=");
+                if (inizio != -1) {
+                    inizio = inizio + nomeCookie.length + 1;
+                    var fine = document.cookie.indexOf(";", inizio);
+                    if (fine == -1) {
+                        fine = document.cookie.length;
+                    }
+                    return unescape(document.cookie.substring(inizio, fine));
+                } else {
+                    return undefined;
+                }
+            }
+            return undefined;
+        }
+        /**
+         * Function that check if the user si logged
+         */
+        function checkLogin() {
+            var id = leggiCookie("userId");
+            if(id == undefined) {
+                console.log("User not logged");
+                document.location.href = serverLocation;
+            } else {
+                console.log("User logged");
+            }
+        }
+        /**
+         * Function that send the information about the id of the user to the server
+         */
+        function action() {
+            var input = document.getElementById("id_turk");
+            console.log("ID: " + input.value);
+            var information = {
+                WorkerId : input.value
+            }
+            var url = serverLocation + "/worker";
+            // fetch the url
+            fetch(url, {
+                method: "post", // this is a HTTP POST
+                headers: {
+                    'Content-Type': 'application/json'    // the content is a JSON so we must set the Content-Type header
+                },
+                // body to send in the request, must convert in string before sending
+                body: JSON.stringify(information)
+            })
+            .then((response) => { // function executed when the request is finisced
+                // parse the response
+                var data = response.json();
+                return data;
+            }).then(function(data){
+                console.log(data);
+                //  Redirect the user to the new page
+                var newUrl = serverLocation + "/bus-visualization.html";
+                document.location.href = newUrl;
+            });
+        }
+    </script>
+    <body onload="checkLogin()">
+        <h1>Inserimento informazioni Mechanical Turk</h1><br><br>
+        <h3>Inserisci il tuo ID di Amazon Mechanical Turk:</h3>
+        <input type="text" id="id_turk"><br>
+        <button onclick="action()">Avanti</button>
+
+    </body>
+</html>

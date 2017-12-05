@@ -48,6 +48,9 @@ Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
 **/
 var pMedia=0.2;
 
+var HITTypeIdUtente;
+var HITIdUtente;
+
 /****************
  INIZIO WEBSERVER
  ****************/
@@ -184,44 +187,64 @@ app.post('/login/', function (request, response, next) {
   })
 
 //funzione che aggiunge il WorkerId al database se è la prima volta che l'utente effettua il login
-app.post('/worker', function (request, response, next) {
-    /**
-    QualificationType personalizzata per l'utente per accettare le HIT, la qualification permette di restringere chi
-    può accettareuna HIT in modo che un utente può accettare solo le HITs create per lui e non le HITs create per altri utenti
-    **/
-    var myQualType = {
-      //Name: 'Qualification for ' + request.body.nome + ' ' + request.body.cognome,
-      //Description: 'Qualifica per accettare le HIT personalizzate di ' + request.body.nome + ' ' + request.body.cognome,
-      Name: 'Qualification for ',
-      Description: 'Qualifica per accettare le HIT personalizzate di ',
-      QualificationTypeStatus: 'Active',
-    };
-    var qualTypeId;
-    //creazione della QualificationType dell'utente
-    mturk.createQualificationType(myQualType, function (err, data){
-      if (err) {
-        console.log(err.message);
-      } else {
-        console.log(data);
-        qualTypeId = data.QualificationType.QualificationTypeId;
-      }
-    });
+app.post('/worker/', function (request, response, next) {
 
-    //associazione tra utente e QualificationType
-    var myAssociationQualWork = {
-      QualificationTypeId: qualTypeId,
-      WorkerId: 'WorkerId', //da modificare con il WorkerId inserito dall'utente
-      SendNotification: true,
-    };
-    //assegna la QualificationType dell'utnte all'utente
-    mturk.associateQualificationWithWorker(myAssociationQualWork, function (err, data) {
-      if (err) {
-        console.log(err.message);
-      } else {
-        console.log(data);
-      }
-    });
-  })
+  async.waterfall([
+    function(callback){
+      var query = 'update Utente set WorkerId=\'' + request.body.WorkerId + '\' where UserID=\'' + request.body.idUtente + '\';'
+      callback(null,query);
+    },
+    insertQuery,
+    function(callback) {
+      /**
+      QualificationType personalizzata per l'utente per accettare le HIT, la qualification permette di restringere chi
+      può accettareuna HIT in modo che un utente può accettare solo le HITs create per lui e non le HITs create per altri utenti
+      **/
+      var myQualType = {
+        Name: 'Qualifica di ',
+        Description: 'Qualifica per accettare le HIT personalizzate di ',
+        QualificationTypeStatus: 'Active',
+      };
+
+      //creazione della QualificationType dell'utente
+      mturk.createQualificationType(myQualType, function (err, data) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(data);
+          var qualTypeId = data.QualificationType.QualificationTypeId;
+
+          callback(null, qualTypeId);
+        }
+      });
+    },
+    function(callback, qualTypeId){
+      //associazione tra utente e QualificationType
+      var myAssociationQualWork = {
+        QualificationTypeId: qualTypeId,
+        WorkerId: request.body.UserId,
+        SendNotification: true,
+      };
+      //assegna la QualificationType dell'utente all'utente
+      mturk.associateQualificationWithWorker(myAssociationQualWork, function (err, data) {
+        if (err) {
+          console.log(err.message);
+        } else {
+          console.log(data);
+        }
+      });
+      var query = 'update Utente set QualificationTypeId=\'' + qualTypeId + '\' where UserID=\'' + request.body.idUtente + '\';'
+      callback(null,query);
+    },
+    insertQuery
+  ], function(errore) {
+    if (errore) {
+      console.log(errore);
+    } else {
+      console.log('ok');
+    }
+  });
+});
 
 /**
  funzione che ritorna le fermate più vicine partendo dalla latitudine e longitudine
@@ -338,116 +361,6 @@ app.get('/ritardi/', function (request, response, next) {
  **/
 app.post('/salita/', function (request, response, next) {
     //console.log(JSON.stringify(request.body,null,4));
-
-/*****************************
-INIZIO AMAZON MECHANICAL TURK
-*****************************/
-
-//legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
-var j = schedule.scheduleJob('0 0 1 * *', function() {
-  fs.readFile('amt-question.xml', 'utf8', function(err, amt-question) {
-    if (err) {
-      console.log(err);
-    } else {
-      var query = "Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome, WorkerId" +
-      "From Segnalazione,Utente" +
-      "Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1))" +
-      "Group by IdSegnalatore;";
-
-      selectQuery(query, function(errore, utenti) {
-        if (errore) {
-          console.log(errore);
-        } else {
-          for (var i = 0; i < utenti.length; i++) {
-            //utenti[i]
-            var HITTypeIdUtente;
-            var HITIdUtente;
-            var reward = '0.10' * utenti[i].NumeroSegnalazioni;
-
-            //costruzione dell'HIT per l'utente
-            var HITUtente = {
-              Title: 'Conferma segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
-              Description: 'HIT per la conferma delle segnalazioni di ritardo degli autobus di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
-              MaxAssignments: 1,
-              LifetimeInSeconds: 604800, // l'utente ha una settimana di tempo per accettare l'HIT e ricevere il pagamento
-              AssignmentDurationInSeconds: 240, // da decidere quanto tempo l'utente ha a disposizione per cliccare Conferma
-              Reward:  reward.toString(),
-              Question: amt-question,
-              /* l'HIT può essere accettato solo da chi possiede la giusta qualifica. Ogni utente ha una sua qualifica personalizzata
-              ** in modo che ogni utente possa accettare solamente le HITs create per le proprie segnalazioni e non possa accettare le
-              ** HITs create per altri utenti*/
-              QualificationRequirements: [
-                {
-                  QualificationTypeId: utenti[i].QualificationTypeId,
-                  Comparator: 'Exists',
-                },
-              ],
-            };
-
-            // creazione dell'HIT personalizzato per utente sul sito di AMT
-            mturk.createHIT(HITUtente, function (err, data) {
-              if (err) {
-                console.log(err);
-              } else {
-                HITTypeIdUtente = data.HIT.HITTypeId;
-                HITIdUtente = data.HIT.HITId;
-
-                console.log(data);
-                console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + data.HIT.HITTypeId + ' with this HITId: ' + data.HIT.HITId);
-              }
-            });
-
-            // dopo la creazione della HIT per il pagamento, viene inviata una mail di notifica all'utente per permettergli di confermare il pagamento
-            mturk.NotifyWorkers({
-              Subject: 'Creazione HIT per pagamento segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
-              MessageText: 'Grazie per le tue segnalazioni! Al seguente link potrai accettare per l\'invio del pagamento: ' +
-              'https://workersandbox.mturk.com/mturk/preview?groupId=' + myHITTypeId,
-              WorkerIds: [
-                utenti[i].WorkerId,
-              ]
-            }, function(err, data) {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(data);
-              }
-            });
-          }
-        }
-      });
-    }
-  });
-});
-
-var y = schedule.scheduleJob('0 0 8 * *', function(){
-
-  mturk.listAssignmentsForHIT({HITId: myHITId}, function (err, assignmentsForHIT) {
-    if (err) {
-      console.log(err.message);
-    } else {
-      console.log('Completed Assignments found: ' + assignmentsForHIT.NumResults);
-      for (var i = 0; i < assignmentsForHIT.NumResults; i++) {
-        console.log('Risposta del Worker con ID - ' + assignmentsForHIT.Assignments[i].WorkerId + ': ', assignmentsForHIT.Assignments[i].Answer);
-
-        if (assignmentsForHIT.Assignments[i].WorkerId == 'WorkerId') { // modificare con WorkerId dell'utente
-          //approva l'assignment fatto dall'utente per inviare il pagamento
-          mturk.approveAssignment({
-            AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
-            RequesterFeedback: 'Grazie per le segnalazioni!',
-          }, function (err) {
-            console.log(err, err.stack);
-          });
-        }
-      }
-    }
-  });
-
-});
-
-/***************************
-FINE AMAZON MECHANICAL TURK
-***************************/
-
     //Valori di test
     var idUtente = request.body.idUtente;
     var dataOra = request.body.dataOra;
@@ -774,6 +687,136 @@ app.get("/some",function(request,response){
   "Only shooting stars break the mold</h1></body>";
   response.status(200).send(shrek);
 });
+
+
+/*****************************
+INIZIO AMAZON MECHANICAL TURK
+*****************************/
+
+//legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
+var j = schedule.scheduleJob('0 0 1 * *', function() {
+//var j = schedule.scheduleJob('*/1 * * * *', function() {
+  fs.readFile('amt-question.xml', 'utf8', function(err, amtQuestion) {
+    if (err) {
+      console.log(err);
+    } else {
+      var query = "Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome, WorkerId From Segnalazione,Utente Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1)) Group by IdSegnalatore;";
+
+      selectQuery(query, function(errore, utenti) {
+        if (errore) {
+          console.log(errore);
+        } else {
+          for (var i = 0; i < utenti.length; i++) {
+            //utenti[i]
+            //var HITTypeIdUtente;
+            //var HITIdUtente;
+            var reward = '0.10' * utenti[i].NumeroSegnalazioni;
+
+            //costruzione dell'HIT per l'utente
+            var HITUtente = {
+              Title: 'Conferma segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
+              Description: 'HIT per la conferma delle segnalazioni di ritardo degli autobus di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
+              MaxAssignments: 1,
+              LifetimeInSeconds: 604800, // l'utente ha una settimana di tempo per accettare l'HIT e ricevere il pagamento
+              AssignmentDurationInSeconds: 240, // da decidere quanto tempo l'utente ha a disposizione per cliccare Conferma
+              Reward:  reward.toString(),
+              Question: amtQuestion,
+              /* l'HIT può essere accettato solo da chi possiede la giusta qualifica. Ogni utente ha una sua qualifica personalizzata
+              ** in modo che ogni utente possa accettare solamente le HITs create per le proprie segnalazioni e non possa accettare le
+              ** HITs create per altri utenti*/
+              QualificationRequirements: [
+                {
+                  //QualificationTypeId: utenti[i].QualificationTypeId,
+                  QualificationTypeId: '3B9KD9M9B16CMSB6N1A06UW4QBNJNJ',
+                  Comparator: 'Exists',
+                },
+              ],
+            };
+
+            /*async.waterfall([
+
+            ], function(errore) {
+              if (errore) {
+                console.log(errore);
+              } else {
+                console.log('Tutto ok');
+              }
+            });*/
+
+            // creazione dell'HIT personalizzato per utente sul sito di AMT
+            mturk.createHIT(HITUtente, function (err, data) {
+              if (err) {
+                console.log(err);
+              } else {
+                HITTypeIdUtente = data.HIT.HITTypeId;
+                HITIdUtente = data.HIT.HITId;
+
+                console.log(data);
+                console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + HITTypeIdUtente + ' with this HITId: ' + HITIdUtente);
+
+                var insert = 'insert into Utenti_Hit_Id(UserID,UtentiHitId,DataHit) values (111,' + HITTypeIdUtente + ',curdate());';
+              }
+            });
+
+            console.log(HITIdUtente);
+
+            // dopo la creazione della HIT per il pagamento, viene inviata una mail di notifica all'utente per permettergli di confermare il pagamento
+            /*mturk.NotifyWorkers({
+              Subject: 'Creazione HIT per pagamento segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
+              MessageText: 'Grazie per le tue segnalazioni! Al seguente link potrai accettare per l\'invio del pagamento: ' +
+              'https://workersandbox.mturk.com/mturk/preview?groupId=' + myHITTypeId,
+              WorkerIds: [
+                utenti[i].WorkerId,
+              ]
+            }, function(err, data) {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(data);
+              }
+            });*/
+          }
+        }
+      });
+    }
+  });
+});
+
+var y = schedule.scheduleJob('0 0 7 * *', function(){
+
+  var query = "select UtentiHitId,UserID,WorkerId from Utente,Utenti_Hit_Id where Utente.UserID=Utenti_Hit_Id.UserID and DataHit=subdate(current_date, 7);";
+
+  selectQuery(query, function(errore, parser) {
+    for (var i = 0; i < parser.length; i++) {
+      //parser[i]
+      mturk.listAssignmentsForHIT({HITId: parser[i].Utenti_Hit_Id}, function (err, assignmentsForHIT) {
+        if (err) {
+          console.log(err.message);
+        } else {
+          console.log('Completed Assignments found: ' + assignmentsForHIT.NumResults);
+          for (var i = 0; i < assignmentsForHIT.NumResults; i++) {
+            console.log('Risposta del Worker con ID - ' + assignmentsForHIT.Assignments[i].WorkerId + ': ', assignmentsForHIT.Assignments[i].Answer);
+
+            if (assignmentsForHIT.Assignments[i].WorkerId == 'WorkerId') { // modificare con WorkerId dell'utente
+              //approva l'assignment fatto dall'utente per inviare il pagamento
+              mturk.approveAssignment({
+                AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
+                RequesterFeedback: 'Grazie per le segnalazioni!',
+              }, function (err) {
+                console.log(err, err.stack);
+              });
+            }
+          }
+        }
+      });
+    }
+  });
+
+});
+
+/***************************
+FINE AMAZON MECHANICAL TURK
+***************************/
 
 
 //comportamento di default (404)
