@@ -23,19 +23,24 @@ from opendata.routes;
 INSERT INTO ritardoautobus.Corsa (IdCorsaTT, IdLinea, Direzione, Capolinea)
 
 select t.trip_id, l.IdLinea, t.direction_id, t.trip_headsign
-from opendata.trips t, ritardoautobus.Linea l
-where t.route_id = l.IdLineaTT;
+from opendata.trips t inner join ritardoautobus.Linea l on t.route_id = l.IdLineaTT
+where t.service_id in (select service_id
+					   from calendar
+					   where monday='1')
 
 -- -----------------------------------------------------------------------------------------------
 
 INSERT INTO ritardoautobus.Linea_Fermata
 
-select l.IdLinea, f.IdFermata
+select distinct l.IdLinea, f.IdFermata
 from (((select t.route_id, st.stop_id
 		from opendata.stop_times st, opendata.trips t
         where t.trip_id = st.trip_id
-        group by t.route_id, st.stop_id) tabella inner join ritardoautobus.Linea l on tabella.route_id = l.IdLineaTT)
-	  inner join ritardoautobus.Fermata f on tabella.stop_id = f.IdFermataTT);
+        and t.service_id in (select service_id
+							 from opendata.calendar
+                             where monday='1')
+        ) tabella inner join ritardoautobus.Linea l on tabella.route_id = l.IdLineaTT)
+		inner join ritardoautobus.Fermata f on tabella.stop_id = f.IdFermataTT);
       
 -- ------------------------------------------------------------------------------------------------
 
@@ -45,5 +50,8 @@ select c.IdCorsa, c.IdLinea, orari.arrival_time, f.IdFermata
 from (((select t.trip_id, t.route_id, st.arrival_time, st.stop_id
 		from opendata.stop_times st, opendata.trips t
 		where t.trip_id = st.trip_id
-		group by t.trip_id, t.route_id, st.arrival_time, st.stop_id) orari inner join ritardoautobus.Corsa c on orari.trip_id = c.IdCorsaTT)
-	  inner join ritardoautobus.Fermata f on orari.stop_id = f.IdFermataTT);
+        and t.service_id in (select c.service_id
+							 from opendata.calendar c
+                             where c.monday='1')
+		) orari inner join ritardoautobus.Corsa c on orari.trip_id = c.IdCorsaTT)
+		inner join ritardoautobus.Fermata f on orari.stop_id = f.IdFermataTT);
