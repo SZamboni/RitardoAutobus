@@ -53,7 +53,7 @@ var opzioni = {
 //invece che cercare nella root del programma redirigo le pagine statice in Front-End
 //Front-End è un brutto nome per una cartella, la cambierei in webdocs o
 //qualcosa di simile.
-app.use(express.static(__dirname + '/Front-End', opzioni));
+app.use(express.static(__dirname + '/docs', opzioni));
 
 /*****************
  FINE WEBSERVER
