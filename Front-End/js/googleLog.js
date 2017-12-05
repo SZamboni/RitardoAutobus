@@ -1,11 +1,12 @@
 /**
  * Function that is callen on a successful Google Login
  */
-function openW(){
-          var myWindow = window.open(serverLocation +"/login.html", "login", "width=200,height=100");
+var logInWindow;
+function openLogin(){
+          logInWindow = window.open(serverLocation +"/login.html", "login", "width=200,height=100");
 }
 function closeWin() {
-    myWindow.close();   // Closes the new window
+    logInWindow.close();   // Closes the new window
 }
 
 function onSignIn(googleUser) {
@@ -52,7 +53,8 @@ function onSignIn(googleUser) {
                 console.log(data);
                 document.cookie = "userId=" + data.id;
                 var newUrl = serverLocation + "/index.html";
-                document.location.href = newUrl;
+                window.opener.location.reload();
+                window.opener.closeWin();
               });
 }
 ;
