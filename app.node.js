@@ -625,7 +625,8 @@ app.get("/some",function(request,response){
 app.use(function (request, response) {
     response.status(404).send('<h1> Pagina non trovata </h1>');
 });
-//apro server su porta 7777
-app.listen(8080, function () {
-    console.log('Server aperto: http://localhost:8080');
+//apro server su porta 8080
+//heroku vuole ascoltare sulla sua porta
+app.listen(process.env.PORT || 3000, function () {
+    console.log('Server aperto');
 });
