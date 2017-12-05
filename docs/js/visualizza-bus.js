@@ -4,7 +4,8 @@
 var serverLocation = "http://localhost:8080";
 
 var stops;
-
+var map = null;
+var marker = null;
 /**
  * Function that given a cookie name controls if there is that cookie
  */
@@ -83,62 +84,21 @@ function initMap() {
             var latitude = position.coords.latitude;
             var longitude = position.coords.longitude;
 
-            /**Mettere // all'inizio di questa linea per attivare i dati test
-            //dati test
-            var latitude = 46.06597000 ;
-            var longitude = 11.1547000;
-            //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
-            //**/
-
-            var scanRange= leggiCookie("scanRange");
-            if(scanRange==null){
-              scanRange=0.5;//il range di default è 500m
-            }
-            console.log(scanRange);
             var myLatLng = {lat: latitude, lng: longitude};
-
-            var url_load_fermate = serverLocation + "/fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
-            // get the stops list
-            fetch(url_load_fermate)
-            .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
-                        data = response.json();
-                        return data;
-            }).then(function (data) {   // elaboro il json
-
-                // create the map and set the zoom and the center
-                var map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 16,
-                    center: myLatLng
-                });
-
-                // create and initialize the marker of the stops
-                for(var i = 0; i < data.fermate.length; i++) {
-                    var pos = { lat : parseFloat(data.fermate[i].latitudine), lng : parseFloat(data.fermate[i].longitudine)};
-                    var m = new google.maps.Marker({
-                        position : pos,
-                        map : map,
-                        title : data.fermate[i].nomeFermata,
-                        icon : "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                    })
-                }
-
-                // create and inizialize the position marker
-                var marker = new google.maps.Marker({
-                    position: myLatLng,
-                    map: map,
-                    title: 'La tua Posizione'
-                });
-
-                // go ahead with the elaboration
-                caricaRitardi(data.fermate);
-
-            })
-            .catch(error => console.error(error))  // error handling
-
-        });
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 16,
+                center: myLatLng
+            });
+            aggiorna();
+      });
     } else {
         alert("Geolocation is not supported by this browser, all the functions will not be available");
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 16,
+            center: {lat: 46.0673076, lng: 11.1212993}
+        });
     }
+
 }
 
 /**
@@ -248,7 +208,68 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
 
 
 }
+function aggiorna(){
+  if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition( function(position) {
+          // get the coordinates
+          var latitude = position.coords.latitude;
+          var longitude = position.coords.longitude;
 
+          var scanRange= leggiCookie("scanRange");
+          if(scanRange==null){
+            scanRange=0.5;//il range di default è 500m
+          }
+          console.log(scanRange);
+          var myLatLng = {lat: latitude, lng: longitude};
+          placeMarker(myLatLng);
+          var url_load_fermate = serverLocation + "/fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
+          // get the stops list
+          fetch(url_load_fermate)
+          .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
+                      data = response.json();
+                      return data;
+          }).then(function (data) {
+
+            for(var i = 0; i < data.fermate.length; i++) {
+                var pos = { lat : parseFloat(data.fermate[i].latitudine), lng : parseFloat(data.fermate[i].longitudine)};
+                var m = new google.maps.Marker({
+                    position : pos,
+                    map : map,
+                    title : data.fermate[i].nomeFermata,
+                    icon : "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                })
+            }
+            // go ahead with the elaboration
+            caricaRitardi(data.fermate);
+
+            })
+            .catch(error => console.error(error))  // error handling
+
+            });
+            console.log("aggiorno");
+        }
+        else {
+          alert("Geolocation is not supported by this browser, all the functions will not be available");
+        }
+}
+
+/*
+funzione che aggiorna la posizione dell'utente
+*/
+function placeMarker(location) {
+    if (marker == null)
+        marker = new google.maps.Marker({
+            position: location,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+            map: map,
+            title: 'La tua Posizione'
+        });
+    else {
+        marker.setPosition(location);
+    }
+    marker.setAnimation(null);
+}
 /**
  * Function that visualize stops and bus
  */
@@ -326,3 +347,5 @@ function clickImpostazioni() {
     var impostazioniUrl = serverLocation + "/impostazioni.html";
     document.location.href = impostazioniUrl;
 }
+
+setInterval(aggiorna,60000);
