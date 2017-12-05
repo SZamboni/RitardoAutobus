@@ -306,6 +306,6 @@ function visualize() {
  * Function that request for a bus stop all the bus with their delay
  */
 function clickImpostazioni() {
-    var impostazioniUrl = serverLocation + "/impostazioni.html";
+    var impostazioniUrl = serverLocation + "impostazioni.html";
     document.location.href = impostazioniUrl;
 }

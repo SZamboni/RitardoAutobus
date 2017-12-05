@@ -141,6 +141,6 @@ function myFunction() {
  * Function called when the user click on the back button
  */
 function back() {
-    var impostazioniUrl = serverLocation + "/bus-visualization.html";
+    var impostazioniUrl = serverLocation + "bus-visualization.html";
     document.location.href = impostazioniUrl;
 }

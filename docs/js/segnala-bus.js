@@ -69,7 +69,7 @@ var click = function (data) {
     })
             .then((response) => { // function executed when the request is finisced
                 //  Redirect the user to the new page
-                var newUrl = serverLocation + "/bus-visualization";
+                var newUrl = serverLocation + "bus-visualization";
                 document.location.href = newUrl;
             });
 

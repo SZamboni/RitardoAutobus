@@ -44,7 +44,7 @@ function onSignIn(googleUser) {
               }).then(function(data){
                 console.log(data);
                 document.cookie = "userId=" + data.id;
-                var newUrl = serverLocation + "/bus-visualization.html";
+                var newUrl = serverLocation + "bus-visualization.html";
                 document.location.href = newUrl;
               });
 }
