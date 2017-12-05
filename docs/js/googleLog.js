@@ -4,7 +4,7 @@
 function onSignIn(googleUser) {
 
     var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";  // variable that store the location of the server
-
+    var nodeLocation = "http://localhost:8080/";
     var profile = googleUser.getBasicProfile();   // get the profile that has signed in
 
     // The ID token you need to pass to your backend:
@@ -25,7 +25,7 @@ function onSignIn(googleUser) {
     console.log("Information that will be sent:\n " + JSON.stringify(informations));
 
     // sending the information using a XMLHTTPRequest
-    var url = serverLocation + "/login/";
+    var url = nodeLocation + "/login/";
 
     // fetch the url
     fetch(url, {
