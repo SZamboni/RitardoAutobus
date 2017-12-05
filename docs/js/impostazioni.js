@@ -3,7 +3,7 @@
  */
 
 var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
-var nodeLocation = "http://localhost:8080";
+var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
 /**
  * Function that given a cookie name controls if there is that cookie
  */

@@ -4,7 +4,7 @@
  */
 
 var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";  // variable that store the location of the server
-var nodeLocation = "http://localhost:8080";
+var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
 /**
  * Function that returns a value of a defined cookie or undefined if that cookie is not found
  */

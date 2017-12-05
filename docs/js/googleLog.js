@@ -4,7 +4,7 @@
 function onSignIn(googleUser) {
 
     var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";  // variable that store the location of the server
-    var nodeLocation = "http://localhost:8080";
+    var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
     var profile = googleUser.getBasicProfile();   // get the profile that has signed in
 
     // The ID token you need to pass to your backend:

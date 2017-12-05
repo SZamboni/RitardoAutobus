@@ -2,7 +2,7 @@
  * Function that returns a value of a defined cookie or undefined if that cookie is not found
  */
 var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
-var nodeLocation = "http://localhost:8080";
+var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
 
 var stops;
 
