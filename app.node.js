@@ -36,6 +36,13 @@ Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
 **/
 var pMedia=0.2;
 
+/** Abilito CORS su tutto il server **/
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 /****************
  INIZIO WEBSERVER
  ****************/
@@ -115,8 +122,6 @@ app.post('/login/', function (request, response, next) {
     //Async waterfall mi permette di avviare delle funzioni in sequenza passando
     //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
     //chiudere le connsessioni ogni volta
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     async.waterfall([
         function (callback) {
             var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='" +
@@ -183,8 +188,8 @@ app.post('/login/', function (request, response, next) {
  **/
 app.get('/fermate/', function (request, response, next) {
     // permetto CORS
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    //response.header('Access-Control-Allow-Origin', '*');
+    //response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     // preparo l'header json
     response.header('Content-Type', 'application/json');
     //stored procedure che trova le fermate più vicine
