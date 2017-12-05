@@ -3,7 +3,7 @@
  * la funzione di invio dati di salita al server e il caricamento dei bus possibili per quella fermata
  */
 
-var serverLocation = "http://localhost:8080";  // variable that store the location of the server
+var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";  // variable that store the location of the server
 
 /**
  * Function that returns a value of a defined cookie or undefined if that cookie is not found

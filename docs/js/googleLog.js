@@ -3,7 +3,7 @@
  */
 function onSignIn(googleUser) {
 
-    var serverLocation = "http://localhost:8080";  // variable that store the location of the server
+    var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";  // variable that store the location of the server
 
     var profile = googleUser.getBasicProfile();   // get the profile that has signed in
 

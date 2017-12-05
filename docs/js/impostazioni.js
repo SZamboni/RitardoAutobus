@@ -2,7 +2,7 @@
  * File javascript for the page impostazioni
  */
 
-var serverLocation = "http://localhost:8080";
+var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
 
 /**
  * Function that given a cookie name controls if there is that cookie
