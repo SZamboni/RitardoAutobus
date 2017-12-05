@@ -3,7 +3,7 @@
  */
 var logInWindow;
 function openLogin(){
-          logInWindow = window.open(serverLocation +"/login.html", "login", "width=200,height=100");
+          logInWindow = window.open(serverLocation +"/login.html", "login", "width=500,height=300");
 }
 function closeWin() {
     logInWindow.close();   // Closes the new window
@@ -52,8 +52,15 @@ function onSignIn(googleUser) {
               }).then(function(data){
                 console.log(data);
                 document.cookie = "userId=" + data.id;
-                window.opener.location.reload();
-                window.opener.closeWin();
+                window.location = serverLocation +"/turk.html";
+                /*
+                if(data.primologin){
+                    window.location = serverLocation +"/turk.html";
+                }
+                else{
+                    window.opener.location.reload();
+                    window.opener.closeWin();
+                }*/
               });
 }
 ;
