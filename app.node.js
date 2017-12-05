@@ -115,6 +115,8 @@ app.post('/login/', function (request, response, next) {
     //Async waterfall mi permette di avviare delle funzioni in sequenza passando
     //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
     //chiudere le connsessioni ogni volta
+    response.header('Access-Control-Allow-Origin', '*');
+    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     async.waterfall([
         function (callback) {
             var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='" +
