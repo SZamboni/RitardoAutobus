@@ -2,10 +2,12 @@
  * Function that is callen on a successful Google Login
  */
 var logInWindow;
+
 function openLogin(){
-          logInWindow = window.open(serverLocation +"/login.html", "login", "width=500,height=300");
+    logInWindow = window.open(serverLocation +"/login.html", "login", "width=500,height=300");
 }
-function closeWin() {
+
+function closeLoginWin() {
     logInWindow.close();   // Closes the new window
 }
 
@@ -45,25 +47,23 @@ function onSignIn(googleUser) {
         // body to send in the request, must convert in string before sending
         body: JSON.stringify(informations)
     })
-            .then((response) => { // function executed when the request is finisced
-                //  Redirect the user to the new page
-                var data = response.json();
-                return data;
-              }).then(function(data){
-                console.log(data);
-                document.cookie = "userId=" + data.id;
-                window.location = serverLocation +"/turk.html";
-                /*
-                if(data.primologin){
-                    window.location = serverLocation +"/turk.html";
-                }
-                else{
-                    window.opener.location.reload();
-                    window.opener.closeWin();
-                }*/
-              });
-}
-;
+    .then((response) => { // function executed when the request is finisced
+        //  Redirect the user to the new page
+        var data = response.json();
+        return data;
+        }).then(function(data){
+        console.log(data);
+        document.cookie = "userId=" + data.id;
+        
+        if(data.primologin){
+            show_turk();
+        }
+        else{
+            window.opener.location.reload();
+            window.opener.closeLoginWin();
+        } 
+    });
+};
 
 function signOut() {
     delete_cookie("token");
@@ -80,3 +80,57 @@ function signOut() {
 var delete_cookie = function(name) {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
+
+/**
+ * Function that send the information about the id of the user to the server
+ */
+function action() {
+    var input = document.getElementById("id_turk");
+    console.log("ID: " + input.value);
+    var information = {
+        WorkerId : input.value
+    }
+    var url = serverLocation + "/worker";
+
+    
+
+    // fetch the url
+    fetch(url, {
+        method: "post", // this is a HTTP POST
+        headers: {
+            'Content-Type': 'application/json'    // the content is a JSON so we must set the Content-Type header
+        },
+        // body to send in the request, must convert in string before sending
+        body: JSON.stringify(information)
+    })
+    .then((response) => { // function executed when the request is finisced
+        // parse the response
+        var data = response.json();
+        return data;
+    }).then(function(data){
+        window.opener.location.reload();
+        window.opener.closeLoginWin();
+
+    });
+}
+
+/**
+ * Function that hide the turk div
+ */
+function load_login() {
+    console.log("load_login")
+    var div_turk = document.getElementById("turk");
+    //div_turk.style.display = 'none';
+}
+
+/**
+ * Function that hide the login div
+ */
+function show_turk() {
+    console.log("show_turk")
+    var div_login = document.getElementById("login");
+    div_login.style.display = 'none';
+
+    var div_turk = document.getElementById("turk");
+    div_turk.style.display = 'inline';
+}

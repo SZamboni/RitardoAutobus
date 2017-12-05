@@ -7,13 +7,27 @@
         <script src="https://apis.google.com/js/platform.js" async defer></script>
         <script type="text/javascript" src="js/googleLog.js"></script>
         <script type="text/javascript" src="js/visualizza-bus.js"></script>
+
+        <style>
+            #turk{
+                 display:none;
+            }
+        </style>
     </head>
 
-    <body>
-
-        <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-        <div id="footer">
-            <p>Ritardo autobus &#174;</p>
+    <body onload="load_login()">
+        <div id = "login">
+            <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+            <div id="footer">
+                <p>Ritardo autobus &#174;</p>
+            </div>
+        </div>
+        
+        <div id = "turk">
+            <h1>Inserimento informazioni Mechanical Turk</h1><br><br>
+            <h3>Inserisci il tuo ID di Amazon Mechanical Turk:</h3>
+            <input type="text" id="id_turk"><br>
+            <button onclick="action()">Avanti</button>
         </div>
     </body>
 </html>
