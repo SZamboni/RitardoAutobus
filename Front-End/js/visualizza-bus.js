@@ -99,6 +99,16 @@ function initMap() {
                     title: 'La tua Posizione'
                 });
 
+                var cerchioPosizione = new google.maps.Circle({
+                    strokeColor: '#0000FF',
+                    strokeOpacity: 0.6,
+                    strokeWeight: 2,
+                    fillColor: '#0000FF',
+                    fillOpacity: 0.15,
+                    map: map,
+                    center: myLatLng,
+                    radius: scanRange  * 1000
+                });
                 // go ahead with the elaboration
                 caricaRitardi(data.fermate);
 
