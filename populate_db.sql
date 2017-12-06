@@ -25,15 +25,15 @@ INSERT INTO ritardoautobus.Corsa (IdCorsaTT, IdLinea, Direzione, Capolinea)
 select t.trip_id, l.IdLinea, t.direction_id, t.trip_headsign
 from opendata.trips t inner join ritardoautobus.Linea l on t.route_id = l.IdLineaTT
 where t.service_id in (select service_id
-					   from calendar
-					   where monday='1')
+					   from opendata.calendar
+					   where monday='1');
 
 -- -----------------------------------------------------------------------------------------------
 
 INSERT INTO ritardoautobus.Linea_Fermata
 
-select distinct l.IdLinea, f.IdFermata
-from (((select t.route_id, st.stop_id
+select l.IdLinea, f.IdFermata
+from (((select distinct t.route_id, st.stop_id
 		from opendata.stop_times st, opendata.trips t
         where t.trip_id = st.trip_id
         and t.service_id in (select service_id
@@ -50,8 +50,8 @@ select c.IdCorsa, c.IdLinea, orari.arrival_time, f.IdFermata
 from (((select t.trip_id, t.route_id, st.arrival_time, st.stop_id
 		from opendata.stop_times st, opendata.trips t
 		where t.trip_id = st.trip_id
-        and t.service_id in (select c.service_id
-							 from opendata.calendar c
-                             where c.monday='1')
+        and t.service_id in (select cal.service_id
+							 from opendata.calendar cal
+                             where cal.monday='1')
 		) orari inner join ritardoautobus.Corsa c on orari.trip_id = c.IdCorsaTT)
 		inner join ritardoautobus.Fermata f on orari.stop_id = f.IdFermataTT);

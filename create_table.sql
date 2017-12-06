@@ -74,7 +74,8 @@ CREATE TABLE IF NOT EXISTS `opendata`.`trips` (
   `shape_id` VARCHAR(100),
   `wheelchair_accesible` VARCHAR(45),
   PRIMARY KEY (`trip_id`),
-  FOREIGN KEY (`service_id`) REFERENCES calendar (`service_id`)
+  FOREIGN KEY (`service_id`) REFERENCES calendar (`service_id`),
+  FOREIGN KEY (`route_id`) REFERENCES routes (`route_id`)
 )
 ENGINE = InnoDB;
 
