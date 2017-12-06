@@ -814,12 +814,15 @@ INIZIO AMAZON MECHANICAL TURK
 
 //legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
 var j = schedule.scheduleJob('0 0 1 * *', function() {
-//var j = schedule.scheduleJob('*/1 * * * *', function() {
+//var j = schedule.scheduleJob('*/1 * * * *', function() { // per test
   fs.readFile('amt-question.xml', 'utf8', function(err, amtQuestion) {
     if (err) {
       console.log(err);
     } else {
-      var query = "Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome, WorkerId From Segnalazione,Utente Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1)) Group by IdSegnalatore;";
+      var query = 'Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome, WorkerId ' +
+      'From Segnalazione,Utente ' +
+      'Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1)) ' +
+      'Group by IdSegnalatore;';
 
       selectQuery(query, function(errore, utenti) {
         if (errore) {
@@ -852,32 +855,8 @@ var j = schedule.scheduleJob('0 0 1 * *', function() {
               ],
             };
 
-            async.waterfall([
-              function(callback) {
-                // creazione dell'HIT personalizzato per utente sul sito di AMT
-                mturk.createHIT(HITUtente, function (err, data) {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                    var HITTypeIdUtente = data.HIT.HITTypeId;
-                    var HITIdUtente = data.HIT.HITId;
-
-                    console.log(data);
-                    console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + HITTypeIdUtente + ' with this HITId: ' + HITIdUtente);
-
-                    var query = 'insert into Utenti_Hit_Id(UserID,UtentiHitId,DataHit) values (' + utenti[i].IdSegnalatore + ',' + HITTypeIdUtente + ',curdate());';
-                    callback(null, query);
-                  }
-                });
-              },
-              insertQuery,
-            ], function(errore) {
-              if (errore) {
-                console.log(errore);
-              } else {
-                console.log('Tutto ok');
-              }
-            });
+            var idUtente = utenti[i].IdSegnalatore;
+            createHITs(idUtente, HITUtente);
 
             // dopo la creazione della HIT per il pagamento, viene inviata una mail di notifica all'utente per permettergli di confermare il pagamento
             /*mturk.NotifyWorkers({
@@ -901,34 +880,88 @@ var j = schedule.scheduleJob('0 0 1 * *', function() {
   });
 });
 
-var y = schedule.scheduleJob('0 0 7 * *', function(){
+//var y = schedule.scheduleJob('0 0 7 * *', function(){
+var y = schedule.scheduleJob('*/1 * * * *', function(){ // per test
 
-  var query = "select UtentiHitId,UserID,WorkerId from Utente,Utenti_Hit_Id where Utente.UserID=Utenti_Hit_Id.UserID and DataHit=subdate(current_date, 7);";
+  /*var query = 'select UtentiHitId,Utente.UserID,WorkerId ' +
+  'from Utente,Utenti_Hit_Id ' +
+  'where Utente.UserID=Utenti_Hit_Id.UserID and DataHit=subdate(current_date, 7);';*/
+
+  // query di test
+  var query = 'select UtentiHitId,Utente.UserID,WorkerId ' +
+  'from Utente,Utenti_Hit_Id ' +
+  'where Utente.UserID=Utenti_Hit_Id.UserID;';
 
   selectQuery(query, function(errore, parser) {
-    for (var i = 0; i < parser.length; i++) {
-      mturk.listAssignmentsForHIT({HITId: parser[i].Utenti_Hit_Id}, function (err, assignmentsForHIT) {
-        if (err) {
-          console.log(err.message);
-        } else {
-          console.log('Completed Assignments found: ' + assignmentsForHIT.NumResults);
-          for (var i = 0; i < assignmentsForHIT.NumResults; i++) {
-            console.log('Risposta del Worker con ID - ' + assignmentsForHIT.Assignments[i].WorkerId + ': ', assignmentsForHIT.Assignments[i].Answer);
+    if (errore) {
+      console.log(errore);
+    } else {
+      for (var i = 0; i < parser.length; i++) {
+        var HITUtente = parser[i].UtentiHitId;
+        var WorkerId = parser[i].WorkerId;
+        getApproveHITs(HITUtente, WorkerId);
 
-            //approva l'assignment fatto dall'utente per inviare il pagamento
-            mturk.approveAssignment({
-              AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
-              RequesterFeedback: 'Grazie per le segnalazioni!',
-            }, function (err) {
-              console.log(err, err.stack);
-            });
-          }
-        }
-      });
+      }
     }
   });
-
 });
+
+
+var createHITs = function(idUtente, HITUtente) {
+  async.waterfall([
+    function(callback) {
+      // creazione dell'HIT personalizzato per utente sul sito di AMT
+      mturk.createHIT(HITUtente, function (err, data) {
+        if (err) {
+          console.log(err);
+        } else {
+          var HITTypeIdUtente = data.HIT.HITTypeId;
+          var HITIdUtente = data.HIT.HITId;
+
+          console.log(data);
+          console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + HITTypeIdUtente + ' with this HITId: ' + HITIdUtente);
+
+          var query = 'insert into Utenti_Hit_Id(UserID,UtentiHitId,DataHit) values (' + idUtente + ',\'' + HITIdUtente + '\',curdate());';
+          callback(null, query);
+        }
+      });
+    },
+    insertQuery,
+  ], function(errore) {
+    if (errore) {
+      console.log(errore);
+    } else {
+      console.log('Tutto ok');
+    }
+  });
+};
+
+var getApproveHITs = function(HITUtente, WorkerId) {
+  mturk.listAssignmentsForHIT({HITId: HITUtente}, function (err, assignmentsForHIT) {
+    if (err) {
+      console.log(err.message);
+    } else {
+      console.log('Completed Assignments found: ' + assignmentsForHIT.NumResults);
+      for (var i = 0; i < assignmentsForHIT.NumResults; i++) {
+        var workId = assignmentsForHIT.Assignments[i].WorkerId;
+        if (WorkerId == workId) {
+          console.log('Risposta del Worker con ID - ' + workId + ': ', assignmentsForHIT.Assignments[i].Answer);
+
+          //approva l'assignment fatto dall'utente per inviare il pagamento
+          mturk.approveAssignment({
+            AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
+            RequesterFeedback: 'Grazie per le segnalazioni!',
+          }, function (err) {
+            console.log(err);
+          });
+        } else {
+          console.log('WorkerIds non corrispondono: ' + workId + ' e ' + WorkerId);
+        }
+
+      }
+    }
+  });
+};
 
 /***************************
 FINE AMAZON MECHANICAL TURK
