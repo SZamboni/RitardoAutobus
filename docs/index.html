@@ -6,8 +6,8 @@
         <style>
             /* Always set the map height explicitly to define the size of the div element that contains the map. */
             #map {
-                height: 100%;
-                z-index: -1;
+                height: 80%;
+
             }
             /* Optional: Makes the sample page fill the window.*/
             html, body {
@@ -33,23 +33,6 @@
     </head>
 
     <body onload="load()">
-
-        <!--<div id="logDiv"></div>
-
-        <h1>Visualizzazione ritardi Autobus</h1><br>
-        <h2>La tua posizione:</h2>
-        <div id="map"></div><br>
-        <h3 id="selezione-fermate">Fermate vicino a te:</h3>
-
-        <h3 id="bus-e-ritardi"></h3><br>
-
-        <div id="impostazioniDiv"></div>
-
-        <div id="footer">
-            <p>Ritardo autobus &#174;</p>
-        </div>-->
-
-
 
         <!--________________________________________________________________________-->
         <div class="container">
@@ -83,20 +66,26 @@
                 <!--style="font-size:30px;cursor:pointer"-->
                 <div class="menu"><a onclick="openNav()">&#9776; impostazioni</a></div>
                 <div class="titolo">
-                    WHERE'S MY BUSS!
+                    WHERE'S MY BUS!
                 </div>
                 <div class="searchbar">
-                    <a href="#bot1">login</a>
+                    <div id="logDiv"></div>
+                    <!--<a onclick = "myFunction()">login</a>-->
                 </div>
             </div>
-            <div class="mapp">
-              <!--<div id="logDiv"></div>-->
 
-              <h1>Visualizzazione ritardi Autobus</h1><br>
+            <div class="mapp">
+
+              <h1>Visualizzazione ritardi</h1><br>
+
               <h2>La tua posizione:</h2>
               <div id="map"></div><br>
             </div>
+
+
+
             <div class="stops">
+
               <h3 id="selezione-fermate">Fermate vicino a te:</h3>
               <h3 id="bus-e-ritardi"></h3><br>
               <div id="impostazioniDiv"></div>
@@ -107,10 +96,9 @@
 
 
         </div>
-        <!--<div class="navbar" id="myNavbar">
-            <a href="#bot1">bot1</a>
-            <a href="#bot2">bot2</a>
-        </div>-->
+        <div class="navbar" id="myNavbar">
+            Where is my bus
+        </div>
 
         <script>
             function openNav() {
