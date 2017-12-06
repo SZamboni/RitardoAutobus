@@ -13,7 +13,7 @@ var async = require('async');
 var express = require('express');
 var app = express();
 //instanza corser per gestire cors
-var corser = require('corser');
+//var corser = require('corser');
 //Istanza node-schedule
 var schedule= require('node-schedule');
 //Istanza bodyparser per leggere i JSON
@@ -37,18 +37,21 @@ P ideale: sui 0.8/0.9.
 Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
 **/
 var pMedia=0.2;
-/**
+
 //Abilito CORS su tutto il server
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods","POST, GET, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Credentials", false);
-  res.header("Access-Control-Max-Age", '86400'); // 24 hours")
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+  if(req.method=='OPTIONS'){
+    res.sendStatus(200);
+  }else{
+    next();
+  }
 });
-**/
-app.use(corser.create());
+
+//app.use(corser.create());
 /****************
  INIZIO WEBSERVER
  ****************/
