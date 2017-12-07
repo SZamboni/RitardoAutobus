@@ -52,10 +52,10 @@ function load() {
       data=response.json();
       return data;
     }).then((data)=>{
-      console.log(data);
-      console.log(data.conteggio);
-      if(data.conteggio!=0){
-        notify.innerHTML="Hai "+data.conteggio+" notifiche da leggere.";
+      //console.log(data);
+      //console.log(data.Conteggio);
+      if(data.Conteggio!=0){
+        notify.innerHTML="Hai "+data.Conteggio+" notifiche da leggere.";
       }else{
         notify.innerHTML="Nessuna notifica da leggere."
       }
@@ -176,7 +176,7 @@ function caricaRitardi(fermate) {
         }).then(function (data) {
 
             for(var j = 0; j < stops.length; j++) {
-                if(stops[j].idFermata == data.lineeRitardi[0].idFermata && data.lineeRitardi[0]==null) {
+                if(stops[j].idFermata == data.lineeRitardi[0].idFermata) {
                     stops[j].lineeRitardi = data.lineeRitardi;
                     stops[j].idCorsa = data.lineeRitardi[0].idCorsa;
                 }

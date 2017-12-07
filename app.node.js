@@ -218,6 +218,7 @@ app.get('/fermate/', function (request, response, next) {
             }
             //per ogni fermata inserisco nel JSON i suoi dati
             for (var i = 0; i < parser[0].length; i++) {
+                //console.log(parser[0][i].NomeFermata);
                 fermate.fermate.push({
                     "idFermata": parser[0][i].IdFermata,
                     "nomeFermata": parser[0][i].NomeFermata,
@@ -319,18 +320,36 @@ Funzione chee ritorna tutte le hits di un utente.
 **/
 app.get("/hits/", function(request, response, next){
   response.header('Content-Type', 'application/json');
-  //var query=""
-  //selectQuery(query,function(errore,parser){
-    var parser = [{"UtentiIdHit":1,"DataHit":"a","Elaborato":1},{"UtentiIdHit":2,"DataHit":"b","Elaborato":0}];
-    var errore = false;//linea di test
+  var query="Select * From Utenti_Hit Where UserId="+request.query.userId+";";
+  //console.log(query);
+  selectQuery(query,function(errore,parser){
+    //console.log(parser);
     if(!errore){
+      //console.log(parser);
       response.send(parser);
     }else{
       console.log("Errore nel fetch delle hits:");
       console.log(errore);
       response.sendStatus(500);
     }
-  //});
+  });
+})
+
+/**
+Funzione che segnala che ho visualizzato una hit nel momento in cui la clicco.
+**/
+app.post("/hits/visual/",function(request, response, next){
+  var query="Update Utenti_Hit Set Visualizzato=1 Where UtentiHitId="+request.body.utentiHitId+";";
+  //console.log(query);
+  insertQuery(query,function(errore){
+    if(!errore){
+      response.sendStatus(200);
+    }else{
+      console.log("Errore nella segnalazione di una visualizzazione avvenuta:");
+      console.log(errore);
+      response.sendStatus(500);
+    }
+  })
 })
 
 /**
@@ -339,10 +358,10 @@ Serve per le notifiche agli utenti.
 **/
 app.get("/hits/unreadamount/", function(request, response, next){
   response.header('Content-Type', 'application/json');
-  //var query=""
-  //selectQuery(query,function(errore,parser){
-    var parser = [{"conteggio":2}];
-    var errore = false;//linea di test
+  var query="Select count(*) as Conteggio From Utenti_Hit Where UserId="+request.query.userId+
+  " and Visualizzato=0;"
+  //console.log(query);
+  selectQuery(query,function(errore,parser){
     if(!errore){
       response.send(parser[0]);
     }else{
@@ -350,7 +369,7 @@ app.get("/hits/unreadamount/", function(request, response, next){
       console.log(errore);
       response.sendStatus(500);
     }
-  //});
+  });
 })
 
 /**
