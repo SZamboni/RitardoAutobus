@@ -241,10 +241,6 @@ app.get('/fermate/', function (request, response, next) {
  Di ritorno verrà inviato un JSON con: idLinea, nomeLinea, orario e ritardo.
  **/
 app.get('/ritardi/', function (request, response, next) {
-    // permetto CORS
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    // preparo l'header json
     response.header('Content-Type', 'application/json');
     //stored procedure che trova le linee e i ritardi per ogni linea
     var query = "CALL ritardoautobus.Linee_Ritardi(" +
@@ -295,6 +291,24 @@ app.get('/ritardi/', function (request, response, next) {
         }
     });
 });
+
+/**
+Funzione che mi ritorna il worker id di un utente
+**/
+app.get("/turkid/", function(request, response, next){
+  response.header('Content-Type', 'application/json');
+  var query="SELECT WorkerId FROM ritardoautobus.Utente where UserID="+request.query.userId+";";
+  selectQuery(query, function(errore,parser){
+    if(!errore){
+      console.log(parser[0]);
+      //il primo elemento del parser è già un json, quindi posso ritornare lui.
+      response.send(parser[0]);
+    }else{
+      console.log("Errore nel fetch del workerId:");
+      console.log(errore);
+    }
+  });
+})
 
 /**
  Funzione per la segnalazione dei ritardi.
