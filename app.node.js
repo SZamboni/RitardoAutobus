@@ -20,6 +20,18 @@ var schedule= require('node-schedule');
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
+//Istanze per Amazon Mechanical Turk
+var util = require('util');
+var AWS = require('aws-sdk');
+AWS.config.loadFromPath('./amt-config.json');
+fs = require('fs');
+//URL della sandbox di AWSMechTurk
+var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
+//Connessione alla requester sandbox
+var mturk = new AWS.MTurk({ endpoint: endpoint });
+//
+var schedule = require('node-schedule');
+
 //IMPOSTAZIONI AGGIORNAMENTO RITARDI
 //Scelgo l'intervallo di aggiornamento automatico dei ritardi.
 var intervalloRitardi = 20000; //20000= 20sec
@@ -412,7 +424,6 @@ app.post("/turk/", function(request, response, next){
  **/
 app.post('/salita/', function (request, response, next) {
     //console.log(JSON.stringify(request.body,null,4));
-
     //Valori di test
     var idUtente = request.body.idUtente;
     var dataOra = request.body.dataOra;
