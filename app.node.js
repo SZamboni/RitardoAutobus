@@ -12,6 +12,8 @@ var async = require('async');
 //Istanza Express
 var express = require('express');
 var app = express();
+//instanza corser per gestire cors
+//var corser = require('corser');
 //Istanza node-schedule
 var schedule= require('node-schedule');
 //Istanza bodyparser per leggere i JSON
@@ -36,8 +38,6 @@ Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
 **/
 var pMedia=0.2;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 //Istanze per Amazon Mechanical Turk
 var util = require('util');
 var AWS = require('aws-sdk');
@@ -50,12 +50,20 @@ var mturk = new AWS.MTurk({ endpoint: endpoint });
 //
 var schedule = require('node-schedule');
 
-=======
-var HITTypeIdUtente;
-var HITIdUtente;
->>>>>>> modifica aggiunta worker id degli utenti
-=======
->>>>>>> modifica creazione e approvazione HITs
+//Abilito CORS su tutto il server
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods","POST, GET, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Credentials", false);
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  if(req.method=='OPTIONS'){
+    res.sendStatus(200);
+  }else{
+    next();
+  }
+});
+
+//app.use(corser.create());
 
 /****************
  INIZIO WEBSERVER
@@ -265,8 +273,8 @@ app.post('/worker/', function (request, response, next) {
  **/
 app.get('/fermate/', function (request, response, next) {
     // permetto CORS
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    //response.header('Access-Control-Allow-Origin', '*');
+    //response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     // preparo l'header json
     response.header('Content-Type', 'application/json');
     //stored procedure che trova le fermate più vicine
@@ -309,10 +317,6 @@ app.get('/fermate/', function (request, response, next) {
  Di ritorno verrà inviato un JSON con: idLinea, nomeLinea, orario e ritardo.
  **/
 app.get('/ritardi/', function (request, response, next) {
-    // permetto CORS
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    // preparo l'header json
     response.header('Content-Type', 'application/json');
     //stored procedure che trova le linee e i ritardi per ogni linea
     var query = "CALL ritardoautobus.Linee_Ritardi(" +
@@ -326,7 +330,7 @@ app.get('/ritardi/', function (request, response, next) {
                 lineeRitardi: [
                 ]
             }
-            /*
+
             //per ogni linea inserisco nel JSON i suoi dati
             for (var i = 0; i < parser[0].length; i++) {
                 lineeRitardi.lineeRitardi.push({
@@ -338,9 +342,9 @@ app.get('/ritardi/', function (request, response, next) {
                     "idFermata" : request.query.idFermata
                 });
                 lineeRitardi.idFermata = request.query.idFermata;
-            }*/
+            }
 
-
+            /*
             //dati test
             lineeRitardi.lineeRitardi.push({
                 "idLinea": 1,
@@ -350,6 +354,7 @@ app.get('/ritardi/', function (request, response, next) {
                 "idCorsa": 1,
                 "idFermata" : request.query.idFermata
             });
+            **/
             //console.log(lineeRitardi);
 
 
@@ -362,6 +367,43 @@ app.get('/ritardi/', function (request, response, next) {
         }
     });
 });
+
+/**
+Funzione che mi ritorna il worker id di un utente
+**/
+app.get("/turkid/", function(request, response, next){
+  response.header('Content-Type', 'application/json');
+  var query="SELECT WorkerId FROM ritardoautobus.Utente where UserID="+request.query.userId+";";
+  selectQuery(query, function(errore,parser){
+    if(!errore){
+      //console.log(parser[0]);
+      //il primo elemento del parser è già un json, quindi posso ritornare lui.
+      response.send(parser[0]);
+    }else{
+      console.log("Errore nel fetch del workerId:");
+      console.log(errore);
+    }
+  });
+})
+
+/**
+Funzione che aggiorna il worker id di un utente dato il suo id
+**/
+app.post("/turk/", function(request, response, next){
+  var query="UPDATE ritardoautobus.Utente SET WorkerId=\'"+
+            request.body.workerId+"\' WHERE UserID="+
+            request.body.userId+";";
+  insertQuery(query,function(errore){
+    if(!errore){
+      console.log("Aggiornamento workerId eseguito con successo.");
+      response.sendStatus(200);
+    }else{
+      console.log("Errore nell'inserimento del workerId:");
+      console.log(errore);
+      respone.status(500).send("Errore del server");
+    }
+  });
+})
 
 /**
  Funzione per la segnalazione dei ritardi.
@@ -698,115 +740,6 @@ app.get("/some",function(request,response){
   response.status(200).send(shrek);
 });
 
-/*****************************
-INIZIO AMAZON MECHANICAL TURK
-*****************************/
-
-//legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
-var j = schedule.scheduleJob('0 0 1 * *', function() {
-  fs.readFile('amt-question.xml', 'utf8', function(err, amt-question) {
-    if (err) {
-      console.log(err);
-    } else {
-      var query = "Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome, WorkerId" +
-      "From Segnalazione,Utente" +
-      "Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1))" +
-      "Group by IdSegnalatore;";
-
-      selectQuery(query, function(errore, utenti) {
-        if (errore) {
-          console.log(errore);
-        } else {
-          for (var i = 0; i < utenti.length; i++) {
-            //utenti[i]
-            var HITTypeIdUtente;
-            var HITIdUtente;
-            var reward = '0.10' * utenti[i].NumeroSegnalazioni;
-
-            //costruzione dell'HIT per l'utente
-            var HITUtente = {
-              Title: 'Conferma segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
-              Description: 'HIT per la conferma delle segnalazioni di ritardo degli autobus di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
-              MaxAssignments: 1,
-              LifetimeInSeconds: 604800, // l'utente ha una settimana di tempo per accettare l'HIT e ricevere il pagamento
-              AssignmentDurationInSeconds: 240, // da decidere quanto tempo l'utente ha a disposizione per cliccare Conferma
-              Reward:  reward.toString(),
-              Question: amt-question,
-              /* l'HIT può essere accettato solo da chi possiede la giusta qualifica. Ogni utente ha una sua qualifica personalizzata
-              ** in modo che ogni utente possa accettare solamente le HITs create per le proprie segnalazioni e non possa accettare le
-              ** HITs create per altri utenti*/
-              QualificationRequirements: [
-                {
-                  QualificationTypeId: utenti[i].QualificationTypeId,
-                  Comparator: 'Exists',
-                },
-              ],
-            };
-
-            // creazione dell'HIT personalizzato per utente sul sito di AMT
-            mturk.createHIT(HITUtente, function (err, data) {
-              if (err) {
-                console.log(err);
-              } else {
-                HITTypeIdUtente = data.HIT.HITTypeId;
-                HITIdUtente = data.HIT.HITId;
-
-                console.log(data);
-                console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + data.HIT.HITTypeId + ' with this HITId: ' + data.HIT.HITId);
-              }
-            });
-
-            // dopo la creazione della HIT per il pagamento, viene inviata una mail di notifica all'utente per permettergli di confermare il pagamento
-            mturk.NotifyWorkers({
-              Subject: 'Creazione HIT per pagamento segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
-              MessageText: 'Grazie per le tue segnalazioni! Al seguente link potrai accettare per l\'invio del pagamento: ' +
-              'https://workersandbox.mturk.com/mturk/preview?groupId=' + myHITTypeId,
-              WorkerIds: [
-                utenti[i].WorkerId,
-              ]
-            }, function(err, data) {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(data);
-              }
-            });
-          }
-        }
-      });
-    }
-  });
-});
-
-var y = schedule.scheduleJob('0 0 8 * *', function(){
-
-  mturk.listAssignmentsForHIT({HITId: myHITId}, function (err, assignmentsForHIT) {
-    if (err) {
-      console.log(err.message);
-    } else {
-      console.log('Completed Assignments found: ' + assignmentsForHIT.NumResults);
-      for (var i = 0; i < assignmentsForHIT.NumResults; i++) {
-        console.log('Risposta del Worker con ID - ' + assignmentsForHIT.Assignments[i].WorkerId + ': ', assignmentsForHIT.Assignments[i].Answer);
-
-        if (assignmentsForHIT.Assignments[i].WorkerId == 'WorkerId') { // modificare con WorkerId dell'utente
-          //approva l'assignment fatto dall'utente per inviare il pagamento
-          mturk.approveAssignment({
-            AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
-            RequesterFeedback: 'Grazie per le segnalazioni!',
-          }, function (err) {
-            console.log(err, err.stack);
-          });
-        }
-      }
-    }
-  });
-
-});
-
-/***************************
-FINE AMAZON MECHANICAL TURK
-***************************/
-
 
 /*****************************
 INIZIO AMAZON MECHANICAL TURK
@@ -880,8 +813,8 @@ var j = schedule.scheduleJob('0 0 1 * *', function() {
   });
 });
 
-//var y = schedule.scheduleJob('0 0 7 * *', function(){
-var y = schedule.scheduleJob('*/1 * * * *', function(){ // per test
+var y = schedule.scheduleJob('0 0 7 * *', function(){
+//var y = schedule.scheduleJob('*/1 * * * *', function(){ // per test
 
   /*var query = 'select UtentiHitId,Utente.UserID,WorkerId ' +
   'from Utente,Utenti_Hit_Id ' +
@@ -973,7 +906,10 @@ FINE AMAZON MECHANICAL TURK
 app.use(function (request, response) {
     response.status(404).send('<h1> Pagina non trovata </h1>');
 });
-//apro server su porta 7777
-app.listen(8080, function () {
-    console.log('Server aperto: http://localhost:8080');
+//apro server su porta 8080
+//heroku vuole ascoltare sulla sua porta
+//var porta = process.env.PORT || 3000;
+var porta = 8080;
+app.listen(porta, function () {
+    console.log('Server aperto');
 });

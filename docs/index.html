@@ -1,50 +1,22 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html>
     <head>
-        <title> Visualizzazione ritardo bus </title>
-        <style>
-            /* Always set the map height explicitly to define the size of the div element that contains the map. */
-            #map {
-                height: 50%;
-            }
-            /* Optional: Makes the sample page fill the window. */
-            html, body {
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-        </style>
+        <title> Where is my bus Login </title>
         <meta charset="utf-8">
         <meta name="google-signin-scope" content="profile">
         <meta name="google-signin-client_id" content="357283213666-8s2b8eiguf5abidvemu4f39aucupgggk.apps.googleusercontent.com">
         <script src="https://apis.google.com/js/platform.js" async defer></script>
-
         <script type="text/javascript" src="js/googleLog.js"></script>
         <script type="text/javascript" src="js/visualizza-bus.js"></script>
-
-        <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
-        </script>
-
     </head>
 
-    <body onload="load()">
+    <body>
 
-        <div id="logDiv"></div>
-
-        <h1>Visualizzazione ritardi Autobus</h1><br>
-        <h2>La tua posizione:</h2>
-        <div id="map"></div><br>
-        <h3 id="selezione-fermate">Fermate vicino a te:</h3>
-
-        <h3 id="bus-e-ritardi"></h3><br>
-
-        <div id="impostazioniDiv"></div>
+        <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" ></div>
+        <button onclick="signOut();">Sign out</button>
 
         <div id="footer">
-            <p>Ritardo autobus &#174;</p>
+            <p>Ritardo autobus</p>
         </div>
-
     </body>
 </html>
