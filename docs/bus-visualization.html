@@ -25,23 +25,20 @@
         <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
         </script>
-                
+
     </head>
 
     <body onload="load()">
-        
-        <h1>Visualizzazione ritardi Autobus</h1><br>
+      <div>
+        <h1>Visualizzazione ritardi Autobus</h1>
+        <button onclick="clickImpostazioni()">Vai a impostazioni</button>
+        <button onclick="signOut()">Sign out</button>
+      </div>
         <h2>La tua posizione:</h2>
         <div id="map"></div><br>
         <h3 id="selezione-fermate">Fermate vicino a te:</h3>
 
         <h3 id="bus-e-ritardi"></h3><br>
-
-        <div>
-            <button onclick="clickImpostazioni()">Vai a impostazioni</button>
-        </div>
-        <button onclick="signOut()">Sign out</button>
-
         <div id="footer">
             <p>Ritardo autobus&#174</p>
         </div>
