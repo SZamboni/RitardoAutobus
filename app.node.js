@@ -189,7 +189,7 @@ app.post('/worker/', function (request, response, next) {
 
   async.waterfall([
     function(callback){
-      var query = 'update Utente set WorkerId=\'' + request.body.WorkerId + '\' where UserID=\'' + request.body.idUtente + '\';'
+      var query = 'update Utente set WorkerId=\'' + request.query.WorkerId + '\' where UserID=\'' + request.query.idUtente + '\';'
       callback(null,query);
     },
     insertQuery,
@@ -199,7 +199,7 @@ app.post('/worker/', function (request, response, next) {
       può accettareuna HIT in modo che un utente può accettare solo le HITs create per lui e non le HITs create per altri utenti
       **/
       var myQualType = {
-        Name: 'Qualifica di ',
+        Name: 'Qualifica di ' + request.query.WorkerId,
         Description: 'Qualifica per accettare le HIT personalizzate di ',
         QualificationTypeStatus: 'Active',
       };
@@ -800,7 +800,8 @@ var createHITs = function(idUtente, HITUtente) {
           console.log(data);
           console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + HITTypeIdUtente + ' with this HITId: ' + HITIdUtente);
 
-          var query = 'insert into Utenti_Hit_Id(UserID,UtentiHitId,DataHit) values (' + idUtente + ',\'' + HITIdUtente + '\',curdate());';
+          var query = 'insert into Utenti_Hit_Id(UserID,UtentiHitId,HitTipeId,DataHit) ' +
+          'values (' + idUtente + ',\'' + HITIdUtente + '\',\'' + HITTypeIdUtente + '\'curdate());';
           callback(null, query);
         }
       });
