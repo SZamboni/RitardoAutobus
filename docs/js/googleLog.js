@@ -51,6 +51,9 @@ function onSignIn(googleUser) {
                 console.log(data);
                 document.cookie = "userId=" + data.id;
                 var newUrl = serverLocation + "bus-visualization.html";
+                if(data.primoLogin){
+                  newUrl= serverLocation + "registrazioneAMT.html";
+                }
                 document.location.href = newUrl;
               });
 }

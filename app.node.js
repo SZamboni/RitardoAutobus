@@ -20,6 +20,18 @@ var schedule= require('node-schedule');
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
+//Istanze per Amazon Mechanical Turk
+var util = require('util');
+var AWS = require('aws-sdk');
+AWS.config.loadFromPath('./amt-config.json');
+fs = require('fs');
+//URL della sandbox di AWSMechTurk
+var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
+//Connessione alla requester sandbox
+var mturk = new AWS.MTurk({ endpoint: endpoint });
+//
+var schedule = require('node-schedule');
+
 //IMPOSTAZIONI AGGIORNAMENTO RITARDI
 //Scelgo l'intervallo di aggiornamento automatico dei ritardi.
 var intervalloRitardi = 20000; //20000= 20sec
@@ -208,7 +220,7 @@ app.post('/worker/', function (request, response, next) {
 
   async.waterfall([
     function(callback){
-      var query = 'update Utente set WorkerId=\'' + request.query.WorkerId + '\' where UserID=\'' + request.query.idUtente + '\';'
+      var query = 'update Utente set WorkerId=\'' + request.body.workerId + '\' where UserID=\'' + request.body.userId + '\';'
       callback(null,query);
     },
     insertQuery,
@@ -218,14 +230,15 @@ app.post('/worker/', function (request, response, next) {
       può accettareuna HIT in modo che un utente può accettare solo le HITs create per lui e non le HITs create per altri utenti
       **/
       var myQualType = {
-        Name: 'Qualifica di ' + request.query.WorkerId,
-        Description: 'Qualifica per accettare le HIT personalizzate di ',
+        Name: 'Qualifica di ' + request.body.workerId,
+        Description: 'Qualifica per accettare le HIT personalizzate di ' + request.body.workerId,
         QualificationTypeStatus: 'Active',
       };
 
       //creazione della QualificationType dell'utente
       mturk.createQualificationType(myQualType, function (err, data) {
         if (err) {
+          console.log("Errore nella creazione della qualifica");
           console.log(err);
         } else {
           console.log(data);
@@ -239,24 +252,31 @@ app.post('/worker/', function (request, response, next) {
       //associazione tra utente e QualificationType
       var myAssociationQualWork = {
         QualificationTypeId: qualTypeId,
-        WorkerId: request.body.UserId,
+        WorkerId: request.body.workerId,
         SendNotification: true,
       };
       //assegna la QualificationType dell'utente all'utente
       mturk.associateQualificationWithWorker(myAssociationQualWork, function (err, data) {
         if (err) {
+          console.log("Errore nell'associazione della qualifica");
           console.log(err.message);
         } else {
           console.log(data);
         }
       });
-      var query = 'update Utente set QualificationTypeId=\'' + qualTypeId + '\' where UserID=\'' + request.body.idUtente + '\';'
+      var query = 'update Utente set QualificationTypeId=\'' + qualTypeId + '\' where UserID=\'' + request.body.userId + '\';'
       callback(null,query);
     },
-    insertQuery
+    insertQuery,
+    function(callback){
+      console.log("Aggiornamento workerId e QualificationTypeId eseguito con successo.");
+      response.sendStatus(200);
+    }
   ], function(errore) {
     if (errore) {
+      console.log("Errore nella waterfall del worker");
       console.log(errore);
+      response.status(500).send("Internal server error.");
     } else {
       console.log('ok');
     }
@@ -412,7 +432,6 @@ app.post("/turk/", function(request, response, next){
  **/
 app.post('/salita/', function (request, response, next) {
     //console.log(JSON.stringify(request.body,null,4));
-
     //Valori di test
     var idUtente = request.body.idUtente;
     var dataOra = request.body.dataOra;
@@ -854,7 +873,7 @@ var createHITs = function(idUtente, HITUtente) {
           console.log(data);
           console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + HITTypeIdUtente + ' with this HITId: ' + HITIdUtente);
 
-          var query = 'insert into Utenti_Hit_Id(UserID,UtentiHitId,HitTipeId,DataHit) ' +
+          var query = 'insert into UtentiHit(UserID,UtentiHitId,HitTipeId,DataHit) ' +
           'values (' + idUtente + ',\'' + HITIdUtente + '\',\'' + HITTypeIdUtente + '\'curdate());';
           callback(null, query);
         }
