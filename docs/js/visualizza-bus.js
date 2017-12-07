@@ -42,11 +42,24 @@ function load() {
     var id = leggiCookie("userId");
 
     if(id == undefined) {
-        console.log("User not logged in");;
+        console.log("User not logged in");
         document.location.href = serverLocation;
     } else {
         console.log("User logged in");
     }
+    var notify = document.getElementById("notify");
+    fetch(nodeLocation+"hits/unreadamount/?userId="+id).then((response)=>{
+      data=response.json();
+      return data;
+    }).then((data)=>{
+      console.log(data);
+      console.log(data.conteggio);
+      if(data.conteggio!=0){
+        notify.innerHTML="Hai "+data.conteggio+" notifiche da leggere.";
+      }else{
+        notify.innerHTML="Nessuna notifica da leggere."
+      }
+    });
 }
 
 /**
@@ -156,14 +169,14 @@ function caricaRitardi(fermate) {
 
     for(var i = 0; i < fermate.length; i++) {
 
-        fetch(nodeLocation + "ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'00:40:00\'")     // get the list of bus and their delay
+        fetch(nodeLocation + "ritardi/?idFermata=" + fermate[i].idFermata + "&rangeTempo=\'"+delayRange+"\'")     // get the list of bus and their delay
         .then((response) => {
             data = response.json();
             return data;
         }).then(function (data) {
 
             for(var j = 0; j < stops.length; j++) {
-                if(stops[j].idFermata == data.lineeRitardi[0].idFermata) {
+                if(stops[j].idFermata == data.lineeRitardi[0].idFermata && data.lineeRitardi[0]==null) {
                     stops[j].lineeRitardi = data.lineeRitardi;
                     stops[j].idCorsa = data.lineeRitardi[0].idCorsa;
                 }

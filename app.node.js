@@ -309,8 +309,48 @@ app.get("/turkid/", function(request, response, next){
     }else{
       console.log("Errore nel fetch del workerId:");
       console.log(errore);
+      response.sendStatus(500);
     }
   });
+})
+
+/**
+Funzione chee ritorna tutte le hits di un utente.
+**/
+app.get("/hits/", function(request, response, next){
+  response.header('Content-Type', 'application/json');
+  //var query=""
+  //selectQuery(query,function(errore,parser){
+    var parser = [{"UtentiIdHit":1,"DataHit":"a","Elaborato":1},{"UtentiIdHit":2,"DataHit":"b","Elaborato":0}];
+    var errore = false;//linea di test
+    if(!errore){
+      response.send(parser);
+    }else{
+      console.log("Errore nel fetch delle hits:");
+      console.log(errore);
+      response.sendStatus(500);
+    }
+  //});
+})
+
+/**
+Funzione che cerca ilnumero delle hit (renumerazioni) non elaborate
+Serve per le notifiche agli utenti.
+**/
+app.get("/hits/unreadamount/", function(request, response, next){
+  response.header('Content-Type', 'application/json');
+  //var query=""
+  //selectQuery(query,function(errore,parser){
+    var parser = [{"conteggio":2}];
+    var errore = false;//linea di test
+    if(!errore){
+      response.send(parser[0]);
+    }else{
+      console.log("Errore nel fetch del numero di hits:");
+      console.log(errore);
+      response.sendStatus(500);
+    }
+  //});
 })
 
 /**
