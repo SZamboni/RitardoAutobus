@@ -3,13 +3,14 @@
  * la funzione di invio dati di salita al server e il caricamento dei bus possibili per quella fermata
  */
 
-
+ /*
  var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
  var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
- /*
+ */
+
  var serverLocation = "http://localhost:8080/";
  var nodeLocation = "http://localhost:8080/";
- */
+ 
 /**
  * Function that returns a value of a defined cookie or undefined if that cookie is not found
  */

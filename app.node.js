@@ -128,6 +128,7 @@ var selectQuery = function (query, callback) {
 
 //Gestione login
 app.post('/login/', function (request, response, next) {
+    var primoLogin=false;
     //Async waterfall mi permette di avviare delle funzioni in sequenza passando
     //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
     //chiudere le connsessioni ogni volta
@@ -150,6 +151,7 @@ app.post('/login/', function (request, response, next) {
                         request.body.cognome + "\',\'" +
                         request.body.email + "\',\'" +
                         request.body.linkFoto + "\');";
+                primoLogin=true;
                 callback(null, query);
             } else {
                 //non devo fare l'Inserimento
@@ -172,7 +174,8 @@ app.post('/login/', function (request, response, next) {
         function(parser,callback){
           //creo il JSON
           var data = {
-            'id' : parser[0].id
+            'id' : parser[0].id,
+            'primoLogin' : primoLogin
           }
           response.send(JSON.stringify(data));
         }
@@ -670,8 +673,8 @@ app.use(function (request, response) {
 });
 //apro server su porta 8080
 //heroku vuole ascoltare sulla sua porta
-var porta = process.env.PORT || 3000;
-//var porta = 8080;
+//var porta = process.env.PORT || 3000;
+var porta = 8080;
 app.listen(porta, function () {
     console.log('Server aperto');
 });

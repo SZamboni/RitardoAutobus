@@ -4,13 +4,13 @@
 function onSignIn(googleUser) {
     var alreadyIn = leggiCookie("userId");
 
-
+    /*
     var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
     var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
-    /*
+    */
     var serverLocation = "http://localhost:8080/";
     var nodeLocation = "http://localhost:8080/";
-    */
+
     var profile = googleUser.getBasicProfile();   // get the profile that has signed in
 
     // The ID token you need to pass to your backend:
@@ -51,6 +51,9 @@ function onSignIn(googleUser) {
                 console.log(data);
                 document.cookie = "userId=" + data.id;
                 var newUrl = serverLocation + "bus-visualization.html";
+                if(data.primoLogin){
+                  newUrl= serverLocation + "registrazioneAMT.html";
+                }
                 document.location.href = newUrl;
               });
 }
