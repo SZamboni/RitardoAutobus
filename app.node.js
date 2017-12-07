@@ -300,12 +300,31 @@ app.get("/turkid/", function(request, response, next){
   var query="SELECT WorkerId FROM ritardoautobus.Utente where UserID="+request.query.userId+";";
   selectQuery(query, function(errore,parser){
     if(!errore){
-      console.log(parser[0]);
+      //console.log(parser[0]);
       //il primo elemento del parser è già un json, quindi posso ritornare lui.
       response.send(parser[0]);
     }else{
       console.log("Errore nel fetch del workerId:");
       console.log(errore);
+    }
+  });
+})
+
+/**
+Funzione che aggiorna il worker id di un utente dato il suo id
+**/
+app.post("/turk/", function(request, response, next){
+  var query="UPDATE ritardoautobus.Utente SET WorkerId=\'"+
+            request.body.workerId+"\' WHERE UserID="+
+            request.body.userId+";";
+  insertQuery(query,function(errore){
+    if(!errore){
+      console.log("Aggiornamento workerId eseguito con successo.");
+      response.sendStatus(200);
+    }else{
+      console.log("Errore nell'inserimento del workerId:");
+      console.log(errore);
+      respone.status(500).send("Errore del server");
     }
   });
 })

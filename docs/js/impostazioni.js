@@ -123,6 +123,7 @@ function click() {
  * Other function
  */
 function applySettings() {
+    var alert="";
     //console.log("click");
     //mi prendo lo slider dello scan
     var scanSlider = document.getElementById("scanSlider");
@@ -132,6 +133,7 @@ function applySettings() {
       console.log("Range aggiornato in "+ scanSlider.value/1000.0);
       document.cookie = "scanRange=" + scanSlider.value /1000.0;
       oldRange=scanSlider.value/1000.0;
+      alert=alert+"Range aggiornato.\n";
     }
     //mi prendo lo slider del tempo
     var timeSlider = document.getElementById("timeSlider");
@@ -141,40 +143,40 @@ function applySettings() {
       console.log("Tempo aggiornato in "+timeSlider.value);
       document.cookie = "timeRange="+ timeSlider.value;
       oldTime=timeSlider.value;
+      alert=alert+"Tempo aggiornato.\n";
     }
     var turkField = document.getElementById("id_turk");
-    console.log(id_turk.value);
-/** da implementare con il turco
-    // information that will be sendt to the server
-    var informations = {
-        'id': leggiCookie("userId"),
-        'id_turk': id_turk.value
-    }
-    console.log("Information that will be sent:\n " + JSON.stringify(informations));
-
-    // sending the information using a XMLHTTPRequest
-    var url = serverLocation + "/postImpostazioni";
-
-    // fetch the url
-    fetch(url, {
-        method: "post", // this is a HTTP POST
+    if (turkField.value!=oldTurk){
+      //devo aggiornare il turkId. Preparo i dati da passare nel post
+      var body={
+        "userId" : leggiCookie("userId"),
+        "workerId" : turkField.value
+      };
+      //console.log(body);
+      var url=nodeLocation+"turk/";
+      fetch(url,{
+        method: "post",
         headers: {
-            'Content-Type': 'application/json'    // the content is a JSON so we must set the Content-Type header
+          'Content-Type': 'application/json'
         },
-
-        // body to send in the request, must convert in string before sending
-        body: JSON.stringify(informations)
-    })
-    .then((response) => { // function executed when the request is finisced
-        // parse the response
-        var data = response.json();
-        return data;
-    }).then(function(data){
-        //  Redirect the user to the new page
-        var newUrl = serverLocation + "/bus-visualization.html";
-        document.location.href = newUrl;
-    });
-    **/
+        body: JSON.stringify(body)
+      }).then((response)=>{
+        if(response.status!=200){
+          alert=alert+"Errore nell\'aggiornamento del workerId.\n Riprova pi\ù tardi.";
+        }else{
+          alert=alert+"Id del turco aggiornato.";
+        }
+        window.alert(alert);
+        back();
+      });
+    }else{
+      if(alert!=""){
+        window.alert(alert);
+        back();
+      }else{
+        window.alert("Nessuna impostazione modificata!");
+      }
+    }
 }
 
 /**
