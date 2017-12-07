@@ -258,7 +258,7 @@ app.get('/ritardi/', function (request, response, next) {
                 lineeRitardi: [
                 ]
             }
-            /*
+
             //per ogni linea inserisco nel JSON i suoi dati
             for (var i = 0; i < parser[0].length; i++) {
                 lineeRitardi.lineeRitardi.push({
@@ -270,9 +270,9 @@ app.get('/ritardi/', function (request, response, next) {
                     "idFermata" : request.query.idFermata
                 });
                 lineeRitardi.idFermata = request.query.idFermata;
-            }*/
+            }
 
-
+            /*
             //dati test
             lineeRitardi.lineeRitardi.push({
                 "idLinea": 1,
@@ -282,6 +282,7 @@ app.get('/ritardi/', function (request, response, next) {
                 "idCorsa": 1,
                 "idFermata" : request.query.idFermata
             });
+            **/
             //console.log(lineeRitardi);
 
 
@@ -636,6 +637,8 @@ app.use(function (request, response) {
 });
 //apro server su porta 8080
 //heroku vuole ascoltare sulla sua porta
-app.listen(process.env.PORT || 3000, function () {
+//var porta = process.env.PORT || 3000;
+var porta = 8080;
+app.listen(porta, function () {
     console.log('Server aperto');
 });
