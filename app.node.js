@@ -264,7 +264,7 @@ app.post('/worker/', function (request, response, next) {
           console.log(data);
         }
       });
-      var query = 'update Utente set QualificationTypeId=\'' + qualTypeId + '\' where UserID=\'' + request.body.userId + '\';'
+      var query = 'update Utente set QualificationTypeId=\'' + qualTypeId + '\' where UserID=\'' + request.body.userId + '\';';
       callback(null,query);
     },
     insertQuery,
@@ -765,8 +765,8 @@ INIZIO AMAZON MECHANICAL TURK
 *****************************/
 
 //legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
-var j = schedule.scheduleJob('0 0 1 * *', function() {
-//var j = schedule.scheduleJob('*/1 * * * *', function() { // per test
+var creazioneHit = schedule.scheduleJob('0 0 1 * *', function() {
+//var creazioneHit = schedule.scheduleJob('*/1 * * * *', function() { // per test
   fs.readFile('amt-question.xml', 'utf8', function(err, amtQuestion) {
     if (err) {
       console.log(err);
@@ -775,15 +775,21 @@ var j = schedule.scheduleJob('0 0 1 * *', function() {
       'From Segnalazione,Utente ' +
       'Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1)) ' +
       'Group by IdSegnalatore;';
+      /*
+      // query per test
+      var query = 'Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome, WorkerId ' +
+      'From Segnalazione,Utente ' +
+      'Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1)) ' +
+      //'and IdSegnalatore=22 ' +
+      'Group by IdSegnalatore;';
+      */
 
       selectQuery(query, function(errore, utenti) {
         if (errore) {
+          console.log("Errore nella ricerca delle segnalazioni");
           console.log(errore);
         } else {
           for (var i = 0; i < utenti.length; i++) {
-            //utenti[i]
-            //var HITTypeIdUtente;
-            //var HITIdUtente;
             var reward = '0.10' * utenti[i].NumeroSegnalazioni;
 
             //costruzione dell'HIT per l'utente
@@ -791,8 +797,8 @@ var j = schedule.scheduleJob('0 0 1 * *', function() {
               Title: 'Conferma segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
               Description: 'HIT per la conferma delle segnalazioni di ritardo degli autobus di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
               MaxAssignments: 1,
-              LifetimeInSeconds: 604800, // l'utente ha una settimana di tempo per accettare l'HIT e ricevere il pagamento
-              AssignmentDurationInSeconds: 240, // da decidere quanto tempo l'utente ha a disposizione per cliccare Conferma
+              LifetimeInSeconds: 1296000, // l'utente ha 15 giorni di tempo per accettare l'HIT e ricevere il pagamento
+              AssignmentDurationInSeconds: 1296000, // l'utente ha 15 giorni di tempo per confermare l'assignment accettato
               Reward:  reward.toString(),
               Question: amtQuestion,
               /* l'HIT può essere accettato solo da chi possiede la giusta qualifica. Ogni utente ha una sua qualifica personalizzata
@@ -801,30 +807,14 @@ var j = schedule.scheduleJob('0 0 1 * *', function() {
               QualificationRequirements: [
                 {
                   QualificationTypeId: utenti[i].QualificationTypeId,
-                  //QualificationTypeId: '3B9KD9M9B16CMSB6N1A06UW4QBNJNJ',
+                  //QualificationTypeId: '3B9KD9M9B16CMSB6N1A06UW4QBNJNJ',  // per test
                   Comparator: 'Exists',
                 },
               ],
             };
 
             var idUtente = utenti[i].IdSegnalatore;
-            createHITs(idUtente, HITUtente);
-
-            // dopo la creazione della HIT per il pagamento, viene inviata una mail di notifica all'utente per permettergli di confermare il pagamento
-            /*mturk.NotifyWorkers({
-              Subject: 'Creazione HIT per pagamento segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
-              MessageText: 'Grazie per le tue segnalazioni! Al seguente link potrai accettare per l\'invio del pagamento: ' +
-              'https://workersandbox.mturk.com/mturk/preview?groupId=' + myHITTypeId,
-              WorkerIds: [
-                utenti[i].WorkerId,
-              ]
-            }, function(err, data) {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(data);
-              }
-            });*/
+            createHITs(idUtente, HITUtente, reward);
           }
         }
       });
@@ -832,39 +822,44 @@ var j = schedule.scheduleJob('0 0 1 * *', function() {
   });
 });
 
-var y = schedule.scheduleJob('0 0 7 * *', function(){
-//var y = schedule.scheduleJob('*/1 * * * *', function(){ // per test
+// funzione che ogni giorno controlla se gli utenti hanno accettato e confermato le HITs create,
+// in caso affermativo, accetta la risposta e invia il pagamento
+var controlloHit = schedule.scheduleJob('0 0 */1 * *', function(){
+//var controlloHit = schedule.scheduleJob('*/1 * * * *', function(){ // per test
 
-  /*var query = 'select UtentiHitId,Utente.UserID,WorkerId ' +
-  'from Utente,Utenti_Hit_Id ' +
-  'where Utente.UserID=Utenti_Hit_Id.UserID and DataHit=subdate(current_date, 7);';*/
-
+  var query = 'select HitId,Utente.UserID,WorkerId ' +
+  'from Utente,Utenti_Hit ' +
+  'where Utente.UserID=Utenti_Hit.UserID and Elaborato=0 and Visualizzato=1;';
+  /*
   // query di test
-  var query = 'select UtentiHitId,Utente.UserID,WorkerId ' +
-  'from Utente,Utenti_Hit_Id ' +
-  'where Utente.UserID=Utenti_Hit_Id.UserID;';
+  var query = 'select HitId,Utente.UserID,WorkerId,UtentiHitId ' +
+  'from Utente,Utenti_Hit ' +
+  'where Utente.UserID=Utenti_Hit.UserID and Elaborato=0;';
+  */
 
   selectQuery(query, function(errore, parser) {
     if (errore) {
       console.log(errore);
     } else {
       for (var i = 0; i < parser.length; i++) {
-        var HITUtente = parser[i].UtentiHitId;
+        var HITUtente = parser[i].HitId;
         var WorkerId = parser[i].WorkerId;
-        getApproveHITs(HITUtente, WorkerId);
+        var UtentiHitId = parser[i].UtentiHitId;
+        getApproveHITs(HITUtente, WorkerId, UtentiHitId);
 
       }
     }
   });
 });
 
-
-var createHITs = function(idUtente, HITUtente) {
+// funzione per la creazione e l'inserimento nel db di una HIT
+var createHITs = function(idUtente, HITUtente, reward) {
   async.waterfall([
     function(callback) {
       // creazione dell'HIT personalizzato per utente sul sito di AMT
       mturk.createHIT(HITUtente, function (err, data) {
         if (err) {
+          console.log("Errore nella creazione dell'HIT");
           console.log(err);
         } else {
           var HITTypeIdUtente = data.HIT.HITTypeId;
@@ -873,8 +868,8 @@ var createHITs = function(idUtente, HITUtente) {
           console.log(data);
           console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + HITTypeIdUtente + ' with this HITId: ' + HITIdUtente);
 
-          var query = 'insert into UtentiHit(UserID,UtentiHitId,HitTipeId,DataHit) ' +
-          'values (' + idUtente + ',\'' + HITIdUtente + '\',\'' + HITTypeIdUtente + '\'curdate());';
+          var query = 'insert into Utenti_Hit(UserID,HitId,HitTypeId,DataHit,ValoreHit) ' +
+          'values (' + idUtente + ',\'' + HITIdUtente + '\',\'' + HITTypeIdUtente + '\',curdate(),' + reward + ');';
           callback(null, query);
         }
       });
@@ -882,6 +877,7 @@ var createHITs = function(idUtente, HITUtente) {
     insertQuery,
   ], function(errore) {
     if (errore) {
+      console.log("Errore nella waterfall della creazione dell'HIT");
       console.log(errore);
     } else {
       console.log('Tutto ok');
@@ -889,9 +885,11 @@ var createHITs = function(idUtente, HITUtente) {
   });
 };
 
-var getApproveHITs = function(HITUtente, WorkerId) {
+// funzione che, dato un HitId, recupera la lista di assignment completati per l'HIT e conferma gli assignment corretti
+var getApproveHITs = function(HITUtente, WorkerId, UtentiHitId) {
   mturk.listAssignmentsForHIT({HITId: HITUtente}, function (err, assignmentsForHIT) {
     if (err) {
+      console.log("Errore nel recupero della lista degli assignment inviati dagli utenti");
       console.log(err.message);
     } else {
       console.log('Completed Assignments found: ' + assignmentsForHIT.NumResults);
@@ -900,17 +898,35 @@ var getApproveHITs = function(HITUtente, WorkerId) {
         if (WorkerId == workId) {
           console.log('Risposta del Worker con ID - ' + workId + ': ', assignmentsForHIT.Assignments[i].Answer);
 
-          //approva l'assignment fatto dall'utente per inviare il pagamento
-          mturk.approveAssignment({
-            AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
-            RequesterFeedback: 'Grazie per le segnalazioni!',
-          }, function (err) {
-            console.log(err);
+          async.waterfall([
+            function(callback){
+              //approva l'assignment fatto dall'utente per inviare il pagamento
+              mturk.approveAssignment({
+                AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
+                RequesterFeedback: 'Grazie per le segnalazioni!',
+              }, function (errore) {
+                if (errore) {
+                  console.log("Errore nell'approvazione dell'assignment dell'utente");
+                  console.log(err);
+                } else {
+                  var query = 'update Utenti_Hit set Elaborato=1 where UtentiHitId=\'' + UtentiHitId + '\';';
+                  callback(null,query);
+                }
+              });
+            },
+            insertQuery,
+          ], function(errore) {
+            if (errore) {
+              console.log("Errore nella waterfall dell'approvazione delle HITs");
+              console.log(errore);
+            } else {
+              console.log("Approvazione e aggiornamento HIT avvenuta con successo");
+            }
           });
+
         } else {
           console.log('WorkerIds non corrispondono: ' + workId + ' e ' + WorkerId);
         }
-
       }
     }
   });
