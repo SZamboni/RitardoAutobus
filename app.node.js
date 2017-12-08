@@ -540,9 +540,9 @@ Funzione che viene avviata ogni giorno alle 3 del mattino.
 Aggiorna la tabella dei ritardi inserendo 0 come ritardo ad ogni corsa.
 Necessaria per poi poter usufruire di UPDATE nel calcolo del ritardo medio.
 **/
-var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},function(){
+var resetRitardi = function(){
   var query="Insert Into Ritardo (IdCorsa,DataRitardo,Ritardo) "+
-              "Select IdCorsa,curdate(),'00:00:00' From Corsa;";
+              "Select IdCorsa,curdate(),\'00:00:00\' From Corsa;";
   insertQuery(query,function(errore){
     if(!errore){
       console.log("Azzeramento dei ritardi per la giornata eseguito con successo.");
@@ -551,12 +551,13 @@ var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},function(){
       console.log(errore);
     }
   })
-});
+};
+var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},resetRitardi);
 /**
 Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
 la tabella dei ritardi a partire dalla tabella delle segnalazioni.
 **/
-setInterval(function() {
+var aggiornaRitardi = function() {
   //questa variabile sarà la mia struttura dati
   //guardare sotto per dettagli.
   var corse = {};
@@ -664,7 +665,8 @@ setInterval(function() {
       console.log(errore);
     }
   });
-},intervalloRitardi);
+};
+setInterval(aggiornaRitardi,intervalloRitardi);
 
 //Easter egg
 app.get("/some",function(request,response){
