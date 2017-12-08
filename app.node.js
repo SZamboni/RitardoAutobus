@@ -12,6 +12,8 @@ var async = require('async');
 //Istanza Express
 var express = require('express');
 var app = express();
+//instanza corser per gestire cors
+//var corser = require('corser');
 //Istanza node-schedule
 var schedule= require('node-schedule');
 //Istanza bodyparser per leggere i JSON
@@ -36,6 +38,20 @@ Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
 **/
 var pMedia=0.2;
 
+//Abilito CORS su tutto il server
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods","POST, GET, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Credentials", false);
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  if(req.method=='OPTIONS'){
+    res.sendStatus(200);
+  }else{
+    next();
+  }
+});
+
+//app.use(corser.create());
 /****************
  INIZIO WEBSERVER
  ****************/
@@ -112,10 +128,10 @@ var selectQuery = function (query, callback) {
 
 //Gestione login
 app.post('/login/', function (request, response, next) {
+    var primoLogin=false;
     //Async waterfall mi permette di avviare delle funzioni in sequenza passando
     //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
     //chiudere le connsessioni ogni volta
-    var primoLogin = false;
     async.waterfall([
         function (callback) {
             var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='" +
@@ -184,8 +200,8 @@ app.post('/login/', function (request, response, next) {
  **/
 app.get('/fermate/', function (request, response, next) {
     // permetto CORS
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    //response.header('Access-Control-Allow-Origin', '*');
+    //response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     // preparo l'header json
     response.header('Content-Type', 'application/json');
     //stored procedure che trova le fermate più vicine
@@ -202,6 +218,7 @@ app.get('/fermate/', function (request, response, next) {
             }
             //per ogni fermata inserisco nel JSON i suoi dati
             for (var i = 0; i < parser[0].length; i++) {
+                //console.log(parser[0][i].NomeFermata);
                 fermate.fermate.push({
                     "idFermata": parser[0][i].IdFermata,
                     "nomeFermata": parser[0][i].NomeFermata,
@@ -228,10 +245,6 @@ app.get('/fermate/', function (request, response, next) {
  Di ritorno verrà inviato un JSON con: idLinea, nomeLinea, orario e ritardo.
  **/
 app.get('/ritardi/', function (request, response, next) {
-    // permetto CORS
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    // preparo l'header json
     response.header('Content-Type', 'application/json');
     //stored procedure che trova le linee e i ritardi per ogni linea
     var query = "CALL ritardoautobus.Linee_Ritardi(" +
@@ -245,7 +258,7 @@ app.get('/ritardi/', function (request, response, next) {
                 lineeRitardi: [
                 ]
             }
-            /*
+
             //per ogni linea inserisco nel JSON i suoi dati
             for (var i = 0; i < parser[0].length; i++) {
                 lineeRitardi.lineeRitardi.push({
@@ -257,9 +270,9 @@ app.get('/ritardi/', function (request, response, next) {
                     "idFermata" : request.query.idFermata
                 });
                 lineeRitardi.idFermata = request.query.idFermata;
-            }*/
+            }
 
-
+            /*
             //dati test
             lineeRitardi.lineeRitardi.push({
                 "idLinea": 1,
@@ -269,6 +282,7 @@ app.get('/ritardi/', function (request, response, next) {
                 "idCorsa": 1,
                 "idFermata" : request.query.idFermata
             });
+            **/
             //console.log(lineeRitardi);
 
 
@@ -281,6 +295,101 @@ app.get('/ritardi/', function (request, response, next) {
         }
     });
 });
+
+/**
+Funzione che mi ritorna il worker id di un utente
+**/
+app.get("/turkid/", function(request, response, next){
+  response.header('Content-Type', 'application/json');
+  var query="SELECT WorkerId FROM ritardoautobus.Utente where UserID="+request.query.userId+";";
+  selectQuery(query, function(errore,parser){
+    if(!errore){
+      //console.log(parser[0]);
+      //il primo elemento del parser è già un json, quindi posso ritornare lui.
+      response.send(parser[0]);
+    }else{
+      console.log("Errore nel fetch del workerId:");
+      console.log(errore);
+      response.sendStatus(500);
+    }
+  });
+})
+
+/**
+Funzione chee ritorna tutte le hits di un utente.
+**/
+app.get("/hits/", function(request, response, next){
+  response.header('Content-Type', 'application/json');
+  var query="Select * From Utenti_Hit Where UserId="+request.query.userId+";";
+  //console.log(query);
+  selectQuery(query,function(errore,parser){
+    //console.log(parser);
+    if(!errore){
+      //console.log(parser);
+      response.send(parser);
+    }else{
+      console.log("Errore nel fetch delle hits:");
+      console.log(errore);
+      response.sendStatus(500);
+    }
+  });
+})
+
+/**
+Funzione che segnala che ho visualizzato una hit nel momento in cui la clicco.
+**/
+app.post("/hits/visual/",function(request, response, next){
+  var query="Update Utenti_Hit Set Visualizzato=1 Where UtentiHitId="+request.body.utentiHitId+";";
+  //console.log(query);
+  insertQuery(query,function(errore){
+    if(!errore){
+      response.sendStatus(200);
+    }else{
+      console.log("Errore nella segnalazione di una visualizzazione avvenuta:");
+      console.log(errore);
+      response.sendStatus(500);
+    }
+  })
+})
+
+/**
+Funzione che cerca ilnumero delle hit (renumerazioni) non elaborate
+Serve per le notifiche agli utenti.
+**/
+app.get("/hits/unreadamount/", function(request, response, next){
+  response.header('Content-Type', 'application/json');
+  var query="Select count(*) as Conteggio From Utenti_Hit Where UserId="+request.query.userId+
+  " and Visualizzato=0;"
+  //console.log(query);
+  selectQuery(query,function(errore,parser){
+    if(!errore){
+      response.send(parser[0]);
+    }else{
+      console.log("Errore nel fetch del numero di hits:");
+      console.log(errore);
+      response.sendStatus(500);
+    }
+  });
+})
+
+/**
+Funzione che aggiorna il worker id di un utente dato il suo id
+**/
+app.post("/turk/", function(request, response, next){
+  var query="UPDATE ritardoautobus.Utente SET WorkerId=\'"+
+            request.body.workerId+"\' WHERE UserID="+
+            request.body.userId+";";
+  insertQuery(query,function(errore){
+    if(!errore){
+      console.log("Aggiornamento workerId eseguito con successo.");
+      response.sendStatus(200);
+    }else{
+      console.log("Errore nell'inserimento del workerId:");
+      console.log(errore);
+      respone.status(500).send("Errore del server");
+    }
+  });
+})
 
 /**
  Funzione per la segnalazione dei ritardi.
@@ -431,9 +540,9 @@ Funzione che viene avviata ogni giorno alle 3 del mattino.
 Aggiorna la tabella dei ritardi inserendo 0 come ritardo ad ogni corsa.
 Necessaria per poi poter usufruire di UPDATE nel calcolo del ritardo medio.
 **/
-var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},function(){
+var resetRitardi = function(){
   var query="Insert Into Ritardo (IdCorsa,DataRitardo,Ritardo) "+
-              "Select IdCorsa,curdate(),'00:00:00' From Corsa;";
+              "Select IdCorsa,curdate(),\'00:00:00\' From Corsa;";
   insertQuery(query,function(errore){
     if(!errore){
       console.log("Azzeramento dei ritardi per la giornata eseguito con successo.");
@@ -442,12 +551,13 @@ var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},function(){
       console.log(errore);
     }
   })
-});
+};
+var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},resetRitardi);
 /**
 Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
 la tabella dei ritardi a partire dalla tabella delle segnalazioni.
 **/
-setInterval(function() {
+var aggiornaRitardi = function() {
   //questa variabile sarà la mia struttura dati
   //guardare sotto per dettagli.
   var corse = {};
@@ -555,7 +665,8 @@ setInterval(function() {
       console.log(errore);
     }
   });
-},intervalloRitardi);
+};
+setInterval(aggiornaRitardi,intervalloRitardi);
 
 //Easter egg
 app.get("/some",function(request,response){
@@ -621,7 +732,10 @@ app.get("/some",function(request,response){
 app.use(function (request, response) {
     response.status(404).send('<h1> Pagina non trovata </h1>');
 });
-//apro server su porta 7777
-app.listen(8080, function () {
-    console.log('Server aperto: http://localhost:8080');
+//apro server su porta 8080
+//heroku vuole ascoltare sulla sua porta
+//var porta = process.env.PORT || 3000;
+var porta = 8080;
+app.listen(porta, function () {
+    console.log('Server aperto');
 });
