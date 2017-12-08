@@ -5,10 +5,10 @@
 var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
 var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
 
-/*
+/**
 var serverLocation = "http://localhost:8080/";
 var nodeLocation = "http://localhost:8080/";
-*/
+**/
 
 var oldTurk;
 var oldTime;
@@ -45,7 +45,7 @@ function load() {
     var id = leggiCookie("userId");
 
     if(id == undefined) {
-        console.log("User not logged in");;
+        console.log("User not logged in");
         document.location.href = serverLocation;
     } else {
         console.log("User logged in");
@@ -142,7 +142,7 @@ function applySettings() {
     //aggiorno il cookie solo se necessario
     if(oldTime==null || oldTime!=timeSlider.value){
       console.log("Tempo aggiornato in "+timeSlider.value);
-      document.cookie = "timeRange="+ timeSlider.value;
+    document.cookie = "timeRange="+ timeSlider.value;
       oldTime=timeSlider.value;
       alert=alert+"Tempo aggiornato.\n";
     }
@@ -169,7 +169,7 @@ function applySettings() {
         }
         window.alert(alert);
         back();
-      });
+    });
     }else{
       if(alert!=""){
         window.alert(alert);
@@ -184,6 +184,5 @@ function applySettings() {
  * Function called when the user click on the back button
  */
 function back() {
-    var impostazioniUrl = serverLocation + "bus-visualization.html";
-    document.location.href = impostazioniUrl;
+    document.location.href = serverLocation;
 }

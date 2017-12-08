@@ -72,6 +72,7 @@ function load_info() {
         return data;
     }).then ((data) =>{
       if(data.length==0){
+        var rigaHit = document.createElement("div");
         rigaHit.setAttribute("style","display:table-row; width:auto; cursor:pointer;");
         var iTag=document.createElement("i");
         iTag.innerHTML="Non ci sono remunerazioni attive su questo account";
@@ -153,5 +154,5 @@ function load_info() {
  * Function called when the user click on the back button
  */
 function back() {
-    document.location.href = serverLocation + "bus-visualization.html";
+    document.location.href = serverLocation;
 }

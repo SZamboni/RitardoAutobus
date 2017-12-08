@@ -1,15 +1,18 @@
 /**
  * Function that returns a value of a defined cookie or undefined if that cookie is not found
  */
-
+ 
  var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
  var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
+
  /*
  var serverLocation = "http://localhost:8080/";
  var nodeLocation = "http://localhost:8080/";
-*/
+ */
 var stops;
-
+var map = null;
+var marker = null;
+var cerchioPosizione = null;
 /**
  * Function that given a cookie name controls if there is that cookie
  */
@@ -40,26 +43,53 @@ function leggiCookie(nomeCookie) {
  */
 function load() {
     var id = leggiCookie("userId");
-
+    console.log(id);
     if(id == undefined) {
         console.log("User not logged in");
-        document.location.href = serverLocation;
+
+        //creo login button
+        var loginbtn = document.createElement("BUTTON");        // Create a <button> element
+        var t = document.createTextNode("LOG IN");
+        loginbtn.appendChild(t);
+        loginbtn.onclick = openLogin;
+        document.getElementById("logDiv").appendChild(loginbtn);
+        /*
+        old_button = document.getElementById("impostazioni");
+        if(old_button != undefined) {
+            old_button.parentNode.removeChild(old_button);
+        }*/
     } else {
-        console.log("User logged in");
+      console.log("User logged in");
+
+      var notify = document.getElementById("notify");
+      fetch(nodeLocation+"hits/unreadamount/?userId="+id).then((response)=>{
+        data=response.json();
+        return data;
+      }).then((data)=>{
+        //console.log(data);
+        //console.log(data.Conteggio);
+        if(data.Conteggio!=0){
+          notify.innerHTML="Hai "+data.Conteggio+" notifiche da leggere.";
+        }else{
+          notify.innerHTML="Nessuna notifica da leggere."
+        }
+      });
+
+      //creo logout button
+      var logoutbtn = document.createElement("BUTTON");        // Create a <button> element
+      var t = document.createTextNode("LOG OUT");
+      logoutbtn.appendChild(t);
+      logoutbtn.onclick = signOut;
+      document.getElementById("logDiv").appendChild(logoutbtn);
+
+      //creo pulsante impostazioni
+      var impostazionibtn = document.createElement("BUTTON");        // Create a <button> element
+      var t = document.createTextNode("impostazioni");
+      impostazionibtn.appendChild(t);
+      impostazionibtn.onclick = clickImpostazioni;
+      document.getElementById("impostazioniDiv").appendChild(impostazionibtn);
     }
-    var notify = document.getElementById("notify");
-    fetch(nodeLocation+"hits/unreadamount/?userId="+id).then((response)=>{
-      data=response.json();
-      return data;
-    }).then((data)=>{
-      //console.log(data);
-      //console.log(data.Conteggio);
-      if(data.Conteggio!=0){
-        notify.innerHTML="Hai "+data.Conteggio+" notifiche da leggere.";
-      }else{
-        notify.innerHTML="Nessuna notifica da leggere."
-      }
-    });
+
 }
 
 /**
@@ -75,72 +105,23 @@ function initMap() {
             var latitude = position.coords.latitude;
             var longitude = position.coords.longitude;
 
-            /**Mettere // all'inizio di questa linea per attivare i dati test
-            //dati test
-            var latitude = 46.06597000 ;
-            var longitude = 11.1547000;
-            //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
-            //**/
-
-            var scanRange= leggiCookie("scanRange");
-            if(scanRange==null){
-              scanRange=0.5;//il range di default è 500m
-            }
-            console.log(scanRange);
             var myLatLng = {lat: latitude, lng: longitude};
-
-            var url_load_fermate = nodeLocation + "fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
-            // get the stops list
-            fetch(url_load_fermate)
-            .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
-                        data = response.json();
-                        return data;
-            }).then(function (data) {   // elaboro il json
-
-                // create the map and set the zoom and the center
-                var map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 16,
-                    center: myLatLng
-                });
-
-                // create and initialize the marker of the stops
-                for(var i = 0; i < data.fermate.length; i++) {
-                    var pos = { lat : parseFloat(data.fermate[i].latitudine), lng : parseFloat(data.fermate[i].longitudine)};
-                    var m = new google.maps.Marker({
-                        position : pos,
-                        map : map,
-                        title : data.fermate[i].nomeFermata,
-                        icon : "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                    })
-                }
-
-                // create and inizialize the position marker
-                var marker = new google.maps.Marker({
-                    position: myLatLng,
-                    map: map,
-                    title: 'La tua Posizione'
-                });
-
-                var cerchioPosizione = new google.maps.Circle({
-                    strokeColor: '#0000FF',
-                    strokeOpacity: 0.6,
-                    strokeWeight: 2,
-                    fillColor: '#0000FF',
-                    fillOpacity: 0.15,
-                    map: map,
-                    center: myLatLng,
-                    radius: scanRange  * 1000
-                });
-                // go ahead with the elaboration
-                caricaRitardi(data.fermate);
-
-            })
-            .catch(error => console.error(error))  // error handling
-
-        });
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 16,
+                center: myLatLng
+            });
+            aggiorna();
+      });
     } else {
         alert("Geolocation is not supported by this browser, all the functions will not be available");
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 16,
+            center: {lat: 46.0673076, lng: 11.1212993}
+        });
+
     }
+
 }
 
 /**
@@ -174,12 +155,13 @@ function caricaRitardi(fermate) {
             data = response.json();
             return data;
         }).then(function (data) {
-
-            for(var j = 0; j < stops.length; j++) {
-                if(stops[j].idFermata == data.lineeRitardi[0].idFermata) {
-                    stops[j].lineeRitardi = data.lineeRitardi;
-                    stops[j].idCorsa = data.lineeRitardi[0].idCorsa;
-                }
+            if(data.lineeRitardi[0]!=null){
+              for(var j = 0; j < stops.length; j++) {
+                  if(stops[j].idFermata == data.lineeRitardi[0].idFermata) {
+                      stops[j].lineeRitardi = data.lineeRitardi;
+                      stops[j].idCorsa = data.lineeRitardi[0].idCorsa;
+                  }
+              }
             }
 
             visualize();
@@ -250,7 +232,96 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
 
 
 }
+function aggiorna(){
+  if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition( function(position) {
+          // get the coordinates
+          var latitude = position.coords.latitude;
+          var longitude = position.coords.longitude;
 
+          /**Mettere // all'inizio di questa linea per attivare i dati test
+          //dati test
+          var latitude = 46.06597000 ;
+          var longitude = 11.1547000;
+          //Piazza manci coordinates: latitude=46.06597000; longitude=11.15470000;
+          //**/
+
+          var scanRange= leggiCookie("scanRange");
+          if(scanRange==null){
+            scanRange=0.5;//il range di default è 500m
+          }
+          console.log(scanRange);
+
+          var myLatLng = {lat: latitude, lng: longitude};
+          placeMarker(myLatLng,scanRange);
+
+          var url_load_fermate = nodeLocation + "fermate/?latitude="+ latitude + "&longitude=" + longitude + "&scanRange=" + scanRange;
+          // get the stops list
+          fetch(url_load_fermate)
+          .then((response) => {   // elaboro il risultato trasformandolo in json con la funzione json() che ritorna una promise
+                      data = response.json();
+                      return data;
+          }).then(function (data) {   // elaboro il json
+
+
+
+            // create and initialize the marker of the stops
+            for(var i = 0; i < data.fermate.length; i++) {
+                var pos = { lat : parseFloat(data.fermate[i].latitudine), lng : parseFloat(data.fermate[i].longitudine)};
+                var m = new google.maps.Marker({
+                    position : pos,
+                    map : map,
+                    title : data.fermate[i].nomeFermata,
+                    icon : "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                })
+            }
+
+            // go ahead with the elaboration
+            caricaRitardi(data.fermate);
+
+            })
+            .catch(error => console.error(error))  // error handling
+
+            });
+            console.log("aggiorno");
+        }
+        else {
+          alert("Geolocation is not supported by this browser, all the functions will not be available");
+        }
+}
+
+/*
+funzione che aggiorna la posizione dell'utente
+*/
+function placeMarker(location,scanRange) {
+    if (marker == null)
+        marker = new google.maps.Marker({
+            position: location,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+            map: map,
+            title: 'La tua Posizione'
+        });
+    else {
+        marker.setPosition(location);
+    }
+    marker.setAnimation(null);
+
+    if(cerchioPosizione == null){
+      cerchioPosizione = new google.maps.Circle({
+          strokeColor: '#0000FF',
+          strokeOpacity: 0.6,
+          strokeWeight: 2,
+          fillColor: '#0000FF',
+          fillOpacity: 0.15,
+          map: map,
+          center: location,
+          radius: scanRange  * 1000
+      });
+    }else{
+      cerchioPosizione.setCenter(location);
+    }
+}
 /**
  * Function that visualize stops and bus
  */
@@ -293,19 +364,21 @@ function visualize() {
             delay.innerHTML = stops[i].lineeRitardi[j].ritardo + " min";
             tr.appendChild(delay);
 
-            var buttoncell = document.createElement("td");
-            var button = document.createElement('button');
-            button.idFermata = stops[i].idFermata;
-            button.idLinea = stops[i].lineeRitardi[j].idLinea;
-            button.idCorsa = stops[i].idCorsa;
-            button.latFermata = stops[i].latitudine;
-            button.lonFermata = stops[i].longitudine;
-            button.onclick = function () {   // the function called when the button is press
-                click(this.idFermata, this.idLinea, this.idCorsa, this.latFermata, this.lonFermata);
-            };
-            button.innerHTML = "Segnala Salita";
-            buttoncell.appendChild(button);
-            tr.appendChild(buttoncell);
+            if(leggiCookie("userId") != undefined) {
+              var buttoncell = document.createElement("td");
+              var button = document.createElement('button');
+              button.idFermata = stops[i].idFermata;
+              button.idLinea = stops[i].lineeRitardi[j].idLinea;
+              button.idCorsa = stops[i].idCorsa;
+              button.latFermata = stops[i].latitudine;
+              button.lonFermata = stops[i].longitudine;
+              button.onclick = function () {   // the function called when the button is press
+                  click(this.idFermata, this.idLinea, this.idCorsa, this.latFermata, this.lonFermata);
+              };
+              button.innerHTML = "Segnala Salita";
+              buttoncell.appendChild(button);
+              tr.appendChild(buttoncell);
+            }
 
             table.appendChild(tr);
         }
@@ -326,3 +399,5 @@ function clickImpostazioni() {
     var impostazioniUrl = serverLocation + "impostazioni.html";
     document.location.href = impostazioniUrl;
 }
+
+setInterval(aggiorna,60000);
