@@ -40,7 +40,8 @@ function load() {
         console.log("User not logged in");
 
         //creo login button
-        var loginbtn = document.createElement("BUTTON");        // Create a <button> element
+        var loginbtn = document.createElement("BUTTON");
+        loginbtn.className += "searchbar";        // Create a <button> element
         var t = document.createTextNode("LOG IN");
         loginbtn.appendChild(t);
         loginbtn.onclick = openLogin;
@@ -54,7 +55,8 @@ function load() {
       console.log("User not logged in");
 
       //creo logout button
-      var logoutbtn = document.createElement("BUTTON");        // Create a <button> element
+      var logoutbtn = document.createElement("BUTTON");
+      loginbtn.className += "searchbar";        // Create a <button> element
       var t = document.createTextNode("LOG OUT");
       logoutbtn.appendChild(t);
       logoutbtn.onclick = signOut;
@@ -80,8 +82,8 @@ function initMap() {
         navigator.geolocation.getCurrentPosition( function(position) {
 
             // get the coordinates
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
+            var latitude = 46.0667069;
+            var longitude = 11.1655039;
 
             /**Mettere // all'inizio di questa linea per attivare i dati test
             //dati test
