@@ -18,9 +18,12 @@ Select count(*)
 From Utenti_Hit
 Where UserId=1;
 
+Alter Table Utenti_Hit
+Add Column ValoreHit DECIMAL(4,2);
+
 Select *
 From Utenti_Hit
-Where UserId=1;
+Where UserId=11;
 
 Update Utenti_Hit
 Set Visualizzato=1

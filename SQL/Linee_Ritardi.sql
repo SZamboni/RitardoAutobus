@@ -16,7 +16,11 @@ And
 T1.IdLinea=Linea.IdLinea
 Order By Orario,IdCorsa,IdLinea;
 
-Select * From Fermata Where NomeFermata like '%manci%';
+Select * From Fermata Where NomeFermata like '%Povo p%';
+
+Update Fermata
+Set NomeFermata=''
+Where IdFermata=11016;
 
 Drop Procedure Linee_Ritardi;
 
