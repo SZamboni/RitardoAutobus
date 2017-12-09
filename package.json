@@ -33,11 +33,8 @@
     "jest": "^21.2.1",
     "superagent": "^3.8.2",
     "supertest": "^3.0.0"
-<<<<<<< HEAD
   },
   "scripts": {
       "test": "jest"
-=======
->>>>>>> 41376e10607aec9e150a940c6303646017b88ef7
   }
 }
