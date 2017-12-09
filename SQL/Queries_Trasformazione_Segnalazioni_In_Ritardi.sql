@@ -26,3 +26,11 @@ where Ritardo.IdCorsa=IdCorsa;
 Update Segnalazione
 set Elaborato=1
 where IdSegnalazione=1;
+
+Select distinct Corsa as IdCorsa,Time_to_Sec(Ritardo.Ritardo) As Ritardo
+From Segnalazione,Ritardo
+Where Elaborato=0 And SegnalazioneValida=1 And Date(DataOra)=Curdate() And Corsa=IdCorsa And DataRitardo=Curdate();
+
+Select Corsa as IdCorsa,Time_to_Sec(Segnalazione.Ritardo) As Ritardo, IdSegnalazione
+From Segnalazione
+Where Elaborato=0 And SegnalazioneValida=1 And Date(DataOra)=Curdate();

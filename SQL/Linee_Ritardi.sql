@@ -16,6 +16,30 @@ And
 T1.IdLinea=Linea.IdLinea
 Order By Orario,IdCorsa,IdLinea;
 
+-- ---------------------------------------------------------------------------
+
+CREATE PROCEDURE Linee_Ritardi(IN IdFerm INT,IN Scarto TIME)
+select distinct Linea.IdLinea, NomeLinea, Orario, Ritardo, T1.IdCorsa
+
+from (select IdLinea, Orario, IdCorsa
+	  from Corsa_Fermata_Orario
+	  where IdFermata=IdFerm
+	  and 
+	  (Orario between Time((Time(addtime(now(),'01:00:00'))))
+      and (Time(addtime((Time(addtime(now(),'01:00:00'))),Scarto))))) As T1, Linea, Ritardo
+      
+where Linea.IdLinea in (select IdLinea 
+						from Linea_Fermata
+                        where IdFermata=IdFerm)
+and
+T1.IdCorsa=Ritardo.IdCorsa
+and
+Ritardo.DataRitardo = Curdate()
+and
+T1.IdLinea=Linea.IdLinea
+Order By Orario;
+-- -----------------------------------------------------------------------------
+
 Select * From Fermata Where NomeFermata like '%Povo p%';
 
 Update Fermata
@@ -24,7 +48,7 @@ Where IdFermata=11016;
 
 Drop Procedure Linee_Ritardi;
 
-Call Linee_Ritardi(10405,'00:10:00');
+Call Linee_Ritardi(170,'01:00:00');
 
 Select distinct IdLinea,Orario,IdCorsa
 From Corsa_Fermata_Orario
@@ -39,3 +63,10 @@ Alter Table Utenti_Hit_Id
 Add column HitTipeId VARCHAR(100);
 
 Describe Utenti_Hit_Id;
+
+select IdLinea, Orario, IdCorsa
+	  from Corsa_Fermata_Orario
+	  where IdFermata=170
+	  and 
+	  (Orario between Time((Time(addtime(now(),'01:00:00'))))
+      and (Time(addtime((Time(addtime(now(),'01:00:00'))),'00:50:00'))))

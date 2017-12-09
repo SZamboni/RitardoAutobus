@@ -9,6 +9,10 @@ update Utenti_Hit
 set UserID=6
 where UserID=11;
 
+update Ritardo
+set Ritardo='00:00:00'
+where DataRitardo=curdate();
+
 -- Numero di Hit non visualizzati in base all'UserId
 -- Dato l'Id : Tutto
 -- Update che mette visualizzato a 1 dato l'Id della tabella

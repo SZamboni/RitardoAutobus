@@ -37,13 +37,13 @@ CREATE TABLE IF NOT EXISTS Segnalazione
 	IdFermata INTEGER NOT NULL,
 	DataOra DATETIME NOT NULL,
     Ritardo TIME NOT NULL,
-	Linea INTEGER NOT NULL,
+	Corsa INTEGER NOT NULL,
 	Latitudine DECIMAL(10,8) NOT NULL,
 	Longitudine DECIMAL(11,8) NOT NULL,
 	Elaborato BIT(1) DEFAULT 0 NOT NULL,
 	SegnalazioneValida BIT(1) NOT NULL,
 	FOREIGN KEY (IdSegnalatore) REFERENCES Utente(UserID),
-	FOREIGN KEY (Linea) REFERENCES Linea(IdLinea),
+	FOREIGN KEY (Corsa) REFERENCES Corsa(IdCorsa),
 	FOREIGN KEY (IdFermata) REFERENCES Fermata(IdFermata)
 );
 

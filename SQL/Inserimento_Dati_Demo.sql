@@ -11,7 +11,7 @@ INSERT INTO Fermata (NomeFermata,Latitudine,Longitudine,Direzione)
 VALUES ("Povo Piazza Manci",46.065806,11.154617,1);
 
 INSERT INTO Fermata (NomeFermata,Latitudine,Longitudine,Direzione)
-VALUES ("Povo Piazza Manci",46.065956 ,11.154595,0);
+VALUES ('àààfffèèè',46.065956 ,11.154595,0);
 
 INSERT INTO Corsa (IdLinea)
 VALUES (1);
@@ -21,6 +21,9 @@ VALUES (2);
 
 INSERT INTO Corsa_Fermata_Orario (IdCorsa,IdLinea,Orario,IdFermata)
 VALUES (1,1,'16:20:00',1);
+
+INSERT INTO Corsa_Fermata_Orario (IdCorsa,IdLinea,Orario,IdFermata)
+VALUES (2,2,'16:20:00',2);
 
 INSERT INTO Linea_Fermata(IdLinea,IdFermata)
 VALUES (1,1);
