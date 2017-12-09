@@ -50,18 +50,6 @@ Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
 **/
 var pMedia=0.2;
 
-//Istanze per Amazon Mechanical Turk
-var util = require('util');
-var AWS = require('aws-sdk');
-AWS.config.loadFromPath('./amt-config.json');
-fs = require('fs');
-//URL della sandbox di AWSMechTurk
-var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
-//Connessione alla requester sandbox
-var mturk = new AWS.MTurk({ endpoint: endpoint });
-//
-var schedule = require('node-schedule');
-
 //Abilito CORS su tutto il server
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -982,10 +970,5 @@ FINE AMAZON MECHANICAL TURK
 app.use(function (request, response) {
     response.status(404).send('<h1> Pagina non trovata </h1>');
 });
-//apro server su porta 8080
-//heroku vuole ascoltare sulla sua porta
-//var porta = process.env.PORT || 3000;
-var porta = 8080;
-app.listen(porta, function () {
-    console.log('Server aperto');
-});
+
+module.exports = app;
