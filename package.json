@@ -2,7 +2,7 @@
   "name": "ritardoautobus",
   "version": "1.0.0",
   "description": "Applicazione per la gestione dei ritardi autobus trentini",
-  "main": "webServ.node.js",
+  "main": "server.node.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
