@@ -865,8 +865,8 @@ var creazioneHit = schedule.scheduleJob('0 0 1 * *', function() {
 
 // funzione che ogni giorno controlla se gli utenti hanno accettato e confermato le HITs create,
 // in caso affermativo, accetta la risposta e invia il pagamento
-//var controlloHit = schedule.scheduleJob('0 0 */1 * *', function(){
-var controlloHit = schedule.scheduleJob('*/1 * * * *', function(){ // per test
+var controlloHit = schedule.scheduleJob('0 0 */1 * *', function(){
+//var controlloHit = schedule.scheduleJob('*/1 * * * *', function(){ // per test
 
   var query = 'select HitId,Utente.UserID,WorkerId,UtentiHitId ' +
   'from Utente,Utenti_Hit ' +
