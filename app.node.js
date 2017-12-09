@@ -198,7 +198,7 @@ app.post('/login/', function (request, response, next) {
         } else {
             console.log('Errore nella waterfall.');
             console.log(errore);
-            response.status(500).send("Internal server error.");
+            response.sendStatus(500);
         }
     });
 });
@@ -264,7 +264,7 @@ app.post('/worker/', function (request, response, next) {
     if (errore) {
       console.log("Errore nella waterfall del worker");
       console.log(errore);
-      response.status(500).send("Internal server error.");
+      response.sendStatus(500);
     } else {
       console.log('ok');
     }
@@ -312,7 +312,7 @@ app.get('/fermate/', function (request, response, next) {
         } else {
             console.log("Errore nella ricerca delle fermate più vicine.");
             console.log(errore);
-            response.status(500).send("Errore nel server.");
+            response.sendStatus(500);
         }
     });
 });
@@ -372,7 +372,7 @@ app.get('/ritardi/', function (request, response, next) {
         } else {
             console.log("Errore nella ricerca delle linee e ritardi.");
             console.log(errore);
-            response.status(500).send("Errore nel server.");
+            response.sendStatus(500);
         }
     });
 });
@@ -467,7 +467,7 @@ app.post("/turk/", function(request, response, next){
     }else{
       console.log("Errore nell'inserimento del workerId:");
       console.log(errore);
-      respone.status(500).send("Errore del server");
+      response.sendStatus(500);
     }
   });
 })
@@ -595,7 +595,7 @@ app.post('/salita/', function (request, response, next) {
         } else {
             console.log('Errore nella waterfall.');
             console.log(errore);
-            response.status(500).send("Internal server error.");
+            response.sendStatus(500);
         }
     });
 });
