@@ -521,21 +521,6 @@ app.post('/salita/', function (request, response, next) {
       function(callback){
         //Controllo se la segnalazione è valida.
 
-        /**
-        //Chiamare una query per calcolare la distanza è stupido,
-        //considerando che si può direttamente fare in node.
-
-        //creo la Query
-        var query="CALL ritardoautobus.Distanza (\'"+
-        latUtente+"\',\'"+lonUtente+"\',\'"+
-        latFermata+"\',\'"+lonFermata+"\');";
-        console.log(query);
-        callback(null,query);
-      },
-      selectQuery,
-      function(parser,callback){
-        **/
-
         //CALCOLO LA DISTANZA TRA I DUE PUNTI
         //funzione strana, ma funziona #vivaifisici
 
@@ -603,14 +588,14 @@ app.post('/salita/', function (request, response, next) {
         }
         //inserisco la segnalazione, che sia valida o meno.
         var query = "INSERT INTO ritardoautobus.Segnalazione " +
-                "(IdSegnalatore,IdFermata,DataOra,Ritardo,Linea,Latitudine,Longitudine,SegnalazioneValida) VALUES (" +
-                idUtente  + "," +
-                idFermata + ",\'" +
+                "(IdSegnalatore,IdFermata,DataOra,Ritardo,Corsa,Latitudine,Longitudine,SegnalazioneValida) VALUES (" +
+                idUtente  + ","     +
+                idFermata + ",\'"   +
                 dataOra   + "\',\'" +
-                ritardo   + "\',"+
-                idLinea   + ","   +
-                latUtente + ","   +
-                lonUtente + ","+
+                ritardo   + "\',"   +
+                idCorsa   + ","     +
+                latUtente + ","     +
+                lonUtente + ","     +
                 segnalazioneValida + ");";
         callback(null,query);
       },
@@ -658,16 +643,12 @@ var aggiornaRitardi = function() {
         //Creo la query da lanciare
         //Cerco inanzitutto gli id delle corse che dovrò aggiornare.
         //Mi salvo anche il ritardo attuale in secondi.
-        var query="Select distinct Ritardo.IdCorsa,time_to_sec(Ritardo) as Ritardo From Ritardo, "+
-                  "(Select IdCorsa "+
-                  "From "+
-                  "(Select * "+
-                  "From Segnalazione "+
-                  "Where Elaborato=0 and SegnalazioneValida=1) As S1, "+
-                  "(Select IdCorsa,IdLinea,IdFermata "+
-                  "From Corsa_Fermata_Orario) As Id "+
-                  "Where Id.IdLinea=S1.Linea and Id.IdFermata=S1.IdFermata) As T1 "+
-                  "Where Ritardo.IdCorsa=T1.IdCorsa;";
+        var query="Select distinct Corsa as IdCorsa, "+
+                  "Time_to_Sec(Ritardo.Ritardo) As Ritardo " +
+                  "From Segnalazione,Ritardo "+
+                  "Where Elaborato=0 And SegnalazioneValida=1 And "+
+                  "Date(DataOra)=Curdate() And Corsa=IdCorsa And "+
+                  "DataRitardo=Curdate();"
         //console.log(query);
         callback(null,query);
       },selectQuery,
@@ -684,16 +665,10 @@ var aggiornaRitardi = function() {
           corse[parser[i].IdCorsa]=parser[i].Ritardo;
         }
         //console.log(corse);
-        //ora che ho le corse mi servono i ritardi in modo da aggiornare le stesse
-        var query="Select Dataora, time_to_sec(S1.Ritardo) as Ritardo, IdCorsa, IdSegnalazione "+
-                    "From "+
-                    "(Select * "+
-                    "From Segnalazione "+
-                    "Where Elaborato=0 and SegnalazioneValida=1 and Date(curdate())=Date(DataOra)) As S1, "+
-                    "(Select IdCorsa,IdLinea,IdFermata "+
-                    "From Corsa_Fermata_Orario) As Id "+
-                    "Where Id.IdLinea=S1.Linea and Id.IdFermata=S1.IdFermata "+
-                    "Order by DataOra;";
+        //ora che ho le corse mi servono le segnalazioni in modo da aggiornare le stesse
+        var query="Select Corsa as IdCorsa,Time_to_Sec(Segnalazione.Ritardo) "+
+                  "As Ritardo, IdSegnalazione From Segnalazione Where "+
+                  "Elaborato=0 And SegnalazioneValida=1 And Date(DataOra)=Curdate();"
         //console.log(query);
         callback(null,query);
       },selectQuery,
@@ -701,6 +676,8 @@ var aggiornaRitardi = function() {
         var query=null;
         //aggiorno la query solo se devo
         if(parser.length!=0){
+          //per ogni corsa ho un update dei ritardi + un update generico per
+          //tutte le segnalazioni che ho elaborato dove il flag elaborato va settato a 1
           query= new Array(Object.keys(corse)+1);
           query[0]="update Segnalazione set Elaborato=1 where";
           var indTemp=0;
@@ -711,14 +688,16 @@ var aggiornaRitardi = function() {
             corse[parser[i].IdCorsa]=
               pMedia*corse[parser[i].IdCorsa]+
               (1-pMedia)*parser[i].Ritardo;
-            //devo aggiornare i record settando le segnalazioni come elaborate  +
+            //devo aggiornare i record settando le segnalazioni come elaborate
             if(indTemp!==0){
+              //se è già la seconda segnalazione che devo aggiornare devo mettere l'OR
               query[0]=query[0]+" OR";
             }
             query[0]=query[0]+" IdSegnalazione = "+parser[i].IdSegnalazione;
             indTemp++;
             //console.log("Nuovo ritardo: "+corse[parser[i].IdCorsa]);
           }
+          //chiudo la prima query
           query[0]=query[0]+";";
           //console.log(query);
           //console.log("Ritardi da inserire:");
@@ -1005,8 +984,8 @@ app.use(function (request, response) {
 });
 //apro server su porta 8080
 //heroku vuole ascoltare sulla sua porta
-var porta = process.env.PORT || 3000;
-//var porta = 8080;
+//var porta = process.env.PORT || 3000;
+var porta = 8080;
 app.listen(porta, function () {
     console.log('Server aperto');
 });
