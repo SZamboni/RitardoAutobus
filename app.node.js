@@ -617,7 +617,7 @@ var resetRitardi = function(){
     }
   })
 };
-var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},resetRitardi);
+var scheduleRitardi = schedule.scheduleJob('1 0 */1 * *',resetRitardi);
 /**
 Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
 la tabella dei ritardi a partire dalla tabella delle segnalazioni.
