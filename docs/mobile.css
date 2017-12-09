@@ -3,7 +3,7 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 */
-/* 
+/*
     Created on : 29-set-2017, 18.00.05
     Author     : Federico
 */
@@ -16,7 +16,7 @@ body{
 
 .container{
     display: grid;
-    grid-template-rows:50px 200px 200px 50px;
+    grid-template-rows:50px 700px 200px;
     grid-template-columns: 100%;
     position:relative;
     grid-template-areas:
@@ -31,15 +31,36 @@ body{
     grid-template-columns:20vw 60vw 20vw;
     position: fixed;
     grid-template-areas:
-        "menu header-title search";
+        "menug header-title search";
     background-color: #434343;
-    margin-bottom: 15px;
+    /*margin-bottom: 15px;*/
     font-family: Arial, Helvetica, sans-serif;
+    z-index: 99999999;
 }
 
-
-.searchbar a{
+.searchbar {
     grid-area:search;
+    background-color: grey;
+    z-index: 99999999;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+      margin: 4px 2px;
+    cursor: pointer;
+}
+/*.searchbar :hover {
+  background-color: #ddd;
+  color: black;
+}*/
+
+/*menu per il profilo*/
+
+.menu a{
+    grid-area:menug;
     overflow: hidden;
     color: white;
     display: block;
@@ -49,23 +70,22 @@ body{
     text-decoration: none;
     font-size: 17px;
 }
-.searchbar a:hover {
+.menu a:hover {
   background-color: #ddd;
   color: black;
 }
-
-/*menu per il profilo*/
 .sidenav {
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 1;
+    z-index: 99999999;
+    color: white;
     top: 0;
     left: 0;
     background-color: #111;
     overflow-x: hidden;
     transition: 0.5s;
-    padding-top: 60px;
+    /*padding-top: 60px;*/
 }
 
 .sidenav a {
@@ -76,7 +96,7 @@ body{
     text-align: center;
     padding: 30px;
     text-decoration: none;
-    font-size: 17px;
+    font-size: 25px;
 }
 
 .sidenav a:hover {
@@ -97,22 +117,6 @@ body{
   .sidenav a {font-size: 18px;}
 }
 
-
-.menu a{
-    overflow: hidden;
-    grid-area:menu;
-    color: white;
-    display: block;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 30px;
-    text-decoration: none;
-    font-size: 17px;
-}
-.menu a:hover {
-  background-color: #ddd;
-  color: black;
-}
 /*menu per il profilo*/
 
 .titolo{
@@ -126,31 +130,43 @@ body{
 
 .mapp{
     grid-area:mappa;
-    margin: auto;
+    margin-top: 50px;
+    height: 100%;
+    margin-left: 25px;
+    margin-right: 25px;
+
 }
 
 
 .stops{
     grid-area:fermate;
     margin: auto;
+    margin-top: 100px;
+    margin-bottom: 40px;
 }
 
 
 /*bottoni in basso*/
 .navbar {
   overflow: hidden;
-  background-color: #333;  
+  background-color: #333;
   position: fixed;
   width: 100%;
   bottom: 0;
+  color: white;
+  padding-left: 13px;
+  vertical-align: middle;
+  /*vertical-align: middle;
+  padding-top: 10px;
+  padding-bottom: 10px;*/
 }
 
 .navbar a {
-  float: left;
+  float: right;
   display: block;
   color: #f2f2f2;
   text-align: center;
-  padding: 14px 50%;/*
+  padding: 14px 45px;/*
   padding-top: 14px;
   padding-right: 48.27%;*/
   text-decoration: none;
@@ -160,11 +176,6 @@ body{
 .navbar a:hover {
   background-color: #ddd;
   color: black;
-}
-
-.navbar a.active {
-  background-color: #4CAF50;
-  color: white;
 }
 
 .navbar .icon {
@@ -185,7 +196,7 @@ body{
     background-color: #434343;
     margin-bottom: 15px;
     font-family: Arial, Helvetica, sans-serif;
-    
+
     justify-content: center;
     align-content:center;
 }
@@ -210,4 +221,3 @@ body{
 
 
 /*________________________________________________________________________________________________*/
-

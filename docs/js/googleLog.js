@@ -9,7 +9,7 @@
 
  var serverLocation = "http://localhost:8080/";
  var nodeLocation = "http://localhost:8080/";
- 
+
 var logInWindow;
 
 function openLogin(){

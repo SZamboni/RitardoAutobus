@@ -20,6 +20,11 @@
         <meta name="google-signin-client_id" content="357283213666-8s2b8eiguf5abidvemu4f39aucupgggk.apps.googleusercontent.com">
         <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+        <!--collapse per le fermate-->
+        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
         <script type="text/javascript" src="js/googleLog.js"></script>
         <script type="text/javascript" src="js/visualizza-bus.js"></script>
         <script type="text/javascript" src="js/impostazioni.js"></script>
@@ -32,7 +37,7 @@
     </head>
 
     <body onload="load()">
-      <div>
+      
         <!--________________________________________________________________________-->
         <div class="container">
             <div class="containerHeader">
@@ -77,10 +82,7 @@
 
 
             <div class="stops">
-              //ZENONE ECCOLE QUA
-              <a id="notify" href="remunerazioni.html"></a>
-              <div id="impostazioniDiv"></div>
-              //ROBA MIA TI PREGO AGGIUNGILA
+              <!--<div id="impostazioniDiv"></div>-->
               <h3 id="selezione-fermate">Fermate vicino a te:</h3>
               <h3 id="bus-e-ritardi"></h3><br>
               <div id="impostazioniDiv"></div>
@@ -92,7 +94,8 @@
 
         </div>
         <div class="navbar" id="myNavbar">
-            Where is my bus
+            Where is my bus &#174;
+            <a id="notify" href="remunerazioni.html">NOTIFICHE</a>
         </div>
 
         <script>
