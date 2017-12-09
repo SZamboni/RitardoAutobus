@@ -20,6 +20,18 @@ var schedule= require('node-schedule');
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
+//Istanze per Amazon Mechanical Turk
+var util = require('util');
+var AWS = require('aws-sdk');
+AWS.config.loadFromPath('./amt-config.json');
+fs = require('fs');
+//URL della sandbox di AWSMechTurk
+var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
+//Connessione alla requester sandbox
+var mturk = new AWS.MTurk({ endpoint: endpoint });
+//
+var schedule = require('node-schedule');
+
 //IMPOSTAZIONI AGGIORNAMENTO RITARDI
 //Scelgo l'intervallo di aggiornamento automatico dei ritardi.
 var intervalloRitardi = 20000; //20000= 20sec
@@ -38,6 +50,18 @@ Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
 **/
 var pMedia=0.2;
 
+//Istanze per Amazon Mechanical Turk
+var util = require('util');
+var AWS = require('aws-sdk');
+AWS.config.loadFromPath('./amt-config.json');
+fs = require('fs');
+//URL della sandbox di AWSMechTurk
+var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
+//Connessione alla requester sandbox
+var mturk = new AWS.MTurk({ endpoint: endpoint });
+//
+var schedule = require('node-schedule');
+
 //Abilito CORS su tutto il server
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -52,6 +76,7 @@ app.use(function(req, res, next) {
 });
 
 //app.use(corser.create());
+
 /****************
  INIZIO WEBSERVER
  ****************/
@@ -188,7 +213,75 @@ app.post('/login/', function (request, response, next) {
             response.status(500).send("Internal server error.");
         }
     });
-})
+});
+
+//funzione che aggiunge il WorkerId al database se è la prima volta che l'utente effettua il login
+app.post('/worker/', function (request, response, next) {
+
+  async.waterfall([
+    function(callback){
+      var query = 'update Utente set WorkerId=\'' + request.body.workerId + '\' where UserID=\'' + request.body.userId + '\';'
+      callback(null,query);
+    },
+    insertQuery,
+    function(callback) {
+      /**
+      QualificationType personalizzata per l'utente per accettare le HIT, la qualification permette di restringere chi
+      può accettareuna HIT in modo che un utente può accettare solo le HITs create per lui e non le HITs create per altri utenti
+      **/
+      var myQualType = {
+        Name: 'Qualifica di ' + request.body.workerId,
+        Description: 'Qualifica per accettare le HIT personalizzate di ' + request.body.workerId,
+        QualificationTypeStatus: 'Active',
+      };
+
+      //creazione della QualificationType dell'utente
+      mturk.createQualificationType(myQualType, function (err, data) {
+        if (err) {
+          console.log("Errore nella creazione della qualifica");
+          console.log(err);
+        } else {
+          console.log(data);
+          var qualTypeId = data.QualificationType.QualificationTypeId;
+
+          callback(null, qualTypeId);
+        }
+      });
+    },
+    function(qualTypeId, callback){
+      //associazione tra utente e QualificationType
+      var myAssociationQualWork = {
+        QualificationTypeId: qualTypeId,
+        WorkerId: request.body.workerId,
+        SendNotification: true,
+      };
+      //assegna la QualificationType dell'utente all'utente
+      mturk.associateQualificationWithWorker(myAssociationQualWork, function (err, data) {
+        if (err) {
+          console.log("Errore nell'associazione della qualifica");
+          console.log(err.message);
+        } else {
+          console.log(data);
+        }
+      });
+      var query = 'update Utente set QualificationTypeId=\'' + qualTypeId + '\' where UserID=\'' + request.body.userId + '\';';
+      callback(null,query);
+    },
+    insertQuery,
+    function(callback){
+      console.log("Aggiornamento workerId e QualificationTypeId eseguito con successo.");
+      response.sendStatus(200);
+    }
+  ], function(errore) {
+    if (errore) {
+      console.log("Errore nella waterfall del worker");
+      console.log(errore);
+      response.status(500).send("Internal server error.");
+    } else {
+      console.log('ok');
+    }
+  });
+});
 
 /**
  funzione che ritorna le fermate più vicine partendo dalla latitudine e longitudine
@@ -398,7 +491,6 @@ app.post("/turk/", function(request, response, next){
  **/
 app.post('/salita/', function (request, response, next) {
     //console.log(JSON.stringify(request.body,null,4));
-
     //Valori di test
     var idUtente = request.body.idUtente;
     var dataOra = request.body.dataOra;
@@ -428,21 +520,6 @@ app.post('/salita/', function (request, response, next) {
     async.waterfall([
       function(callback){
         //Controllo se la segnalazione è valida.
-
-        /**
-        //Chiamare una query per calcolare la distanza è stupido,
-        //considerando che si può direttamente fare in node.
-
-        //creo la Query
-        var query="CALL ritardoautobus.Distanza (\'"+
-        latUtente+"\',\'"+lonUtente+"\',\'"+
-        latFermata+"\',\'"+lonFermata+"\');";
-        console.log(query);
-        callback(null,query);
-      },
-      selectQuery,
-      function(parser,callback){
-        **/
 
         //CALCOLO LA DISTANZA TRA I DUE PUNTI
         //funzione strana, ma funziona #vivaifisici
@@ -511,14 +588,14 @@ app.post('/salita/', function (request, response, next) {
         }
         //inserisco la segnalazione, che sia valida o meno.
         var query = "INSERT INTO ritardoautobus.Segnalazione " +
-                "(IdSegnalatore,IdFermata,DataOra,Ritardo,Linea,Latitudine,Longitudine,SegnalazioneValida) VALUES (" +
-                idUtente  + "," +
-                idFermata + ",\'" +
+                "(IdSegnalatore,IdFermata,DataOra,Ritardo,Corsa,Latitudine,Longitudine,SegnalazioneValida) VALUES (" +
+                idUtente  + ","     +
+                idFermata + ",\'"   +
                 dataOra   + "\',\'" +
-                ritardo   + "\',"+
-                idLinea   + ","   +
-                latUtente + ","   +
-                lonUtente + ","+
+                ritardo   + "\',"   +
+                idCorsa   + ","     +
+                latUtente + ","     +
+                lonUtente + ","     +
                 segnalazioneValida + ");";
         callback(null,query);
       },
@@ -566,16 +643,12 @@ var aggiornaRitardi = function() {
         //Creo la query da lanciare
         //Cerco inanzitutto gli id delle corse che dovrò aggiornare.
         //Mi salvo anche il ritardo attuale in secondi.
-        var query="Select distinct Ritardo.IdCorsa,time_to_sec(Ritardo) as Ritardo From Ritardo, "+
-                  "(Select IdCorsa "+
-                  "From "+
-                  "(Select * "+
-                  "From Segnalazione "+
-                  "Where Elaborato=0 and SegnalazioneValida=1) As S1, "+
-                  "(Select IdCorsa,IdLinea,IdFermata "+
-                  "From Corsa_Fermata_Orario) As Id "+
-                  "Where Id.IdLinea=S1.Linea and Id.IdFermata=S1.IdFermata) As T1 "+
-                  "Where Ritardo.IdCorsa=T1.IdCorsa;";
+        var query="Select distinct Corsa as IdCorsa, "+
+                  "Time_to_Sec(Ritardo.Ritardo) As Ritardo " +
+                  "From Segnalazione,Ritardo "+
+                  "Where Elaborato=0 And SegnalazioneValida=1 And "+
+                  "Date(DataOra)=Curdate() And Corsa=IdCorsa And "+
+                  "DataRitardo=Curdate();"
         //console.log(query);
         callback(null,query);
       },selectQuery,
@@ -592,16 +665,10 @@ var aggiornaRitardi = function() {
           corse[parser[i].IdCorsa]=parser[i].Ritardo;
         }
         //console.log(corse);
-        //ora che ho le corse mi servono i ritardi in modo da aggiornare le stesse
-        var query="Select Dataora, time_to_sec(S1.Ritardo) as Ritardo, IdCorsa, IdSegnalazione "+
-                    "From "+
-                    "(Select * "+
-                    "From Segnalazione "+
-                    "Where Elaborato=0 and SegnalazioneValida=1 and Date(curdate())=Date(DataOra)) As S1, "+
-                    "(Select IdCorsa,IdLinea,IdFermata "+
-                    "From Corsa_Fermata_Orario) As Id "+
-                    "Where Id.IdLinea=S1.Linea and Id.IdFermata=S1.IdFermata "+
-                    "Order by DataOra;";
+        //ora che ho le corse mi servono le segnalazioni in modo da aggiornare le stesse
+        var query="Select Corsa as IdCorsa,Time_to_Sec(Segnalazione.Ritardo) "+
+                  "As Ritardo, IdSegnalazione From Segnalazione Where "+
+                  "Elaborato=0 And SegnalazioneValida=1 And Date(DataOra)=Curdate();"
         //console.log(query);
         callback(null,query);
       },selectQuery,
@@ -609,6 +676,8 @@ var aggiornaRitardi = function() {
         var query=null;
         //aggiorno la query solo se devo
         if(parser.length!=0){
+          //per ogni corsa ho un update dei ritardi + un update generico per
+          //tutte le segnalazioni che ho elaborato dove il flag elaborato va settato a 1
           query= new Array(Object.keys(corse)+1);
           query[0]="update Segnalazione set Elaborato=1 where";
           var indTemp=0;
@@ -619,14 +688,16 @@ var aggiornaRitardi = function() {
             corse[parser[i].IdCorsa]=
               pMedia*corse[parser[i].IdCorsa]+
               (1-pMedia)*parser[i].Ritardo;
-            //devo aggiornare i record settando le segnalazioni come elaborate  +
+            //devo aggiornare i record settando le segnalazioni come elaborate
             if(indTemp!==0){
+              //se è già la seconda segnalazione che devo aggiornare devo mettere l'OR
               query[0]=query[0]+" OR";
             }
             query[0]=query[0]+" IdSegnalazione = "+parser[i].IdSegnalazione;
             indTemp++;
             //console.log("Nuovo ritardo: "+corse[parser[i].IdCorsa]);
           }
+          //chiudo la prima query
           query[0]=query[0]+";";
           //console.log(query);
           //console.log("Ritardi da inserire:");
@@ -727,6 +798,185 @@ app.get("/some",function(request,response){
   "Only shooting stars break the mold</h1></body>";
   response.status(200).send(shrek);
 });
+
+
+/*****************************
+INIZIO AMAZON MECHANICAL TURK
+*****************************/
+
+//legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
+var creazioneHit = schedule.scheduleJob('0 0 1 * *', function() {
+//var creazioneHit = schedule.scheduleJob('*/1 * * * *', function() { // per test
+  fs.readFile('amt-question.xml', 'utf8', function(err, amtQuestion) {
+    if (err) {
+      console.log(err);
+    } else {
+      var query = 'Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome, WorkerId ' +
+      'From Segnalazione,Utente ' +
+      'Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1)) ' +
+      'and SegnalazioneValida=1 ' +
+      'Group by IdSegnalatore;';
+      /*
+      // query per test
+      var query = 'Select Count(*) As NumeroSegnalazioni, IdSegnalatore, QualificationTypeId, Nome, Cognome, WorkerId ' +
+      'From Segnalazione,Utente ' +
+      'Where IdSegnalatore=UserID and Month(Date(DataOra))=Month(subdate(current_date, 1)) and Year(Date(DataOra))=Year(subdate(current_date, 1)) ' +
+      //'and IdSegnalatore=22 ' +
+      'Group by IdSegnalatore;';
+      */
+
+      selectQuery(query, function(errore, utenti) {
+        if (errore) {
+          console.log("Errore nella ricerca delle segnalazioni");
+          console.log(errore);
+        } else {
+          for (var i = 0; i < utenti.length; i++) {
+            var reward = '0.10' * utenti[i].NumeroSegnalazioni;
+
+            //costruzione dell'HIT per l'utente
+            var HITUtente = {
+              Title: 'Conferma segnalazioni di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
+              Description: 'HIT per la conferma delle segnalazioni di ritardo degli autobus di ' + utenti[i].Nome + ' ' + utenti[i].Cognome,
+              MaxAssignments: 1,
+              LifetimeInSeconds: 1296000, // l'utente ha 15 giorni di tempo per accettare l'HIT e ricevere il pagamento
+              AssignmentDurationInSeconds: 1296000, // l'utente ha 15 giorni di tempo per confermare l'assignment accettato
+              Reward:  reward.toString(),
+              Question: amtQuestion,
+              /* l'HIT può essere accettato solo da chi possiede la giusta qualifica. Ogni utente ha una sua qualifica personalizzata
+              ** in modo che ogni utente possa accettare solamente le HITs create per le proprie segnalazioni e non possa accettare le
+              ** HITs create per altri utenti*/
+              QualificationRequirements: [
+                {
+                  QualificationTypeId: utenti[i].QualificationTypeId,
+                  //QualificationTypeId: '3B9KD9M9B16CMSB6N1A06UW4QBNJNJ',  // per test
+                  Comparator: 'Exists',
+                },
+              ],
+            };
+
+            var idUtente = utenti[i].IdSegnalatore;
+            createHITs(idUtente, HITUtente, reward);
+          }
+        }
+      });
+    }
+  });
+});
+
+// funzione che ogni giorno controlla se gli utenti hanno accettato e confermato le HITs create,
+// in caso affermativo, accetta la risposta e invia il pagamento
+//var controlloHit = schedule.scheduleJob('0 0 */1 * *', function(){
+var controlloHit = schedule.scheduleJob('*/1 * * * *', function(){ // per test
+
+  var query = 'select HitId,Utente.UserID,WorkerId,UtentiHitId ' +
+  'from Utente,Utenti_Hit ' +
+  'where Utente.UserID=Utenti_Hit.UserID and Elaborato=0 and Visualizzato=1;';
+  /*
+  // query di test
+  var query = 'select HitId,Utente.UserID,WorkerId,UtentiHitId ' +
+  'from Utente,Utenti_Hit ' +
+  'where Utente.UserID=Utenti_Hit.UserID and Elaborato=0;';
+  */
+
+  selectQuery(query, function(errore, parser) {
+    if (errore) {
+      console.log(errore);
+    } else {
+      for (var i = 0; i < parser.length; i++) {
+        var HITUtente = parser[i].HitId;
+        var WorkerId = parser[i].WorkerId;
+        var UtentiHitId = parser[i].UtentiHitId;
+        getApproveHITs(HITUtente, WorkerId, UtentiHitId);
+
+      }
+    }
+  });
+});
+
+// funzione per la creazione e l'inserimento nel db di una HIT
+var createHITs = function(idUtente, HITUtente, reward) {
+  async.waterfall([
+    function(callback) {
+      // creazione dell'HIT personalizzato per utente sul sito di AMT
+      mturk.createHIT(HITUtente, function (err, data) {
+        if (err) {
+          console.log("Errore nella creazione dell'HIT");
+          console.log(err);
+        } else {
+          var HITTypeIdUtente = data.HIT.HITTypeId;
+          var HITIdUtente = data.HIT.HITId;
+
+          console.log(data);
+          console.log('HIT has been successfully published here: https://workersandbox.mturk.com/mturk/preview?groupId=' + HITTypeIdUtente + ' with this HITId: ' + HITIdUtente);
+
+          var query = 'insert into Utenti_Hit(UserID,HitId,HitTypeId,DataHit,ValoreHit) ' +
+          'values (' + idUtente + ',\'' + HITIdUtente + '\',\'' + HITTypeIdUtente + '\',curdate(),' + reward + ');';
+          callback(null, query);
+        }
+      });
+    },
+    insertQuery,
+  ], function(errore) {
+    if (errore) {
+      console.log("Errore nella waterfall della creazione dell'HIT");
+      console.log(errore);
+    } else {
+      console.log('Tutto ok');
+    }
+  });
+};
+
+// funzione che, dato un HitId, recupera la lista di assignment completati per l'HIT e conferma gli assignment corretti
+var getApproveHITs = function(HITUtente, WorkerId, UtentiHitId) {
+  mturk.listAssignmentsForHIT({HITId: HITUtente}, function (err, assignmentsForHIT) {
+    if (err) {
+      console.log("Errore nel recupero della lista degli assignment inviati dagli utenti");
+      console.log(err.message);
+    } else {
+      console.log('Completed Assignments found: ' + assignmentsForHIT.NumResults);
+      for (var i = 0; i < assignmentsForHIT.NumResults; i++) {
+        var workId = assignmentsForHIT.Assignments[i].WorkerId;
+        if (WorkerId == workId) {
+          console.log('Risposta del Worker con ID - ' + workId + ': ', assignmentsForHIT.Assignments[i].Answer);
+
+          async.waterfall([
+            function(callback){
+              //approva l'assignment fatto dall'utente per inviare il pagamento
+              mturk.approveAssignment({
+                AssignmentId: assignmentsForHIT.Assignments[i].AssignmentId,
+                RequesterFeedback: 'Grazie per le segnalazioni!',
+              }, function (errore) {
+                if (errore) {
+                  console.log("Errore nell'approvazione dell'assignment dell'utente");
+                  console.log(err);
+                } else {
+                  var query = 'update Utenti_Hit set Elaborato=1 where UtentiHitId=' + UtentiHitId + ';';
+                  callback(null,query);
+                }
+              });
+            },
+            insertQuery,
+          ], function(errore) {
+            if (errore) {
+              console.log("Errore nella waterfall dell'approvazione delle HITs");
+              console.log(errore);
+            } else {
+              console.log("Approvazione e aggiornamento HIT avvenuta con successo");
+            }
+          });
+
+        } else {
+          console.log('WorkerIds non corrispondono: ' + workId + ' e ' + WorkerId);
+        }
+      }
+    }
+  });
+};
+
+/***************************
+FINE AMAZON MECHANICAL TURK
+***************************/
+
 
 //comportamento di default (404)
 app.use(function (request, response) {

@@ -33,11 +33,14 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
         </script>
         <link href="style.css" rel="stylesheet" type="text/css"/>
+        <link href="style.css" media="only screen and (min-width: 801px)" rel="stylesheet" type="text/css"/>
+        <link href="mobilehor.css" media="only screen and (max-width: 800px)" rel="stylesheet" type="text/css"/>
+        <link href="mobile.css" media="only screen and (max-width: 400px)" rel="stylesheet" type="text/css"/>
 
     </head>
 
     <body onload="load()">
-      
+
         <!--________________________________________________________________________-->
         <div class="container">
             <div class="containerHeader">
@@ -84,11 +87,12 @@
             <div class="stops">
               <!--<div id="impostazioniDiv"></div>-->
               <h3 id="selezione-fermate">Fermate vicino a te:</h3>
-              <h3 id="bus-e-ritardi"></h3><br>
-              <div id="impostazioniDiv"></div>
+              <h3 id="bus-e-ritardi"></h3>
+              <br><br><br><br><br><br><br>
+              <!--<div id="impostazioniDiv"></div>
               <div id="footer">
                   <p>Ritardo autobus &#174;</p>
-              </div>
+              </div>-->
             </div>
 
 

@@ -1,11 +1,10 @@
 /**
  * Function that returns a value of a defined cookie or undefined if that cookie is not found
  */
- /*
+/*
  var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
  var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
 */
-
  var serverLocation = "http://localhost:8080/";
  var nodeLocation = "http://localhost:8080/";
 
@@ -189,6 +188,8 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
             // get the coordinates
             var latitude = position.coords.latitude;   //position.coords.latitude
             var longitude = position.coords.longitude;   //position.coords.longitude
+          //  var latitude = 46.0667069;
+          //  var longitude = 11.1655039;
 
             /**Mettere // all'inizio di questa linea per attivare i dati test
             //dati test
@@ -238,8 +239,10 @@ function aggiorna(){
   if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition( function(position) {
           // get the coordinates
-          var latitude = position.coords.latitude;
-          var longitude = position.coords.longitude;
+          //var latitude = position.coords.latitude;
+          //var longitude = position.coords.longitude;
+          var latitude = 46.0667069;
+          var longitude = 11.1655039;
 
           /**Mettere // all'inizio di questa linea per attivare i dati test
           //dati test

@@ -17,12 +17,17 @@
   },
   "homepage": "https://github.com/michelebonapace/RitardoAutobus#readme",
   "dependencies": {
+    "amt": "^0.1.4",
     "async": "^2.6.0",
+    "aws-sdk": "^2.167.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "minimatch": "^3.0.4",
     "mysql": "^2.15.0",
     "node-schedule": "^1.2.5",
     "tern-node-express": "^0.4.0"
+  },
+  "devDependencies": {
+    "jest": "^21.2.1"
   }
 }

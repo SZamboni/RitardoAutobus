@@ -16,7 +16,7 @@ body{
 
 .container{
     display: grid;
-    grid-template-rows:50px 700px 200px;
+    grid-template-rows:45px 200px 100px;
     grid-template-columns: 100%;
     position:relative;
     grid-template-areas:
@@ -143,6 +143,16 @@ body{
     margin: auto;
     margin-top: 100px;
     margin-bottom: 40px;
+}
+.stops a {
+    overflow: hidden;
+    color: white;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 30px;
+    text-decoration: none;
+    font-size: 25px;
 }
 
 

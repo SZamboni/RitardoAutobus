@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title> Inserimento informazioni Amazon Mechanical Turk</title>
+      <meta charset="utf-8">
+      <script type="text/javascript" src="js/registrazioneAMT.js"></script>
+    </head>
+    <body onload=load()>
+
+
+        <div class="container">
+            <div class="containerHeader">
+
+                <div id="mySidenav" class="sidenav">
+                    <a onclick="closeNav()">&times;</a>
+                    <p></p>
+                    <p></p>
+                    <h1 id = "title">Impostazioni utente </h1>
+
+                    <img id = "icona_utente"></img>
+
+                    <h3>Modifica le tue impostazioni</h3>
+
+                    <div>
+                        Modifica raggio di ricerca (metri)<br>
+                        <input type="range" min=50 max=1000 id="scanSlider"> </input> <label id="scanRangeLabel"></label><br>
+                        Modifica range temporale di ricerca (minuti)<br>
+                        <input type="range" min=5 max=120 id="timeSlider"> </input> <label id="timeRangeLabel"></label><br>
+                        Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
+
+                        <a onclick = "myFunction()">Cambia Impostazioni</a>
+                    </div>
+                    <div id="footer">
+                        <p>Ritardo autobus &#174;</p>
+                    </div>
+                </div>
+                <div class="menu"><a onclick="openNav()">&#9776; impostazioni</a></div>
+
+                <div class="titolo">
+                    WHERE'S MY BUS!
+                </div>
+
+                <div id="logDiv"></div>
+            </div>
+
+            <div class="mapp">
+            </div>
+
+
+
+            <div class="stops">
+              <h1>Inserimento informazioni Mechanical Turk</h1><br><br>
+              <h3>Inserisci il tuo ID di Amazon Mechanical Turk:</h3>
+              <input type="text" id="workerId"><br>
+              <button onclick="conferma()">Conferma</button>
+              <div>
+                <a href="https://www.amazon.com/ap/signin?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.assoc_handle=amzn_mturk_workersandbox&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&_encoding=UTF8&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=43200&marketplaceId=A3H5SF4P7V8G3G&clientContext=95434baa1d1bee091b08d30c0ca0f6&openid.return_to=https%3A%2F%2Fworkersandbox.mturk.com%2Fmturk%2Fendsignin" target="_blank"> Pagina di login di Amazon Mechanical Turk Worker </a>
+                Trovi il tuo Worker Id nella tua pagina "Your Account"
+              </div>
+            </div>
+
+
+        </div>
+        <div class="navbar" id="myNavbar">
+            Where is my bus &#174;
+            <a id="notify" href="remunerazioni.html">NOTIFICHE</a>
+        </div>
+    </body>
+</html>

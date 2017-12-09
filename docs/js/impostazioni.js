@@ -5,7 +5,6 @@
 var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
 var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
 */
-
 var serverLocation = "http://localhost:8080/";
 var nodeLocation = "http://localhost:8080/";
 
@@ -141,7 +140,7 @@ function applySettings() {
     //aggiorno il cookie solo se necessario
     if(oldTime==null || oldTime!=timeSlider.value){
       console.log("Tempo aggiornato in "+timeSlider.value);
-    document.cookie = "timeRange="+ timeSlider.value;
+      document.cookie = "timeRange="+ timeSlider.value;
       oldTime=timeSlider.value;
       alert=alert+"Tempo aggiornato.\n";
     }
