@@ -479,6 +479,7 @@ app.post("/turk/", function(request, response, next){
  **/
 app.post('/salita/', function (request, response, next) {
     //console.log(JSON.stringify(request.body,null,4));
+
     //Valori di test
     var idUtente = request.body.idUtente;
     var dataOra = request.body.dataOra;
@@ -508,6 +509,21 @@ app.post('/salita/', function (request, response, next) {
     async.waterfall([
       function(callback){
         //Controllo se la segnalazione è valida.
+
+        /**
+        //Chiamare una query per calcolare la distanza è stupido,
+        //considerando che si può direttamente fare in node.
+
+        //creo la Query
+        var query="CALL ritardoautobus.Distanza (\'"+
+        latUtente+"\',\'"+lonUtente+"\',\'"+
+        latFermata+"\',\'"+lonFermata+"\');";
+        console.log(query);
+        callback(null,query);
+      },
+      selectQuery,
+      function(parser,callback){
+        **/
 
         //CALCOLO LA DISTANZA TRA I DUE PUNTI
         //funzione strana, ma funziona #vivaifisici
@@ -727,6 +743,11 @@ var aggiornaRitardi = function() {
 };
 setInterval(aggiornaRitardi,intervalloRitardi);
 
+/**
+Funzioni admin per lanciare le funzioni periodiche a volontà
+**/
+app.get("/admin/update/",aggiornaRitardi);
+app.get("/admin/reset/",resetRitardi);
 //Easter egg
 app.get("/some",function(request,response){
   var shrek="<body style=\"background-image: url(\'"+
