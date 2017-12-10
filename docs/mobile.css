@@ -14,6 +14,11 @@ body{
     font-family: ProximaNova,Arial,Sans-serif;
 }
 
+#map {
+    height: 80%;
+
+}
+
 .container{
     display: grid;
     grid-template-rows:45px 200px 100px;

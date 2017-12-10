@@ -15,13 +15,16 @@ body{
 }
 
 #map {
-    height: 80%;
-
+    width:100%;
+    height:100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 
 .container{
     display: grid;
-    grid-template-rows:50px 700px 200px;
+    grid-template-rows:45px 200px 100px;
     grid-template-columns: 100%;
     position:relative;
     grid-template-areas:
@@ -147,7 +150,7 @@ body{
     grid-area:fermate;
     margin: auto;
     margin-top: 100px;
-    margin-bottom: 200px;
+    margin-bottom: 40px;
 }
 .stops a {
     overflow: hidden;
