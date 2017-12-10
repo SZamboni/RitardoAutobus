@@ -331,3 +331,66 @@ describe('Testo il get dei ritardi della fermata di una fermata che non esiste',
         });
     });
 });
+
+//Tests di Anna
+
+//CORS: access control allow content type
+describe('Test utilizzo dell\'header Content-Type in /ritardi', () => {
+    test('Deve esserci l\'header Content-Type in formato application/json', (done) => {
+        request(app)
+        .get("/ritardi/?idFermata=170&rangeTempo=\'02:00:00\'")
+        .expect('Content-Type',"application/json; charset=utf-8")
+        .expect(200,done);
+    });
+});
+
+//CORS: acces controlo allow origin
+describe('Test utilizzo dell\'header Access-Control-Allow-Origin in /fermate', () => {
+    test('Deve esserci l\'header Access-Control-Allow-Origin uguale a *', (done) => {
+        request(app)
+        .get("/ritardi/?idFermata=170&rangeTempo=\'02:00:00\'")
+        .expect('Access-Control-Allow-Origin',"*")
+        .expect(200,done);
+    });
+});
+
+//CORS: access control allow options
+describe('Test utilizzo metodo OPTIONS in /ritardi', () => {
+    test('Deve esserci lo status code uguale a 200', (done) => {
+        request(app)
+        .options("/ritardi/?idFermata=170&rangeTempo=\'02:00:00\'")
+        .expect(200,done);
+    });
+});
+
+//CORS: access control allow methods
+describe('Test utilizzo dell\'header Access-Control-Allow-Methods per il CORS in /fermate', () => {
+    test('Devi esserci l\'header Access-Control-Allow-Methods uguale a POST, GET, PUT, DELETE, OPTIONS', (done) => {
+        request(app)
+        .get("/ritardi/?idFermata=170&rangeTempo=\'02:00:00\'")
+        .expect('Access-Control-Allow-Methods',"POST, GET, PUT, DELETE, OPTIONS")
+        .expect(200,done);
+    });
+});
+
+describe('Test post della segnalazione di una salita corretta da Povo Piazza Manci sul 5', () => {
+    test("Dovrebbe darmi codice 200", (done) => {
+        request(app)
+        .post("/salita/")
+        .send({
+          idUtente: '1',
+          dataora: '2017-12-10 19:10:00',
+          idLinea: '2',
+          idCorsa: '196',
+          idFermata: '170',
+          latUtente: '46.06580734',
+          lonUtente: '11.15461731',
+          latFermata: '46.06580734',
+          lonFermata: '11.15461731'
+        })
+        .then((response) => {
+          expect(response.statusCode).toBe(200);
+          done();
+        });
+    });
+});
