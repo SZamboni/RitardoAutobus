@@ -273,3 +273,61 @@ describe('Testo il post generato dal login di un utente', () => {
         });
     });
 });
+
+
+//TEST DI MICHELE
+
+describe('Testo il post della salita senza i parametri', () => {
+    test("Dovrebbe darmi errore", (done) => {
+        request(app)
+        .post("/salita/")
+        .then((response) => {
+          expect(response.statusCode).toBe(500);
+          done();
+        });
+    });
+});
+
+describe('Testo il get delle fermate senza passare la longitudine', () => {
+    test("Dovrebbe darmi errore", (done) => {
+        request(app)
+        .get("/fermate/?latitude=46.0659276&&scanRange=\'02:00:00\'")
+        .then((response) => {
+          expect(response.statusCode).toBe(500);
+          done();
+        });
+    });
+});
+
+describe('Testo il post della salita con parametri non completi', () => {
+    test("Dovrebbe darmi errore", (done) => {
+        request(app)
+        .post("/salita/?idUtente=1&dataOra="+Date.now()+"&idLinea=1&latUtente=46.06580240&lonUtente=11.15461478")
+        .then((response) => {
+          expect(response.statusCode).toBe(500);
+          done();
+        });
+    });
+});
+
+describe('Testo il post del login di un utente dove non passo i parametri', () => {
+    test("Dovrebbe comunque darmi il body", (done) => {
+        request(app)
+        .post("/login/")
+        .then((response) => {
+            expect(response.body.length).not.toBe(0);
+            done();
+        });
+    });
+});
+
+describe('Testo il get dei ritardi della fermata di una fermata che non esiste', () => {
+    test("Dovrebbe funzionare lo stesso", (done) => {
+        request(app)
+        .get("/ritardi/?idFermata=10000&rangeTempo=\'02:00:00\'")
+        .then((response) => {
+          expect(response.statusCode).toBe(200);
+          done();
+        });
+    });
+});
