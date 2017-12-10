@@ -202,3 +202,74 @@ describe('Testo il get delle fermate con un parametro in più', () => {
         });
     });
 });
+
+// test di Simone
+
+/**
+ * Test sull'utilizzo del CORS e dell'header Access-Control-Allow-Origin
+ * nell'interfaccia /fermate
+ */
+describe('Test utilizzo dell\'header Access-Control-Allow-Origin per il CORS in /fermate', () => {
+    test('Controllo ci sia l\'header Access-Control-Allow-Origin e sia uguale a *', (done) => {
+        request(app)
+        .get('/fermate/?latitude=46.0659276&longitude=11.1548419&scanRange=1')
+        .expect('Access-Control-Allow-Origin',"*")
+        .expect(200,done);
+    });
+});
+
+/**
+ * Test sull'utilizzo del CORS e dell'header Access-Control-Allow-Methods
+ * nell'interfaccia /fermate
+ */
+describe('Test utilizzo dell\'header Access-Control-Allow-Methods per il CORS in /fermate', () => {
+    test('Controllo ci sia l\'header Access-Control-Allow-Methods e sia uguale a POST, GET, PUT, DELETE, OPTIONS', (done) => {
+        request(app)
+        .get('/fermate/?latitude=46.0659276&longitude=11.1548419&scanRange=1')
+        .expect('Access-Control-Allow-Methods',"POST, GET, PUT, DELETE, OPTIONS")
+        .expect(200,done);
+    });
+});
+
+/**
+ * Test sull'utilizzo del CORS e del metodo options nell'interfaccia /fermate
+ */
+describe('Test utilizzo metodo OPTIONS in /fermate', () => {
+    test('Controllo che risposta sia con lo status 200', (done) => {
+        request(app)
+        .options('/fermate/?latitude=46.0659276&longitude=11.1548419&scanRange=1')
+        .expect(200,done);
+    });
+});
+
+
+/**
+ * Test sull'utilizzo dell'header Content-Type nell'interfaccia /fermate
+ */
+describe('Test utilizzo dell\'hearder Content-Type in /fermate', () => {
+    test('Controllo che l\'header Content-Type sia application/json', (done) => {
+        request(app)
+        .get('/fermate/?latitude=46.0659276&longitude=11.1548419&scanRange=1')
+        .expect('Content-Type',"application/json; charset=utf-8")
+        .expect(200,done);
+    });
+});
+/**
+ * Test post di un login
+ */
+describe('Testo il post generato dal login di un utente', () => {
+    test("Dovrebbe rispondermi con il body", (done) => {
+        request(app)
+        .post("/login")
+        .send({
+            "email":"thefallen5555@gmail.com",
+            "nome":"the",
+            "cognome":"fallen",
+            "linkFoto":"https://lh5.googleusercontent.com/-wYgBwcjY8ik/AAAAAAAAAAI/AAAAAAAAAAA/AFiYof3QYaaThh6lNRAJa9VnBbjqTgfJHw/s96-c/photo.jpg"}
+        )
+        .then((response) => {
+            expect(response.body.length).not.toBe(0);
+            done();
+        });
+    });
+});
