@@ -136,3 +136,69 @@ describe('Testo il get delle fermate con un parametro in più', () => {
         });
     });
 });
+
+// Testing di Michela
+
+describe('Testo il post dell\'inserimento del workerId al primo accesso', () => {
+    test("Dovrebbe darmi errore 500", (done) => {
+        request(app)
+        .post("/worker/")
+        .send({
+          workerId: 'dfhgfjfcgjdf',
+          userId: '6',
+        })
+        .then((response) => {
+          expect(response.statusCode).toBe(500);
+          done();
+        });
+    });
+});
+
+describe('Testo il get delle hits workerId con l\'utente con id 2', () => {
+    test("Dovrebbe darmi tutte le hit dell'utente 2", (done) => {
+        request(app)
+        .get("/hits/?userId=2")
+        .then((response) => {
+          expect(response.statusCode).not.toBe(500);
+          expect(response.body.length).not.toBe(0);
+          done();
+        });
+    });
+});
+
+describe('Testo il get del workerId con l\'utente con id 2', () => {
+    test("Dovrebbe darmi il workerId dell'utente 2", (done) => {
+        request(app)
+        .get("/turkid/?userId=2")
+        .then((response) => {
+          expect(response.statusCode).not.toBe(500);
+          expect(response.body.length).not.toBe(0);
+          done();
+        });
+    });
+});
+
+describe('Testo il get del workerId con un userId non valido', () => {
+    test("Dovrebbe darmi errore 500", (done) => {
+        request(app)
+        .get("/turkid/?userId=100er0")
+        .then((response) => {
+          expect(response.statusCode).toBe(500);
+          done();
+        });
+    });
+});
+
+describe('Testo il get delle fermate con un parametro in più', () => {
+    test("Dovrebbe darmi le fermate attorno a me perchè ignora il parametro aggiuntivo", (done) => {
+        request(app)
+        .post("/hits/visual/")
+        .send({
+          utentiHitId: '1',
+        })
+        .then((response) => {
+          expect(response.statusCode).toBe(200);
+          done();
+        });
+    });
+});

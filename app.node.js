@@ -228,6 +228,7 @@ app.post('/worker/', function (request, response, next) {
         if (err) {
           console.log("Errore nella creazione della qualifica");
           console.log(err);
+          response.sendStatus(500);
         } else {
           console.log(data);
           var qualTypeId = data.QualificationType.QualificationTypeId;
@@ -248,6 +249,7 @@ app.post('/worker/', function (request, response, next) {
         if (err) {
           console.log("Errore nell'associazione della qualifica");
           console.log(err.message);
+          response.sendStatus(500);
         } else {
           console.log(data);
         }
@@ -397,7 +399,7 @@ app.get("/turkid/", function(request, response, next){
 })
 
 /**
-Funzione chee ritorna tutte le hits di un utente.
+Funzione che ritorna tutte le hits di un utente.
 **/
 app.get("/hits/", function(request, response, next){
   response.header('Content-Type', 'application/json');
