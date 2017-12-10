@@ -62,8 +62,9 @@ body{
   color: black;
 }*/
 
-/*menu per il profilo*/
 
+
+/*menu per il profilo*/
 .menu a{
     grid-area:menug;
     overflow: hidden;

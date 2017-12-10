@@ -3,7 +3,7 @@
     <head>
         <title> When is my bus </title>
         <style>
-            
+
             /* Optional: Makes the sample page fill the window.*/
             html, body {
                 height: 100%;
@@ -99,8 +99,44 @@
         </div>
 
         <script>
+            //funzioni per il menu a comparsa
+            
+            /*var bounds = [
+                {min:0,max:400,func:red},
+                {min:801,func:orange}
+            ];
+
+            // define a resize function. use a closure for the lastBoundry determined.
+            var resizeFn = function(){
+                var lastBoundry; // cache the last boundry used
+                return function(){
+                    var width = window.innerWidth; // get the window's inner width
+                    var boundry, min, max;
+                    for(var i=0; i<bounds.length; i++){
+                        boundry = bounds[i];
+                        min = boundry.min || Number.MIN_VALUE;
+                        max = boundry.max || Number.MAX_VALUE;
+                        if(width > min && width < max
+                           && lastBoundry !== boundry){
+                            lastBoundry = boundry;
+                            return boundry.func.call(boundry);
+                        }
+                    }
+                }
+            };
+            $(window).resize(resizeFn()); // bind the resize event handler
+            $(document).ready(function(){
+                $(window).trigger('resize'); // on load, init the lastBoundry
+            });*/
+
             function openNav() {
-                document.getElementById("mySidenav").style.width = "500px";
+                var width = window.innerWidth;
+                if (width < 400) {
+                  document.getElementById("mySidenav").style.width = "60vw";
+                }else {
+                  document.getElementById("mySidenav").style.width = "500px";
+                }
+
             }
 
             function closeNav() {

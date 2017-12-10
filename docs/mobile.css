@@ -86,6 +86,7 @@ body{
     z-index: 99999999;
     color: white;
     top: 0;
+    text-align: center;
     left: 0;
     background-color: #111;
     overflow-x: hidden;

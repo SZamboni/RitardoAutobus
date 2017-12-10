@@ -397,7 +397,7 @@ function visualize() {
 
 }
 
-/*funzione per il collapse*/
+/*funzione per il collapse
 $(document).ready(function() {
     $(".btn-primary").click(function(){
         $(".collapse").collapse('toggle');
@@ -408,7 +408,7 @@ $(document).ready(function() {
     $(".btn-warning").click(function(){
         $(".collapse").collapse('hide');
     });
-});
+});*/
 
 /**
  * Function that request for a bus stop all the bus with their delay
