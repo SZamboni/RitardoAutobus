@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <script type="text/javascript">
+        //var nodeLocation= "http://localhost:8080/";
+        var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
+        var aggiornaRitardi = function(){
+          fetch(nodeLocation+"admin/update/").then(function(){
+            var label=document.getElementById("aggiornaRitardiLabel");
+            label.innerHTML= "Fatto";
+          });
+        };
+        var resetRitardi = function(){
+          fetch(nodeLocation+"admin/reset/").then(function(){
+            var label=document.getElementById("resetRitardiLabel");
+            label.innerHTML= "Fatto";
+          });
+        };
+        var creazioneHit = function(){
+          fetch(nodeLocation+"admin/creazioneHit/").then(function(){
+            var label=document.getElementById("creazioneHitLabel");
+            label.innerHTML= "Fatto";
+          });
+        };
+        var controlloHit = function(){
+          fetch(nodeLocation+"admin/controlloHit/").then(function(){
+            var label=document.getElementById("controlloHitLabel");
+            label.innerHTML= "Fatto";
+          });
+        }
+      </script>
+    </head>
+
+    <body>
+      <div>
+        <button onclick="aggiornaRitardi()">aggiorna ritardi</button>
+        <label id="aggiornaRitardiLabel"></label><br>
+        <button onclick="resetRitardi()">reset ritardi</button>
+        <label id="resetRitardiLabel"></label><br>
+        <button onclick="creazioneHit()">creazione HIT</button>
+        <label id="creazioneHitLabel"></label><br>
+        <button onclick="controlloHit()">controllo HIT</button>
+        <label id="controlloHitLabel"></label><br>
+      </div>
+    </body>
+</html>

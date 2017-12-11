@@ -1,9 +1,11 @@
+//richiesta variabili d'ambiente
+require('dotenv').config();
 //connessione SQL
 var mysql = require('mysql');
 var connection = mysql.createConnection({
-    host: 'ritardoautobus.c147tajn45vc.us-east-2.rds.amazonaws.com',
-    user: 'ritardoautobus',
-    password: 'trentino',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
     database: 'ritardoautobus'
 });
 
@@ -23,7 +25,12 @@ app.use(bodyParser.json());
 //Istanze per Amazon Mechanical Turk
 var util = require('util');
 var AWS = require('aws-sdk');
-AWS.config.loadFromPath('./amt-config.json');
+//AWS.config.loadFromPath('./amt-config.json');
+AWS.config.update({
+    "accessKeyId": process.env.TURK_ACCESS_KEY_ID,
+    "secretAccessKey": process.env.TURK_SECRET_ACCESS_KEY,
+    "region": process.env.TURK_REGION
+});
 fs = require('fs');
 //URL della sandbox di AWSMechTurk
 var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
@@ -49,18 +56,6 @@ P ideale: sui 0.8/0.9.
 Per il test utilizzo p=0.2 che da più peso alle poche segnalazioni di test
 **/
 var pMedia=0.2;
-
-//Istanze per Amazon Mechanical Turk
-var util = require('util');
-var AWS = require('aws-sdk');
-AWS.config.loadFromPath('./amt-config.json');
-fs = require('fs');
-//URL della sandbox di AWSMechTurk
-var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
-//Connessione alla requester sandbox
-var mturk = new AWS.MTurk({ endpoint: endpoint });
-//
-var schedule = require('node-schedule');
 
 //Abilito CORS su tutto il server
 app.use(function(req, res, next) {
@@ -210,7 +205,7 @@ app.post('/login/', function (request, response, next) {
         } else {
             console.log('Errore nella waterfall.');
             console.log(errore);
-            response.status(500).send("Internal server error.");
+            response.sendStatus(500);
         }
     });
 });
@@ -240,6 +235,7 @@ app.post('/worker/', function (request, response, next) {
         if (err) {
           console.log("Errore nella creazione della qualifica");
           console.log(err);
+          response.sendStatus(500);
         } else {
           console.log(data);
           var qualTypeId = data.QualificationType.QualificationTypeId;
@@ -260,6 +256,7 @@ app.post('/worker/', function (request, response, next) {
         if (err) {
           console.log("Errore nell'associazione della qualifica");
           console.log(err.message);
+          response.sendStatus(500);
         } else {
           console.log(data);
         }
@@ -276,7 +273,7 @@ app.post('/worker/', function (request, response, next) {
     if (errore) {
       console.log("Errore nella waterfall del worker");
       console.log(errore);
-      response.status(500).send("Internal server error.");
+      response.sendStatus(500);
     } else {
       console.log('ok');
     }
@@ -324,7 +321,7 @@ app.get('/fermate/', function (request, response, next) {
         } else {
             console.log("Errore nella ricerca delle fermate più vicine.");
             console.log(errore);
-            response.status(500).send("Errore nel server.");
+            response.sendStatus(500);
         }
     });
 });
@@ -384,7 +381,7 @@ app.get('/ritardi/', function (request, response, next) {
         } else {
             console.log("Errore nella ricerca delle linee e ritardi.");
             console.log(errore);
-            response.status(500).send("Errore nel server.");
+            response.sendStatus(500);
         }
     });
 });
@@ -409,7 +406,7 @@ app.get("/turkid/", function(request, response, next){
 })
 
 /**
-Funzione chee ritorna tutte le hits di un utente.
+Funzione che ritorna tutte le hits di un utente.
 **/
 app.get("/hits/", function(request, response, next){
   response.header('Content-Type', 'application/json');
@@ -469,17 +466,88 @@ app.get("/hits/unreadamount/", function(request, response, next){
 Funzione che aggiorna il worker id di un utente dato il suo id
 **/
 app.post("/turk/", function(request, response, next){
-  var query="UPDATE ritardoautobus.Utente SET WorkerId=\'"+
-            request.body.workerId+"\' WHERE UserID="+
-            request.body.userId+";";
-  insertQuery(query,function(errore){
+
+  async.waterfall([
+    function(callback){
+      var query = "select QualificationTypeId, WorkerId, UserID " +
+      "from Utente " +
+      "where UserID=\'" + request.body.userId + "\';";
+      callback(null,query);
+    },
+    selectQuery,
+    function(parser,callback) {
+      mturk.deleteQualificationType({
+        QualificationTypeId: parser[0].QualificationTypeId,
+      }, function(errore, data) {
+        if (errore) {
+          console.log("Errore nella cancellazione della qualifica");
+          console.log(errore.message);
+          response.sendStatus(500);
+        } else {
+          console.log("Cancellazione della qualifica completata");
+        }
+      });
+      callback(null);
+    },
+    function(callback){
+      var query="UPDATE ritardoautobus.Utente SET WorkerId=\'"+
+                request.body.workerId+"\' WHERE UserID="+
+                request.body.userId+";";
+      callback(null,query);
+    },
+    insertQuery,
+    function(callback) {
+      // creazione della qualifica per il nuovo worker id inserito
+      var myQualType = {
+        Name: 'Qualifica di ' + request.body.workerId,
+        Description: 'Qualifica per accettare le HIT personalizzate di ' + request.body.workerId,
+        QualificationTypeStatus: 'Active',
+      };
+
+      mturk.createQualificationType(myQualType, function (err, data) {
+        if (err) {
+          console.log("Errore nella creazione della qualifica");
+          console.log(err);
+          response.sendStatus(500);
+        } else {
+          console.log(data);
+          var qualTypeId = data.QualificationType.QualificationTypeId;
+
+          callback(null, qualTypeId);
+        }
+      });
+    },
+    function(qualTypeId, callback){
+      var myAssociationQualWork = {
+        QualificationTypeId: qualTypeId,
+        WorkerId: request.body.workerId,
+        SendNotification: true,
+      };
+      mturk.associateQualificationWithWorker(myAssociationQualWork, function (err, data) {
+        if (err) {
+          console.log("Errore nell'associazione della qualifica");
+          console.log(err.message);
+          response.sendStatus(500);
+        } else {
+          console.log(data);
+        }
+      });
+      var query = 'update Utente set QualificationTypeId=\'' + qualTypeId + '\' where UserID=\'' + request.body.userId + '\';';
+      callback(null,query);
+    },
+    insertQuery,
+    function(callback){
+      console.log("Aggiornamento workerId e QualificationTypeId eseguito con successo.");
+      response.sendStatus(200);
+    }
+  ], function(errore) {
     if(!errore){
       console.log("Aggiornamento workerId eseguito con successo.");
       response.sendStatus(200);
     }else{
       console.log("Errore nell'inserimento del workerId:");
       console.log(errore);
-      respone.status(500).send("Errore del server");
+      response.sendStatus(500);
     }
   });
 })
@@ -491,6 +559,7 @@ app.post("/turk/", function(request, response, next){
  **/
 app.post('/salita/', function (request, response, next) {
     //console.log(JSON.stringify(request.body,null,4));
+
     //Valori di test
     var idUtente = request.body.idUtente;
     var dataOra = request.body.dataOra;
@@ -520,6 +589,21 @@ app.post('/salita/', function (request, response, next) {
     async.waterfall([
       function(callback){
         //Controllo se la segnalazione è valida.
+
+        /**
+        //Chiamare una query per calcolare la distanza è stupido,
+        //considerando che si può direttamente fare in node.
+
+        //creo la Query
+        var query="CALL ritardoautobus.Distanza (\'"+
+        latUtente+"\',\'"+lonUtente+"\',\'"+
+        latFermata+"\',\'"+lonFermata+"\');";
+        console.log(query);
+        callback(null,query);
+      },
+      selectQuery,
+      function(parser,callback){
+        **/
 
         //CALCOLO LA DISTANZA TRA I DUE PUNTI
         //funzione strana, ma funziona #vivaifisici
@@ -607,7 +691,7 @@ app.post('/salita/', function (request, response, next) {
         } else {
             console.log('Errore nella waterfall.');
             console.log(errore);
-            response.status(500).send("Internal server error.");
+            response.sendStatus(500);
         }
     });
 });
@@ -629,7 +713,7 @@ var resetRitardi = function(){
     }
   })
 };
-var scheduleRitardi = schedule.scheduleJob({hour: 00, minute: 00},resetRitardi);
+var scheduleRitardi = schedule.scheduleJob('1 0 */1 * *',resetRitardi);
 /**
 Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
 la tabella dei ritardi a partire dalla tabella delle segnalazioni.
@@ -739,6 +823,25 @@ var aggiornaRitardi = function() {
 };
 setInterval(aggiornaRitardi,intervalloRitardi);
 
+/**
+Funzioni admin per lanciare le funzioni periodiche a volontà
+**/
+app.get("/admin/update/",function(request,response){
+  aggiornaRitardi();
+  response.sendStatus(200);
+});
+app.get("/admin/reset/",function(request,response){
+  resetRitardi();
+  response.sendStatus(200);
+});
+app.get("/admin/creazioneHit/", function(request,response) {
+  creazioneHit();
+  response.sendStatus(200);
+});
+app.get("/admin/controlloHit/", function(request, response) {
+  controlloHit();
+  response.sendStatus(200);
+});
 //Easter egg
 app.get("/some",function(request,response){
   var shrek="<body style=\"background-image: url(\'"+
@@ -805,8 +908,7 @@ INIZIO AMAZON MECHANICAL TURK
 *****************************/
 
 //legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
-var creazioneHit = schedule.scheduleJob('0 0 1 * *', function() {
-//var creazioneHit = schedule.scheduleJob('*/1 * * * *', function() { // per test
+var creazioneHit = function() {
   fs.readFile('amt-question.xml', 'utf8', function(err, amtQuestion) {
     if (err) {
       console.log(err);
@@ -861,12 +963,12 @@ var creazioneHit = schedule.scheduleJob('0 0 1 * *', function() {
       });
     }
   });
-});
+};
+var scheduleCreateHits = schedule.scheduleJob('0 0 1 * *', controlloHit);
 
 // funzione che ogni giorno controlla se gli utenti hanno accettato e confermato le HITs create,
 // in caso affermativo, accetta la risposta e invia il pagamento
-//var controlloHit = schedule.scheduleJob('0 0 */1 * *', function(){
-var controlloHit = schedule.scheduleJob('*/1 * * * *', function(){ // per test
+var controlloHit = function(){
 
   var query = 'select HitId,Utente.UserID,WorkerId,UtentiHitId ' +
   'from Utente,Utenti_Hit ' +
@@ -891,7 +993,8 @@ var controlloHit = schedule.scheduleJob('*/1 * * * *', function(){ // per test
       }
     }
   });
-});
+};
+var scheduleApproveHits = schedule.scheduleJob('0 0 */1 * *', controlloHit);
 
 // funzione per la creazione e l'inserimento nel db di una HIT
 var createHITs = function(idUtente, HITUtente, reward) {
@@ -982,10 +1085,5 @@ FINE AMAZON MECHANICAL TURK
 app.use(function (request, response) {
     response.status(404).send('<h1> Pagina non trovata </h1>');
 });
-//apro server su porta 8080
-//heroku vuole ascoltare sulla sua porta
-//var porta = process.env.PORT || 3000;
-var porta = 8080;
-app.listen(porta, function () {
-    console.log('Server aperto');
-});
+
+module.exports = app;
