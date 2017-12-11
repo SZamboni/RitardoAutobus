@@ -228,6 +228,7 @@ app.post('/worker/', function (request, response, next) {
         if (err) {
           console.log("Errore nella creazione della qualifica");
           console.log(err);
+          response.sendStatus(500);
         } else {
           console.log(data);
           var qualTypeId = data.QualificationType.QualificationTypeId;
@@ -248,6 +249,7 @@ app.post('/worker/', function (request, response, next) {
         if (err) {
           console.log("Errore nell'associazione della qualifica");
           console.log(err.message);
+          response.sendStatus(500);
         } else {
           console.log(data);
         }
@@ -397,7 +399,7 @@ app.get("/turkid/", function(request, response, next){
 })
 
 /**
-Funzione chee ritorna tutte le hits di un utente.
+Funzione che ritorna tutte le hits di un utente.
 **/
 app.get("/hits/", function(request, response, next){
   response.header('Content-Type', 'application/json');
@@ -457,10 +459,81 @@ app.get("/hits/unreadamount/", function(request, response, next){
 Funzione che aggiorna il worker id di un utente dato il suo id
 **/
 app.post("/turk/", function(request, response, next){
-  var query="UPDATE ritardoautobus.Utente SET WorkerId=\'"+
-            request.body.workerId+"\' WHERE UserID="+
-            request.body.userId+";";
-  insertQuery(query,function(errore){
+
+  async.waterfall([
+    function(callback){
+      var query = "select QualificationTypeId, WorkerId, UserID " +
+      "from Utente " +
+      "where UserID=\'" + request.body.userId + "\';";
+      callback(null,query);
+    },
+    selectQuery,
+    function(parser,callback) {
+      mturk.deleteQualificationType({
+        QualificationTypeId: parser[0].QualificationTypeId,
+      }, function(errore, data) {
+        if (errore) {
+          console.log("Errore nella cancellazione della qualifica");
+          console.log(errore.message);
+          response.sendStatus(500);
+        } else {
+          console.log("Cancellazione della qualifica completata");
+        }
+      });
+      callback(null);
+    },
+    function(callback){
+      var query="UPDATE ritardoautobus.Utente SET WorkerId=\'"+
+                request.body.workerId+"\' WHERE UserID="+
+                request.body.userId+";";
+      callback(null,query);
+    },
+    insertQuery,
+    function(callback) {
+      // creazione della qualifica per il nuovo worker id inserito
+      var myQualType = {
+        Name: 'Qualifica di ' + request.body.workerId,
+        Description: 'Qualifica per accettare le HIT personalizzate di ' + request.body.workerId,
+        QualificationTypeStatus: 'Active',
+      };
+
+      mturk.createQualificationType(myQualType, function (err, data) {
+        if (err) {
+          console.log("Errore nella creazione della qualifica");
+          console.log(err);
+          response.sendStatus(500);
+        } else {
+          console.log(data);
+          var qualTypeId = data.QualificationType.QualificationTypeId;
+
+          callback(null, qualTypeId);
+        }
+      });
+    },
+    function(qualTypeId, callback){
+      var myAssociationQualWork = {
+        QualificationTypeId: qualTypeId,
+        WorkerId: request.body.workerId,
+        SendNotification: true,
+      };
+      mturk.associateQualificationWithWorker(myAssociationQualWork, function (err, data) {
+        if (err) {
+          console.log("Errore nell'associazione della qualifica");
+          console.log(err.message);
+          response.sendStatus(500);
+        } else {
+          console.log(data);
+        }
+      });
+      var query = 'update Utente set QualificationTypeId=\'' + qualTypeId + '\' where UserID=\'' + request.body.userId + '\';';
+      callback(null,query);
+    },
+    insertQuery,
+    function(callback){
+      console.log("Aggiornamento workerId e QualificationTypeId eseguito con successo.");
+      response.sendStatus(200);
+    }
+  ], function(errore) {
     if(!errore){
       console.log("Aggiornamento workerId eseguito con successo.");
       response.sendStatus(200);
