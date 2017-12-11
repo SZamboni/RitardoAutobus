@@ -302,7 +302,15 @@ describe('Testo il get delle fermate senza passare la longitudine', () => {
 describe('Testo il post della salita con parametri non completi', () => {
     test("Dovrebbe darmi errore", (done) => {
         request(app)
-        .post("/salita/?idUtente=1&dataOra="+Date.now()+"&idLinea=1&latUtente=46.06580240&lonUtente=11.15461478")
+        .post("/salita/")
+        .send({
+          idUtente: '7',
+          dataora: '2017-12-11 15:20:00',
+          idLinea: '5',
+          idCorsa: '185',
+          idFermata: '170',
+          latUtente: '46.07543'
+        })
         .then((response) => {
           expect(response.statusCode).toBe(500);
           done();
