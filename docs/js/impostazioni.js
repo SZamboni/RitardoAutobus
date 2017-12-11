@@ -46,18 +46,17 @@ function settingsLoad() {
 
     if(id == undefined) {
         console.log("User not logged in");
-        document.location.href = serverLocation;
+        //document.location.href = serverLocation;
     } else {
         console.log("User logged in");
+        load_info_settings();
     }
-
-    load_info();
 }
 
 /**
  * Function called when the page is loaded
  */
-function load_info() {
+function load_info_settings() {
     var title = document.getElementById("title");
     title.innerHTML += leggiCookie("email");
 
@@ -114,13 +113,6 @@ function load_info() {
 }
 
 /**
- * Function called when the user click the button
- */
-function click() {
-
-}
-
-/**
  * Other function
  */
 function applySettings() {
@@ -173,16 +165,10 @@ function applySettings() {
     }else{
       if(alert!=""){
         window.alert(alert);
-        back();
+        closeNav();
+        aggiorna();
       }else{
         window.alert("Nessuna impostazione modificata!");
       }
     }
-}
-
-/**
- * Function called when the user click on the back button
- */
-function back() {
-    document.location.href = serverLocation;
 }

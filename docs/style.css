@@ -15,7 +15,7 @@ body{
 }
 
 #map {
-    height: 80%;
+    height: 100%;
     border-color: black;
     border-style: solid double;
     -webkit-box-shadow: 0 10px 10px -6px #0a0809;
@@ -53,7 +53,7 @@ body{
     grid-area:search;
     /*background-color: grey;*/
     border: none;
-    color: white;
+    color: black;
     text-align: center;
     vertical-align: middle;
     text-decoration: none;
@@ -70,6 +70,9 @@ body{
 
 
 /*menu per il profilo*/
+#menuImpostazioni{
+  display: none;
+}
 .menu a{
     grid-area:menug;
     overflow: hidden;
@@ -132,6 +135,10 @@ body{
 /*menu per il profilo*/
 
 /*bottone notifiche*/
+/*r sta per right */
+#menuNotifiche{
+  display: none;
+}
 .notify a{
     grid-area:notifiche;
     overflow: hidden;
@@ -141,7 +148,7 @@ body{
     text-align: center;
     padding: 30px;
     text-decoration: none;
-    font-size: 17px;
+    font-size: 15px;
 }
 .notify a:hover {
   background-color: #ddd;
@@ -210,32 +217,53 @@ body{
 
 }
 
-
+/*tabella ritardi fermate*/
 .stops{
     grid-area:fermate;
     margin: auto;
-    margin-top: 100px;
+    margin-top: 70px;
     margin-bottom: 200px;
 }
-.stops a {
-    overflow: hidden;
-    color: white;
-    display: block;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 30px;
-    text-decoration: none;
-    font-size: 25px;
-}
-.stops tr{
-    margin: 15px;
-    border: grey;
-    color: grey;
-}
-.stops button{
 
+.selezione-fermate{
+  display: table;
+  width: auto;
 }
 
+.fermataHead, .rigaRitardo{
+  display: table-row;
+  width: auto;
+  clear: both;
+}
+
+.fermataHead{
+  cursor: pointer;
+  overflow: hidden;
+  background-color: #a9a9a9;
+  color: white;
+  display: block;
+  text-indent: 5px;
+  width: 100%;
+  height: 25px;
+  text-decoration: none;
+  margin-bottom: 7px;
+  margin-top: 7px;
+  font-size: 17px;
+}
+
+.rigaRitardo > div {
+  float: left;
+  display: table-cell;
+  width: auto;
+}
+
+.rigaRitardo button {
+  background-color: red;
+  color: white;
+  padding: 2px;
+  text-align: center;
+}
+/*tabella ritardi fermate*/
 
 /*footer*/
 .navbar {

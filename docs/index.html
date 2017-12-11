@@ -24,6 +24,7 @@
         <script type="text/javascript" src="js/googleLog.js"></script>
         <script type="text/javascript" src="js/visualizza-bus.js"></script>
         <script type="text/javascript" src="js/impostazioni.js"></script>
+        <script type="text/javascript" src="js/remunerazioni.js"></script>
 
         <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
@@ -41,7 +42,7 @@
         <div class="container">
             <div class="containerHeader">
 
-                <div id="mySidenav" class="sidenav" onload = "settingsLoad()"> <!--menu-->
+                <div id="mySidenav" class="sidenav"> <!--menu-->
                     <a onclick="closeNav()">&times;</a>
 
                             <h1 id = "title">Impostazioni utente </h1>
@@ -58,7 +59,7 @@
                                 Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
 
                                 <a onclick = "applySettings()">Applica</a>
-                                <a onclick = "back()">Annulla</a>
+                                <a onclick = "closeNav()">Annulla</a>
                             </div>
 
                 </div>
@@ -79,27 +80,20 @@
                     <img id = "icona_utente"></img>
                     <div id = "areaRemunerazioni" style="display:table; width:auto;border:1px solid #666;">
                     </div>
-                    <div id="footer">
-                        <p>Ritardo autobus &#174;</p>
-                    </div>
                 </div>
-                <div class="menu" id="menuNotifiche"><a onclick="openNavr()">&#9776; NOTIFICHE</a></div>
+                <div class="notify" id="menuNotifiche"><a onclick="openNavr()">&#9776; NOTIFICHE</a></div>
 
             </div>
 
             <div class="mapp">
-              <h2>La tua posizione:</h2>
-              <div id="map"></div><br>
+              <div id="map"></div>
             </div>
-
-
 
             <div class="stops">
               <!--<div id="impostazioniDiv"></div>-->
               <h3>Fermate vicino a te:</h3>
               <div id="selezione-fermate"></div>
-              <h3 id="bus-e-ritardi"></h3>
-              <br><br><br><br><br><br><br>
+              <br><br><br>
               <!--<div id="impostazioniDiv"></div>
               <div id="footer">
                   <p>Ritardo autobus &#174;</p>

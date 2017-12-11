@@ -39,23 +39,22 @@ function leggiCookie(nomeCookie) {
 /**
  * Function that ckeck if the user is logged in
  */
-function load() {
+function loadRemunerazioni() {
     var id = leggiCookie("userId");
 
     if(id == undefined) {
         console.log("User not logged in");
-        document.location.href = serverLocation;
+        //document.location.href = serverLocation;
     } else {
         console.log("User logged in");
+        load_info_remunerazioni();
     }
-
-    load_info();
 }
 
 /**
  * Function called when the page is loaded
  */
-function load_info() {
+function load_info_remunerazioni() {
     var title = document.getElementById("title");
     title.innerHTML += leggiCookie("email");
 
@@ -150,11 +149,4 @@ function load_info() {
         }
       }
     });
-}
-
-/**
- * Function called when the user click on the back button
- */
-function back() {
-    document.location.href = serverLocation;
 }

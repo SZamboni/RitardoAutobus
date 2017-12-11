@@ -47,10 +47,6 @@ function load() {
     console.log(id);
     if(id == undefined) {
         console.log("User not logged in");
-        var menuImpostazioni = document.getElementById("menuImpostazioni");
-        menuImpostazioni.style.display= "none";
-        var menuNotifiche = document.getElementById("menuNotifiche");
-        menuNotifiche.style.display= "none";
         //creo login button
         var loginbtn = document.createElement("BUTTON");
         loginbtn.className += "searchbar";        // Create a <button> element
@@ -64,20 +60,27 @@ function load() {
             old_button.parentNode.removeChild(old_button);
         }*/
     } else {
+      settingsLoad();
+      loadRemunerazioni();
       console.log("User logged in");
-
-      var notify = document.getElementById("notify");
+      var menuImpostazioni = document.getElementById("menuImpostazioni");
+      menuImpostazioni.style.display= "block";
+      var menuNotifiche = document.getElementById("menuNotifiche");
+      menuNotifiche.style.display= "block";
+      var notify = document.getElementById("menuNotifiche").firstChild;
       fetch(nodeLocation+"hits/unreadamount/?userId="+id).then((response)=>{
         data=response.json();
         return data;
       }).then((data)=>{
         //console.log(data);
         //console.log(data.Conteggio);
+        notify.innerHTML = "&#9776; NOTIFICHE ("+data.Conteggio+")";/*
         if(data.Conteggio!=0){
           notify.innerHTML="Hai "+data.Conteggio+" notifiche da leggere.";
         }else{
           notify.innerHTML="Nessuna notifica da leggere."
         }
+        */
       });
 
       //creo logout button
@@ -87,13 +90,14 @@ function load() {
       logoutbtn.appendChild(t);
       logoutbtn.onclick = signOut;
       document.getElementById("logDiv").appendChild(logoutbtn);
-
+      /*
       //creo pulsante impostazioni
       var impostazionibtn = document.createElement("BUTTON");        // Create a <button> element
       var t = document.createTextNode("impostazioni");
       impostazionibtn.appendChild(t);
       impostazionibtn.onclick = clickImpostazioni;
       document.getElementById("impostazioniDiv").appendChild(impostazionibtn);
+      */
     }
 
 }
@@ -332,6 +336,7 @@ function placeMarker(location,scanRange) {
       });
     }else{
       cerchioPosizione.setCenter(location);
+      cerchioPosizione.setRadius(scanRange*1000);
     }
 }
 /**
@@ -340,41 +345,57 @@ function placeMarker(location,scanRange) {
 function visualize() {
 
     // remove the old visualization
-    var old_div = document.getElementById("parent");
+    var old_div = document.getElementById("tabellaFermate");
+    var original = document.getElementById("selezione-fermate");
     if(old_div != undefined) {
-        old_div.parentNode.removeChild(old_div);
+        original.removeChild(old_div);
     }
 
-    original = document.getElementById("selezione-fermate");
-
-    parent = document.createElement('div');
-    parent.id = "parent";
+    var tabellaFermate = document.createElement('div');
+    tabellaFermate.id = "tabellaFermate";
 
     for(var i = 0; i < stops.length; i++) {
-        var table = document.createElement('div');
-        table.classList.add('fermataContainer');
-        var div = document.createElement('div');
-        div.classList.add('fermataHead');
-        div.innerHTML = stops[i].nomeFermata;
-        div.id = stops[i].idFermata;
-        table.appendChild(div);
+        var fermataContainer = document.createElement('div');
+        fermataContainer.classList.add('fermataContainer');
+        var fermataHead = document.createElement('div');
+        fermataHead.classList.add('fermataHead');
+        fermataHead.innerHTML = stops[i].nomeFermata;
+        fermataHead.id = stops[i].idFermata;
+        fermataContainer.appendChild(fermataHead);
 
 
         for(var j = 0; j < stops[i].lineeRitardi.length; j++) {
 
-            var tr = document.createElement('div');
-            tr.classList.add('rigaRitardo')
+            var rigaRitardo = document.createElement('div');
+            rigaRitardo.classList.add('rigaRitardo')
             var bus = document.createElement("div");
             bus.innerHTML = stops[i].lineeRitardi[j].nomeLinea;
-            tr.appendChild(bus);
+            rigaRitardo.appendChild(bus);
 
             var next = document.createElement("div");
-            next.innerHTML = stops[i].lineeRitardi[j].orario;
-            tr.appendChild(next);
+            var orario = stops[i].lineeRitardi[j].orario.split(":");
+            next.innerHTML = orario[0]+":"+orario[1];
+            rigaRitardo.appendChild(next);
 
             var delay = document.createElement("div");
-            delay.innerHTML = stops[i].lineeRitardi[j].ritardo + " min";
-            tr.appendChild(delay);
+            var testoRitardo="";
+            var ritardo = stops[i].lineeRitardi[j].ritardo.split(":");
+            var coloreRitardo = "#FF3300";
+            if(parseInt(ritardo[1])<5){
+              coloreRitard="#FF9900";
+            }
+            if(parseInt(ritardo[1])<2){
+              coloreRitardo="#00CC00";
+            }
+            if(stops[i].lineeRitardi[j].ritardo[0]=="-"){
+              testoRitardo = testoRitardo + "-";
+            }else{
+              testoRitardo = testoRitardo + "+";
+            }
+            testoRitardo = testoRitardo + parseInt(ritardo[1])+ ":"+ritardo[2];
+            delay.innerHTML = testoRitardo + " min";
+            delay.style.color = coloreRitardo;
+            rigaRitardo.appendChild(delay);
 
             if(leggiCookie("userId") != undefined) {
               var buttoncell = document.createElement("div");
@@ -389,15 +410,15 @@ function visualize() {
               };
               button.innerHTML = "Segnala Salita";
               buttoncell.appendChild(button);
-              tr.appendChild(buttoncell);
+              rigaRitardo.appendChild(buttoncell);
             }
 
-            table.appendChild(tr);
+            fermataContainer.appendChild(rigaRitardo);
         }
 
 
-        parent.appendChild(table);
-        original.appendChild(parent);
+        tabellaFermate.appendChild(fermataContainer);
+        original.appendChild(tabellaFermate);
     }
 
 
