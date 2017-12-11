@@ -2,12 +2,14 @@
  * Function that returns a value of a defined cookie or undefined if that cookie is not found
  */
 
- var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
- var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
-/*
- var serverLocation = "http://localhost:8080/";
- var nodeLocation = "http://localhost:8080/";
-*/
+ /*
+  var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
+  var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
+ */
+
+  var serverLocation = "http://localhost:8080/";
+  var nodeLocation = "http://localhost:8080/";
+
 var stops;
 var map = null;
 var marker = null;
@@ -45,7 +47,10 @@ function load() {
     console.log(id);
     if(id == undefined) {
         console.log("User not logged in");
-
+        var menuImpostazioni = document.getElementById("menuImpostazioni");
+        menuImpostazioni.style.display= "none";
+        var menuNotifiche = document.getElementById("menuNotifiche");
+        menuNotifiche.style.display= "none";
         //creo login button
         var loginbtn = document.createElement("BUTTON");
         loginbtn.className += "searchbar";        // Create a <button> element
@@ -103,8 +108,10 @@ function initMap() {
         navigator.geolocation.getCurrentPosition( function(position) {
 
             // get the coordinates
-            var latitude = 46.0667069;
-            var longitude = 11.1655039;
+            var latitude = position.coords.latitude;   //position.coords.latitude
+            var longitude = position.coords.longitude;   //position.coords.longitude
+          //  var latitude = 46.0667069;
+          //  var longitude = 11.1655039;
 
             var myLatLng = {lat: latitude, lng: longitude};
             map = new google.maps.Map(document.getElementById('map'), {
@@ -239,10 +246,10 @@ function aggiorna(){
   if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition( function(position) {
           // get the coordinates
-          //var latitude = position.coords.latitude;
-          //var longitude = position.coords.longitude;
-          var latitude = 46.0667069;
-          var longitude = 11.1655039;
+          var latitude = position.coords.latitude;   //position.coords.latitude
+          var longitude = position.coords.longitude;   //position.coords.longitude
+        //  var latitude = 46.0667069;
+        //  var longitude = 11.1655039;
 
           /**Mettere // all'inizio di questa linea per attivare i dati test
           //dati test
@@ -344,33 +351,33 @@ function visualize() {
     parent.id = "parent";
 
     for(var i = 0; i < stops.length; i++) {
-
+        var table = document.createElement('div');
+        table.classList.add('fermataContainer');
         var div = document.createElement('div');
+        div.classList.add('fermataHead');
         div.innerHTML = stops[i].nomeFermata;
         div.id = stops[i].idFermata;
-
-        var table = document.createElement('table');
-
+        table.appendChild(div);
 
 
         for(var j = 0; j < stops[i].lineeRitardi.length; j++) {
 
-            var tr = document.createElement('tr');
-
-            var bus = document.createElement("td");
+            var tr = document.createElement('div');
+            tr.classList.add('rigaRitardo')
+            var bus = document.createElement("div");
             bus.innerHTML = stops[i].lineeRitardi[j].nomeLinea;
             tr.appendChild(bus);
 
-            var next = document.createElement("td");
+            var next = document.createElement("div");
             next.innerHTML = stops[i].lineeRitardi[j].orario;
             tr.appendChild(next);
 
-            var delay = document.createElement("td");
+            var delay = document.createElement("div");
             delay.innerHTML = stops[i].lineeRitardi[j].ritardo + " min";
             tr.appendChild(delay);
 
             if(leggiCookie("userId") != undefined) {
-              var buttoncell = document.createElement("td");
+              var buttoncell = document.createElement("div");
               var button = document.createElement('button');
               button.idFermata = stops[i].idFermata;
               button.idLinea = stops[i].lineeRitardi[j].idLinea;
@@ -388,9 +395,8 @@ function visualize() {
             table.appendChild(tr);
         }
 
-        div.appendChild(table);
 
-        parent.appendChild(div);
+        parent.appendChild(table);
         original.appendChild(parent);
     }
 

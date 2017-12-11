@@ -41,36 +41,50 @@
         <div class="container">
             <div class="containerHeader">
 
-                <div id="mySidenav" class="sidenav">
+                <div id="mySidenav" class="sidenav" onload = "settingsLoad()"> <!--menu-->
                     <a onclick="closeNav()">&times;</a>
-                    <p></p>
-                    <p></p>
-                    <h1 id = "title">Impostazioni utente </h1>
+
+                            <h1 id = "title">Impostazioni utente </h1>
+
+                            <img id = "icona_utente"></img>
+
+                            <h3>Modifica le tue impostazioni</h3>
+
+                            <div>
+                                Modifica raggio di ricerca (metri)<br>
+                                <input type="range" min=50 max=1000 id="scanSlider"> </input> <label id="scanRangeLabel"></label><br>
+                                Modifica range temporale di ricerca (minuti)<br>
+                                <input type="range" min=5 max=120 id="timeSlider"> </input> <label id="timeRangeLabel"></label><br>
+                                Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
+
+                                <a onclick = "applySettings()">Applica</a>
+                                <a onclick = "back()">Annulla</a>
+                            </div>
+
+                </div>
+                <div class="menu" id="menuImpostazioni"><a onclick="openNav()">&#9776; impostazioni</a></div>
+
+                <div class="titolo">
+                    WHEN IS MY BUS!
+                </div>
+
+                <div class="searchbar">
+                    <div id="logDiv"></div> <!--bottone di login-->
+                </div>
+
+                <div id="mySidenavr" class="sidenavr"> <!--notifiche-->
+                    <a onclick="closeNavr()">&times;</a>
+                    <h1 id = "title">Lista remunerazioni utente </h1>
 
                     <img id = "icona_utente"></img>
-
-                    <h3>Modifica le tue impostazioni</h3>
-
-                    <div>
-                        Modifica raggio di ricerca (metri)<br>
-                        <input type="range" min=50 max=1000 id="scanSlider"> </input> <label id="scanRangeLabel"></label><br>
-                        Modifica range temporale di ricerca (minuti)<br>
-                        <input type="range" min=5 max=120 id="timeSlider"> </input> <label id="timeRangeLabel"></label><br>
-                        Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
-
-                        <a onclick = "myFunction()">Cambia Impostazioni</a>
+                    <div id = "areaRemunerazioni" style="display:table; width:auto;border:1px solid #666;">
                     </div>
                     <div id="footer">
                         <p>Ritardo autobus &#174;</p>
                     </div>
                 </div>
-                <div class="menu"><a onclick="openNav()">&#9776; impostazioni</a></div>
+                <div class="menu" id="menuNotifiche"><a onclick="openNavr()">&#9776; NOTIFICHE</a></div>
 
-                <div class="titolo">
-                    WHERE'S MY BUS!
-                </div>
-
-                <div id="logDiv"></div>
             </div>
 
             <div class="mapp">
@@ -82,7 +96,8 @@
 
             <div class="stops">
               <!--<div id="impostazioniDiv"></div>-->
-              <h3 id="selezione-fermate">Fermate vicino a te:</h3>
+              <h3>Fermate vicino a te:</h3>
+              <div id="selezione-fermate"></div>
               <h3 id="bus-e-ritardi"></h3>
               <br><br><br><br><br><br><br>
               <!--<div id="impostazioniDiv"></div>
@@ -94,13 +109,13 @@
 
         </div>
         <div class="navbar" id="myNavbar">
-            Where is my bus &#174;
-            <a id="notify" href="remunerazioni.html">NOTIFICHE</a>
+            When is my bus &#174; - 2017
+            <!--<a id="notify" href="remunerazioni.html">NOTIFICHE</a>-->
         </div>
 
         <script>
             //funzioni per il menu a comparsa
-            
+
             /*var bounds = [
                 {min:0,max:400,func:red},
                 {min:801,func:orange}
@@ -139,8 +154,21 @@
 
             }
 
+            function openNavr() { //sidenav per le notifiche
+                var width = window.innerWidth;
+                if (width < 400) {
+                  document.getElementById("mySidenavr").style.width = "60vw";
+                }else {
+                  document.getElementById("mySidenavr").style.width = "500px";
+                }
+
+            }
+
             function closeNav() {
                 document.getElementById("mySidenav").style.width = "0";
+            }
+            function closeNavr() { //sidenav per le notifiche
+                document.getElementById("mySidenavr").style.width = "0";
             }
         </script>
         <!--________________________________________________________________________-->

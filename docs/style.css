@@ -16,6 +16,11 @@ body{
 
 #map {
     height: 80%;
+    border-color: black;
+    border-style: solid double;
+    -webkit-box-shadow: 0 10px 10px -6px #0a0809;
+       -moz-box-shadow: 0 10px 10px -6px #0a0809;
+            box-shadow: 0 10px 10px -6px #0a0809;
 
 }
 
@@ -33,11 +38,12 @@ body{
 .containerHeader{
     display: grid;
     grid-area: header;
-    grid-template-columns:20vw 60vw 20vw;
+    grid-template-columns:20vw 60vw 10vw 10vw;
     position: fixed;
     grid-template-areas:
-        "menug header-title search";
+        "menug header-title search notifiche";
     background-color: #434343;
+    vertical-align: middle;
     /*margin-bottom: 15px;*/
     font-family: Arial, Helvetica, sans-serif;
     z-index: 99999999;
@@ -45,22 +51,21 @@ body{
 
 .searchbar {
     grid-area:search;
-    background-color: grey;
-    z-index: 99999999;
+    /*background-color: grey;*/
     border: none;
     color: white;
-    padding: 15px 32px;
     text-align: center;
+    vertical-align: middle;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
-      margin: 4px 2px;
-    cursor: pointer;
+    margin: 10px;
+    font-size: 17px;
 }
-/*.searchbar :hover {
-  background-color: #ddd;
-  color: black;
-}*/
+.searchbar button {
+  padding: 12px;
+  width: 95%;
+  cursor: pointer;
+}
 
 
 
@@ -72,9 +77,10 @@ body{
     display: block;
     color: #f2f2f2;
     text-align: center;
-    padding: 30px;
+    padding: 31px;
     text-decoration: none;
     font-size: 17px;
+    cursor: pointer;
 }
 .menu a:hover {
   background-color: #ddd;
@@ -125,6 +131,67 @@ body{
 
 /*menu per il profilo*/
 
+/*bottone notifiche*/
+.notify a{
+    grid-area:notifiche;
+    overflow: hidden;
+    color: white;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 30px;
+    text-decoration: none;
+    font-size: 17px;
+}
+.notify a:hover {
+  background-color: #ddd;
+  color: black;
+}
+.sidenavr {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 99999999;
+    color: white;
+    top: 0;
+    right: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    /*padding-top: 60px;*/
+}
+
+.sidenavr a {
+    overflow: hidden;
+    color: white;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 30px;
+    text-decoration: none;
+    font-size: 25px;
+}
+
+.sidenavr a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.sidenavr .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+/*bottone notifiche*/
+
 .titolo{
     display: table-cell;
     grid-area:header-title;
@@ -160,9 +227,17 @@ body{
     text-decoration: none;
     font-size: 25px;
 }
+.stops tr{
+    margin: 15px;
+    border: grey;
+    color: grey;
+}
+.stops button{
+
+}
 
 
-/*bottoni in basso*/
+/*footer*/
 .navbar {
   overflow: hidden;
   background-color: #333;
@@ -170,70 +245,14 @@ body{
   width: 100%;
   bottom: 0;
   color: white;
-  padding-left: 13px;
+  padding: 5px;
   vertical-align: middle;
+  text-align: center;
   /*vertical-align: middle;
   padding-top: 10px;
   padding-bottom: 10px;*/
 }
-
-.navbar a {
-  float: right;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 45px;/*
-  padding-top: 14px;
-  padding-right: 48.27%;*/
-  text-decoration: none;
-  font-size: 17px;
-}
-
-.navbar a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.navbar .icon {
-  display: none;
-}
-/*bottoni in basso*/
-
-
-/*.containerBottom{
-    display: grid;
-    grid-area: bottom;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    grid-template-columns:50vw 50vw;
-    grid-template-areas:
-        "bottone1 bottone2";
-    background-color: #434343;
-    margin-bottom: 15px;
-    font-family: Arial, Helvetica, sans-serif;
-
-    justify-content: center;
-    align-content:center;
-}
-.containerBottom a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.botton1{
-    grid-area:bottone1;
-    color: white;
-    text-align: center;
-    vertical-align: middle;
-}
-
-.botton2{
-    grid-area:bottone2;
-    color: white;
-    text-align: center;
-    vertical-align: middle;
-}*/
+/*footer*/
 
 
 /*________________________________________________________________________________________________*/
