@@ -819,8 +819,14 @@ setInterval(aggiornaRitardi,intervalloRitardi);
 /**
 Funzioni admin per lanciare le funzioni periodiche a volontà
 **/
-app.get("/admin/update/",aggiornaRitardi);
-app.get("/admin/reset/",resetRitardi);
+app.get("/admin/update/",function(request,response){
+  aggiornaRitardi();
+  response.sendStatus(200);
+});
+app.get("/admin/reset/",function(request,response){
+  resetRitardi();
+  response.sendStatus(200);
+});
 //Easter egg
 app.get("/some",function(request,response){
   var shrek="<body style=\"background-image: url(\'"+
