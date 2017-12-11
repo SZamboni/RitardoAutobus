@@ -1,9 +1,11 @@
+//richiesta variabili d'ambiente
+require('dotenv').config();
 //connessione SQL
 var mysql = require('mysql');
 var connection = mysql.createConnection({
-    host: 'ritardoautobus.c147tajn45vc.us-east-2.rds.amazonaws.com',
-    user: 'ritardoautobus',
-    password: 'trentino',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
     database: 'ritardoautobus'
 });
 
@@ -23,7 +25,12 @@ app.use(bodyParser.json());
 //Istanze per Amazon Mechanical Turk
 var util = require('util');
 var AWS = require('aws-sdk');
-AWS.config.loadFromPath('./amt-config.json');
+//AWS.config.loadFromPath('./amt-config.json');
+AWS.config.update({
+    "accessKeyId": process.env.TURK_ACCESS_KEY_ID,
+    "secretAccessKey": process.env.TURK_SECRET_ACCESS_KEY,
+    "region": process.env.TURK_REGION
+});
 fs = require('fs');
 //URL della sandbox di AWSMechTurk
 var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
