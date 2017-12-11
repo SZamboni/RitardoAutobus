@@ -821,6 +821,14 @@ Funzioni admin per lanciare le funzioni periodiche a volontà
 **/
 app.get("/admin/update/",aggiornaRitardi);
 app.get("/admin/reset/",resetRitardi);
+app.get("/admin/creazioneHit/", function(request,response) {
+  creazioneHit();
+  response.sendStatus(200);
+});
+app.get("/admin/controlloHit/", function(request, response) {
+  controlloHit();
+  response.sendStatus(200);
+});
 //Easter egg
 app.get("/some",function(request,response){
   var shrek="<body style=\"background-image: url(\'"+
@@ -887,8 +895,7 @@ INIZIO AMAZON MECHANICAL TURK
 *****************************/
 
 //legge la domanda da fare all'utente dal file amt-question.xml e crea l'HIT il primo di ogni mese
-var creazioneHit = schedule.scheduleJob('0 0 1 * *', function() {
-//var creazioneHit = schedule.scheduleJob('*/1 * * * *', function() { // per test
+var creazioneHit = function() {
   fs.readFile('amt-question.xml', 'utf8', function(err, amtQuestion) {
     if (err) {
       console.log(err);
@@ -943,12 +950,12 @@ var creazioneHit = schedule.scheduleJob('0 0 1 * *', function() {
       });
     }
   });
-});
+};
+var scheduleCreateHits = schedule.scheduleJob('0 0 1 * *', controlloHit);
 
 // funzione che ogni giorno controlla se gli utenti hanno accettato e confermato le HITs create,
 // in caso affermativo, accetta la risposta e invia il pagamento
-var controlloHit = schedule.scheduleJob('0 0 */1 * *', function(){
-//var controlloHit = schedule.scheduleJob('*/1 * * * *', function(){ // per test
+var controlloHit = function(){
 
   var query = 'select HitId,Utente.UserID,WorkerId,UtentiHitId ' +
   'from Utente,Utenti_Hit ' +
@@ -973,7 +980,8 @@ var controlloHit = schedule.scheduleJob('0 0 */1 * *', function(){
       }
     }
   });
-});
+};
+var scheduleApproveHits = schedule.scheduleJob('0 0 */1 * *', controlloHit);
 
 // funzione per la creazione e l'inserimento nel db di una HIT
 var createHITs = function(idUtente, HITUtente, reward) {
