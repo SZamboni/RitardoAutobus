@@ -15,6 +15,18 @@
             var label=document.getElementById("resetRitardiLabel");
             label.innerHTML= "Fatto";
           });
+        };
+        var creazioneHit = function(){
+          fetch(nodeLocation+"admin/creazioneHit/").then(function(){
+            var label=document.getElementById("creazioneHitLabel");
+            label.innerHTML= "Fatto";
+          });
+        };
+        var controlloHit = function(){
+          fetch(nodeLocation+"admin/controlloHit/").then(function(){
+            var label=document.getElementById("controlloHitLabel");
+            label.innerHTML= "Fatto";
+          });
         }
       </script>
     </head>
@@ -25,6 +37,10 @@
         <label id="aggiornaRitardiLabel"></label><br>
         <button onclick="resetRitardi()">reset ritardi</button>
         <label id="resetRitardiLabel"></label><br>
+        <button onclick="creazioneHit()">creazione HIT</button>
+        <label id="creazioneHitLabel"></label><br>
+        <button onclick="controlloHit()">controllo HIT</button>
+        <label id="controlloHitLabel"></label><br>
       </div>
     </body>
 </html>
