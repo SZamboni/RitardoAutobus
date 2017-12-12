@@ -319,11 +319,11 @@ describe('Testo il post della salita con parametri non completi', () => {
 });
 
 describe('Testo il post del login di un utente dove non passo i parametri', () => {
-    test("Dovrebbe comunque darmi il body", (done) => {
+    test("Dovrebbe darmi 400 bad request", (done) => {
         request(app)
         .post("/login/")
         .then((response) => {
-            expect(response.body.length).not.toBe(0);
+            expect(response.statusCode).toBe(400);
             done();
         });
     });
