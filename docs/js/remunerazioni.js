@@ -80,9 +80,9 @@ function load_info_remunerazioni() {
         var dataIntestazione=document.createElement("div");
         var valoreIntestazione=document.createElement("div");
         //stilizzo i miei elementi
-        rigaIntestazione.setAttribute("style","display:table-row; width:auto; background-color:#878787;");
+        rigaIntestazione.id="rigaheader";
         dataIntestazione.id="datanotifica";
-        valoreIntestazione.setAttribute("style","float:left;display:table-column;");
+        valoreIntestazione.id= "valoreheader";
         //popolo l'intestazione
         dataIntestazione.innerHTML="Data remunerazione";
         valoreIntestazione.innerHTML="Valore remunerazione";
@@ -96,9 +96,9 @@ function load_info_remunerazioni() {
           var dataRemun=document.createElement("div");
           var valoreRemun=document.createElement("div");
           //stilizzo gli elementi
-          rigaHit.setAttribute("style","display:table-row; width:auto; cursor:pointer;");
+          rigaHit.id= "rihaHit";
           dataRemun.id="dataremunerazione";
-          valoreRemun.setAttribute("style","float:left;display:table-column;");
+          valoreRemun.id= "valoreRemun";
 
           //console.log(data[i]);
           //rendo la riga cliccabile
