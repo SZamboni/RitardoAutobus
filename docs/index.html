@@ -47,16 +47,23 @@
 
                             <h1 id = "title">Impostazioni utente </h1>
 
-                            <img id = "icona_utente"></img>
+                            <!--<img id = "icona_utente"></img>
 
-                            <h3>Modifica le tue impostazioni</h3>
+                            <h3>Modifica le tue impostazioni</h3>-->
 
                             <div>
+                              <div class="bordi_menu">
+                                <img id = "icona_utente"></img>
+
+                                <h3>Modifica le tue impostazioni</h3>
+
                                 Modifica raggio di ricerca (metri)<br>
                                 <input type="range" min=50 max=1000 id="scanSlider"> </input> <label id="scanRangeLabel"></label><br>
                                 Modifica range temporale di ricerca (minuti)<br>
                                 <input type="range" min=5 max=120 id="timeSlider"> </input> <label id="timeRangeLabel"></label><br>
                                 Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
+
+                              </div>
 
                                 <a onclick = "applySettings()">Applica</a>
                                 <a onclick = "closeNav()">Annulla</a>
@@ -74,12 +81,14 @@
                 </div>
 
                 <div id="mySidenavr" class="sidenavr"> <!--notifiche-->
+                  <div class="bordi_menu">
                     <a onclick="closeNavr()">&times;</a>
                     <h1 id = "title">Lista remunerazioni utente </h1>
 
                     <img id = "icona_utente"></img>
                     <div id = "areaRemunerazioni" style="display:table; width:auto;border:1px solid #666;">
                     </div>
+                  </div>
                 </div>
                 <div class="notify" id="menuNotifiche"><a onclick="openNavr()">&#9776; NOTIFICHE</a></div>
 

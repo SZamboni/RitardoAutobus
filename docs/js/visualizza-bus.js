@@ -338,7 +338,21 @@ function placeMarker(location,scanRange) {
       cerchioPosizione.setCenter(location);
       cerchioPosizione.setRadius(scanRange*1000);
     }
+  }
+/*
+Funzione che gestisce il collapse dei ritardi
+*/
+/*
+function collapse(){
+    var collapser=this.parentNode.lastChild;
+    var sizer= collapser.firstChild;
+    if(collapser.clientHeight){
+      collapser.style.height = 0;
+    }else{
+      collapser.style.height = sizer.clientHeight + "px";
+    }
 }
+*/
 /**
  * Function that visualize stops and bus
  */
@@ -357,27 +371,41 @@ function visualize() {
     for(var i = 0; i < stops.length; i++) {
         var fermataContainer = document.createElement('div');
         fermataContainer.classList.add('fermataContainer');
+        var fermataSizer = document.createElement('div');
+        fermataSizer.classList.add('fermataSizer');
         var fermataHead = document.createElement('div');
+        fermataHead.id= "fermataname"
         fermataHead.classList.add('fermataHead');
         fermataHead.innerHTML = stops[i].nomeFermata;
         fermataHead.id = stops[i].idFermata;
+        fermataHead.onclick = function(){
+          var collapser=this.parentNode.lastChild;
+          var sizer= collapser.firstChild;
+          if(collapser.clientHeight){
+            collapser.style.height = 0;
+          }else{
+            collapser.style.height = sizer.clientHeight + "px";
+          }
+        };
         fermataContainer.appendChild(fermataHead);
-
-
         for(var j = 0; j < stops[i].lineeRitardi.length; j++) {
 
             var rigaRitardo = document.createElement('div');
             rigaRitardo.classList.add('rigaRitardo')
+            rigaRitardo.id= "rigadelay"
             var bus = document.createElement("div");
+            bus.id= "tratta"
             bus.innerHTML = stops[i].lineeRitardi[j].nomeLinea;
             rigaRitardo.appendChild(bus);
 
             var next = document.createElement("div");
+            next.id= "orario"
             var orario = stops[i].lineeRitardi[j].orario.split(":");
             next.innerHTML = orario[0]+":"+orario[1];
             rigaRitardo.appendChild(next);
 
             var delay = document.createElement("div");
+            delay.id= "ritardo"
             var testoRitardo="";
             var ritardo = stops[i].lineeRitardi[j].ritardo.split(":");
             var coloreRitardo = "#FF3300";
@@ -399,10 +427,11 @@ function visualize() {
 
             if(leggiCookie("userId") != undefined) {
               var buttoncell = document.createElement("div");
+              buttoncell.id="bottonesegnala"
               var button = document.createElement('button');
               button.idFermata = stops[i].idFermata;
               button.idLinea = stops[i].lineeRitardi[j].idLinea;
-              button.idCorsa = stops[i].idCorsa;
+              button.idCorsa = stops[i].lineeRitardi[j].idCorsa;
               button.latFermata = stops[i].latitudine;
               button.lonFermata = stops[i].longitudine;
               button.onclick = function () {   // the function called when the button is press
@@ -412,30 +441,24 @@ function visualize() {
               buttoncell.appendChild(button);
               rigaRitardo.appendChild(buttoncell);
             }
-
-            fermataContainer.appendChild(rigaRitardo);
+            fermataSizer.appendChild(rigaRitardo);
+        }
+        if(stops[i].lineeRitardi.length==0){
+            var nessunaCorsa = document.createElement("div");
+            nessunaCorsa.classList.add("nessunaCorsa");
+            nessunaCorsa.innerHTML = "Nessuna corsa programmata per la fermata."
+            fermataSizer.appendChild(nessunaCorsa);
         }
 
-
+        var fermataCollapser = document.createElement("div");
+        fermataCollapser.classList.add("fermataCollapser");
+        fermataCollapser.appendChild(fermataSizer);
+        fermataContainer.appendChild(fermataCollapser);
         tabellaFermate.appendChild(fermataContainer);
-        original.appendChild(tabellaFermate);
     }
-
+    original.appendChild(tabellaFermate);
 
 }
-
-/*funzione per il collapse
-$(document).ready(function() {
-    $(".btn-primary").click(function(){
-        $(".collapse").collapse('toggle');
-    });
-    $(".btn-success").click(function(){
-        $(".collapse").collapse('show');
-    });
-    $(".btn-warning").click(function(){
-        $(".collapse").collapse('hide');
-    });
-});*/
 
 /**
  * Function that request for a bus stop all the bus with their delay

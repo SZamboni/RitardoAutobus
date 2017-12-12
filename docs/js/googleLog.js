@@ -61,11 +61,11 @@ function onSignIn(googleUser) {
               }).then(function(data){
                 console.log(data);
                 document.cookie = "userId=" + data.id;
-
-        if(data.primologin){
-            show_turk();
-                }
-        else{
+        if(data.primoLogin){
+            //document.location.href = serverLocation + "registrazioneAMT.html";
+            window.opener.location.href=serverLocation + "registrazioneAMT.html";
+            window.opener.closeLoginWin();
+        }else{
             window.opener.location.reload();
             window.opener.closeLoginWin();
         }
@@ -129,16 +129,4 @@ function load_login() {
     console.log("load_login")
     var div_turk = document.getElementById("turk");
     //div_turk.style.display = 'none';
-}
-
-/**
- * Function that hide the login div
- */
-function show_turk() {
-    console.log("show_turk")
-    var div_login = document.getElementById("login");
-    div_login.style.display = 'none';
-
-    newUrl= serverLocation + "registrazioneAMT.html";
-    document.location.href = newUrl;
 }

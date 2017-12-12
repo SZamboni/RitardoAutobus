@@ -56,7 +56,7 @@ function conferma(){
     },
     body: JSON.stringify(body)
   }).then((response)=>{
-    var newUrl = serverLocation + "bus-visualization.html";
+    var newUrl = serverLocation;
     document.location.href = newUrl;
   });
 }

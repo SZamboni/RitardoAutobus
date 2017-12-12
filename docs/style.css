@@ -38,7 +38,7 @@ body{
 .containerHeader{
     display: grid;
     grid-area: header;
-    grid-template-columns:20vw 60vw 10vw 10vw;
+    grid-template-columns:20vw 60vw 8vw 12vw;
     position: fixed;
     grid-template-areas:
         "menug header-title search notifiche";
@@ -67,7 +67,11 @@ body{
   cursor: pointer;
 }
 
-
+.bordi_menu{
+  overflow-x: hidden;
+  margin-left: 10px;
+  margin-right: 5px;
+}
 
 /*menu per il profilo*/
 #menuImpostazioni{
@@ -100,7 +104,6 @@ body{
     background-color: #111;
     overflow-x: hidden;
     transition: 0.5s;
-    /*padding-top: 60px;*/
 }
 
 .sidenav a {
@@ -112,6 +115,7 @@ body{
     padding: 30px;
     text-decoration: none;
     font-size: 25px;
+    cursor: pointer;
 }
 
 .sidenav a:hover {
@@ -146,9 +150,10 @@ body{
     display: block;
     color: #f2f2f2;
     text-align: center;
-    padding: 30px;
+    padding: 31px;
     text-decoration: none;
-    font-size: 15px;
+    font-size: 17px;
+    cursor: pointer;
 }
 .notify a:hover {
   background-color: #ddd;
@@ -177,6 +182,7 @@ body{
     padding: 30px;
     text-decoration: none;
     font-size: 25px;
+    cursor: pointer;
 }
 
 .sidenavr a:hover {
@@ -226,12 +232,12 @@ body{
 }
 
 .selezione-fermate{
-  display: table;
   width: auto;
 }
 
+
 .fermataHead, .rigaRitardo{
-  display: table-row;
+  /*display: table-row;*/
   width: auto;
   clear: both;
 }
@@ -252,16 +258,71 @@ body{
 }
 
 .rigaRitardo > div {
-  float: left;
-  display: table-cell;
+  /*float: left;
+  display: table-cell;*/
   width: auto;
+  /*display: grid;
+  grid-template-columns: 500px 50px 50px 100px;
+  grid-template-areas:
+      "direzione" "arrivo" "ritardobus" "bottone_segnala";*/
 }
 
 .rigaRitardo button {
+  grid-area: bottone_segnala;
   background-color: red;
   color: white;
   padding: 2px;
   text-align: center;
+}
+
+.bus > div{
+  grid-area: direzione;
+}
+.next > div{
+  grid-area: arrivo;
+}
+.delay > div{
+  grid-area: ritardobus;
+}
+
+/*#fermataContainer{
+  display: grid;
+  grid-template-columns: 500px 50px 50px 50px;
+  grid-template-areas:
+      "stopname" "stopname" "stopname" "stopname"
+      "direzione" "arrivo" "ritardobus" "bottone_segnala";
+}*/
+.fermataCollapser {
+    -moz-transition: height .5s;
+    -ms-transition: height .5s;
+    -o-transition: height .5s;
+    -webkit-transition: height .5s;
+    transition: height .5s;
+    height: 0;
+    overflow: hidden;
+  }
+#rigadelay{
+  display: grid;
+  grid-template-columns: 400px 75px 75px 100px;
+  grid-template-areas:
+      "direzione" "arrivo" "ritardobus" "bottone_segnala";
+}
+
+/*#fermataname{
+  grid-area: stopname;
+}
+#tratta{
+  grid-area: direzione;
+}
+#orario{
+  grid-area: arrivo;
+}
+#ritardo{
+  grid-area: ritardobus;
+}
+/*
+#bottonesegnala{
+  grid-area: bottone_segnala;
 }
 /*tabella ritardi fermate*/
 
