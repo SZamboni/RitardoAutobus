@@ -189,8 +189,8 @@ describe('Testo il get del workerId con un userId non valido', () => {
     });
 });
 
-describe('Testo il get delle fermate con un parametro in più', () => {
-    test("Dovrebbe darmi le fermate attorno a me perchè ignora il parametro aggiuntivo", (done) => {
+describe('Testo il post della visualizzazione della hit con id 1', () => {
+    test("Dovrebbe aggiornare a visualizzata la hit inviata com e parametro", (done) => {
         request(app)
         .post("/hits/visual/")
         .send({
