@@ -257,6 +257,7 @@ describe('Test utilizzo dell\'hearder Content-Type in /fermate', () => {
 /**
  * Test post di un login
  */
+ /*
 describe('Testo il post generato dal login di un utente', () => {
     test("Dovrebbe rispondermi con il body", (done) => {
         request(app)
@@ -273,7 +274,7 @@ describe('Testo il post generato dal login di un utente', () => {
         });
     });
 });
-
+*/
 
 //TEST DI MICHELE
 
@@ -398,6 +399,66 @@ describe('Test post della segnalazione di una salita corretta da Povo Piazza Man
         })
         .then((response) => {
           expect(response.statusCode).toBe(200);
+          done();
+        });
+    });
+});
+
+
+//tests di Federico
+
+describe('Testo l\'aggiornamento del worker-id con un user-id', () => {
+    test("Dovrebbe aggiornare il worker id", (done) => {
+        request(app)
+        .post("/turk/")
+        .send({
+          workerId: 'AJ65LZI612RT0',
+          userId: '10',
+        })
+        .then((response) => {
+          expect(response.statusCode).toBe(200);
+          done();
+        });
+    });
+});
+
+describe('Testo il get delle hits workerId con l\'user-id non valido', () => {
+    test("Dovrebbe darmi ERRORE 500", (done) => {
+        request(app)
+        .get("/hits/?userId=SD")
+        .then((response) => {
+          expect(response.statusCode).toBe(500);
+          done();
+        });
+    });
+});
+
+
+describe('Testo l\'aggiornamento del worker-id con i parametr non validi', () => {
+    test("Dovrebbe darmi ERRORE 500", (done) => {
+        request(app)
+        .post("/turk/")
+        .send({
+          workerId: 345678,
+          userId: '2fy0',
+        })
+        .then((response) => {
+          expect(response.statusCode).toBe(500);
+          done();
+        });
+    });
+});
+
+
+describe('Testo il post della visualizzazione della hit con id non valido', () => {
+    test("Dovrebbe darmi ERRORE 500", (done) => {
+        request(app)
+        .post("/hits/visual/")
+        .send({
+          utentiHitId: '1lytrdt',
+        })
+        .then((response) => {
+          expect(response.statusCode).toBe(500);
           done();
         });
     });
