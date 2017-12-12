@@ -1,12 +1,13 @@
 /**
  * File javascript for the page impostazioni
  */
+ 
+ var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
+ var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
 /*
-var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
-var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
+ var serverLocation = "http://localhost:8080/";
+ var nodeLocation = "http://localhost:8080/";
 */
-var serverLocation = "http://localhost:8080/";
-var nodeLocation = "http://localhost:8080/";
 
 var oldTurk;
 var oldTime;

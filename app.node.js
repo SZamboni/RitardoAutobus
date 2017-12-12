@@ -1,9 +1,11 @@
+//richiesta variabili d'ambiente
+require('dotenv').config();
 //connessione SQL
 var mysql = require('mysql');
 var connection = mysql.createConnection({
-    host: 'ritardoautobus.c147tajn45vc.us-east-2.rds.amazonaws.com',
-    user: 'ritardoautobus',
-    password: 'trentino',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
     database: 'ritardoautobus'
 });
 
@@ -23,7 +25,12 @@ app.use(bodyParser.json());
 //Istanze per Amazon Mechanical Turk
 var util = require('util');
 var AWS = require('aws-sdk');
-AWS.config.loadFromPath('./amt-config.json');
+//AWS.config.loadFromPath('./amt-config.json');
+AWS.config.update({
+    "accessKeyId": process.env.TURK_ACCESS_KEY_ID,
+    "secretAccessKey": process.env.TURK_SECRET_ACCESS_KEY,
+    "region": process.env.TURK_REGION
+});
 fs = require('fs');
 //URL della sandbox di AWSMechTurk
 var endpoint = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com';
@@ -706,7 +713,10 @@ var resetRitardi = function(){
     }
   })
 };
-var scheduleRitardi = schedule.scheduleJob('1 0 */1 * *',resetRitardi);
+var rule = new schedule.RecurrenceRule();
+rule.hour = 1;
+rule.minute = 30;
+var scheduleRitardi = schedule.scheduleJob(rule,resetRitardi);
 /**
 Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
 la tabella dei ritardi a partire dalla tabella delle segnalazioni.
@@ -824,7 +834,14 @@ app.get("/admin/update/",function(request,response){
   response.sendStatus(200);
 });
 app.get("/admin/reset/",function(request,response){
-  resetRitardi();
+  //eseguo il reset solo se necessario
+  var query="SELECT if(count(*)>1,TRUE,FALSE) As NRitardi FROM Ritardo Where DataRitardo=curdate();";
+  selectQuery(query,function(errore,parser){
+    if(parser[0].NRitardi!=1){
+      resetRitardi();
+    }
+  });
+  //resetRitardi();
   response.sendStatus(200);
 });
 app.get("/admin/creazioneHit/", function(request,response) {
