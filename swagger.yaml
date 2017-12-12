@@ -1,0 +1,119 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: "When is my bus?"
+  description: Autobus delays calculator app built from the ground up for our SE2 project.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: RitardoAutobus team, Michele Bonapace, Marcello Gecchele, Anna Martignano, Simone Zamboni, Francesco Loda, Michela Lorandi e Federico Porteri 
+  license:
+    name: MIT
+    url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
+host: floating-eyrie-45682.herokuapp.com
+basePath: /
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /fermate:
+    get:
+      description: Return all the bus stops in the scan range of the given coordinates
+      parameters:
+        - name: latitude
+          in: query
+          description: The latitude used to center the scan of near bus stops
+          required: true
+          type: number
+        - name: longitude
+          in: query
+          description: The longitude used to center the scan of near bus stops
+          required: true
+          type: number
+        - name: scanRange
+          in: query
+          description: The radius of the research in km
+          required: true
+          type: number
+      responses:
+        200:
+          description: the list of the bus stops in the scan range
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Fermata'
+  
+  /ritardi:
+    get:
+      description: Return all the bus that will pass in the next "rangeTempo" on that bus stop
+      parameters:
+        - name: idFermata
+          in: query
+          description: The ID of the bus stop where you want to know the delay of the buses
+          required: true
+          type: integer
+        - name: rangeTempo
+          in: query
+          description: The range of time that will be used to search the next bus in minutes
+          required: true
+          type: string
+      responses:
+        200:
+          description: The list of all the bus that will pass in the next "rangeTempo" minutes from the requested bus stop and their delay
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Bus'
+
+definitions:
+  Fermata:
+    required:
+      - idFermata
+      - nomeFermata
+      - latitudine
+      - longitudine
+    properties:
+      idFermata:
+        type: integer
+        description: the ID of the bus stop
+      nomeFermata:
+        type: string
+        description: the name of the bus stop
+      latitudine:
+        type: number
+        description: the latitude of the bus stop
+      longitudine:
+        type: number
+        description: the longitude of the bus stop
+  Bus:
+    required:
+      - idLinea
+      - nomeLinea
+      - orario
+      - ritardo
+      - idCorsa
+      - idFermata
+    properties:
+      idLinea:
+        type: integer
+      nomeLinea:
+        type: string
+        description: the name of the line
+      orario:
+        type: string
+        description: the correct time when the bus will pass
+      ritardo:
+        type: string
+        description: the delay of the bus in respect to the correct time
+      idCorsa:
+        type: integer
+      idFermata:
+        type: number
+  Error:
+    required:
+      - message
+    properties:
+      message:
+        type: string
