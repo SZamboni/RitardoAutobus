@@ -1,23 +1,13 @@
 /**
  * File javascript for the page impostazioni
  */
-<<<<<<< HEAD
 
- /*
-  var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
-  var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
- */
-  var serverLocation = "http://localhost:8080/";
-  var nodeLocation = "http://localhost:8080/";
-
-=======
  var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
  var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
 /*
  var serverLocation = "http://localhost:8080/";
  var nodeLocation = "http://localhost:8080/";
 */
->>>>>>> 69cd7f6... Nuovo commit per il cherry pick - rimozione variabili locali
 /**
  * Function that given a cookie name controls if there is that cookie
  */
