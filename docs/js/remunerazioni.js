@@ -96,7 +96,7 @@ function load_info_remunerazioni() {
           var dataRemun=document.createElement("div");
           var valoreRemun=document.createElement("div");
           //stilizzo gli elementi
-          rigaHit.id= "rihaHit";
+          rigaHit.id= "rigaHit";
           dataRemun.id="dataremunerazione";
           valoreRemun.id= "valoreRemun";
 

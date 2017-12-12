@@ -203,7 +203,9 @@ body{
   /*solid #666;*/
 }
 #rigaheader{
-  display:table-row; width:auto; background-color:#878787;
+  display:table-row;
+   width:auto;
+  background-color:#878787;
 }
 #datanotifica{
   float:left;
@@ -211,11 +213,14 @@ body{
   width:200px;
 }
 #valoreheader{
-  float:left;display:table-column;
+  float:left;
+  display:table-column;
 }
 
 #rigaHit{
-  display:table-row; width:auto; cursor:pointer;
+  display:table-row;
+   width:auto;
+   cursor:pointer;
 }
 #dataremunerazione{
   float:left;
@@ -223,7 +228,8 @@ body{
   width:200px;
 }
 #valoreRemun{
-  float:left;display:table-column;
+  float:left;
+  display:table-column;
 }
 /*tabella remunerazioni*/
 

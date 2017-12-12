@@ -1,0 +1,127 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : 29-set-2017, 18.00.05
+    Author     : Federico
+*/
+
+body{
+    background-color: #ffffff;
+    margin: 0;
+    font-family: ProximaNova,Arial,Sans-serif;
+}
+
+
+
+.container{
+    display: grid;
+    grid-template-rows:50px 700px 200px;
+    grid-template-columns: 100%;
+    position:relative;
+    grid-template-areas:
+        "title"
+        "corpo"
+        "footer";
+}
+
+.bordi{
+  margin-left: 20px;
+  margin-top: 70px;
+}
+
+.titolo{
+    grid-area:title;
+    width: 100%;
+    position: fixed;
+    background-color: #434343;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 70px;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.corpo{
+  grid-area:corpo;
+  margin-left: auto;
+  margin-right: auto;
+}
+.corpo button{
+  border-color: #C9E6DE;
+  font-size: 13px;
+  line-height: 18px;
+  outline: none;
+  border: 1px solid #B1E1ED;
+  -webkit-appearance: none;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  padding: 4px 5% 6px 0;
+}
+.corpo a{
+  overflow: hidden;
+  color: blue;
+  display: block;
+  width: 450px;
+  padding: 2px;
+  text-decoration: none;
+  font-size: 17px;
+  cursor: pointer;
+}
+.corpo a:hover{
+  color: #0000cd;
+}
+
+
+.footer{
+  overflow: footer;
+  background-color: #333;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  color: white;
+  padding: 5px;
+  vertical-align: middle;
+  text-align: center;
+}
+#workerId{
+  border-color: #C9E6DE;
+  font-size: 13px;
+  line-height: 18px;
+  outline: none;
+  border: 1px solid #B1E1ED;
+  -webkit-appearance: none;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  float: left;
+  clear: none;
+  /*padding-top: 12px;
+  /*padding-bottom: 10px;*/
+  padding: 6px 5% 6px 0;
+  text-indent: 5%;
+  height: 15px;
+  line-height: 2;
+  width: 100px;
+}
+
+.footer {
+  overflow: footer;
+  background-color: #333;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  color: white;
+  padding: 5px;
+  vertical-align: middle;
+  text-align: center;
+  /*vertical-align: middle;
+  padding-top: 10px;
+  padding-bottom: 10px;*/
+}
+
+
+/*________________________________________________________________________________________________*/
