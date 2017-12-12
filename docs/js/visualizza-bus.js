@@ -7,8 +7,8 @@
   var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
  */
 
-  var serverLocation = "http://localhost:8080/";
-  var nodeLocation = "http://localhost:8080/";
+  var serverLocation = "http://192.168.1.8:8080/";
+  var nodeLocation = "http://192.168.1.8:8080/";
 
 var stops;
 var map = null;
@@ -108,14 +108,15 @@ function load() {
 function initMap() {
 
     // check if the geolocation is enabled
+    /* commento MOBILE
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition( function(position) {
-
+*/
             // get the coordinates
-            var latitude = position.coords.latitude;   //position.coords.latitude
-            var longitude = position.coords.longitude;   //position.coords.longitude
-          //  var latitude = 46.0667069;
-          //  var longitude = 11.1655039;
+            //var latitude = position.coords.latitude;   //position.coords.latitude
+            //var longitude = position.coords.longitude;   //position.coords.longitude
+            var latitude = 46.0667069;
+            var longitude = 11.1655039;
 
             var myLatLng = {lat: latitude, lng: longitude};
             map = new google.maps.Map(document.getElementById('map'), {
@@ -123,7 +124,9 @@ function initMap() {
                 center: myLatLng
             });
             aggiorna();
+            /* commento MOBILE
       });
+
     } else {
         alert("Geolocation is not supported by this browser, all the functions will not be available");
 
@@ -133,7 +136,7 @@ function initMap() {
         });
 
     }
-
+*/
 }
 
 /**
@@ -192,15 +195,15 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
 
     var data = new Date(Date.now());
     data.setHours(data.getHours() + 1); //fix alla timezone
-
+/* COMMENTO MOBILE
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition( function(position) {
-
+*/
             // get the coordinates
-            var latitude = position.coords.latitude;   //position.coords.latitude
-            var longitude = position.coords.longitude;   //position.coords.longitude
-          //  var latitude = 46.0667069;
-          //  var longitude = 11.1655039;
+            //var latitude = position.coords.latitude;   //position.coords.latitude
+            //var longitude = position.coords.longitude;   //position.coords.longitude
+            var latitude = 46.0667069;
+            var longitude = 11.1655039;
 
             /**Mettere // all'inizio di questa linea per attivare i dati test
             //dati test
@@ -241,19 +244,22 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
             .then((response) => { // function executed when the request is finisced
                 alert("Segnalazione ricevuta");
             });
+            /*COMMENTO MOBILE
         })
     }
-
+    /*
 
 }
 function aggiorna(){
+  /* Commento mobile
   if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition( function(position) {
+      */
           // get the coordinates
-          var latitude = position.coords.latitude;   //position.coords.latitude
-          var longitude = position.coords.longitude;   //position.coords.longitude
-        //  var latitude = 46.0667069;
-        //  var longitude = 11.1655039;
+        //  var latitude = position.coords.latitude;   //position.coords.latitude
+        //  var longitude = position.coords.longitude;   //position.coords.longitude
+          var latitude = 46.0667069;
+          var longitude = 11.1655039;
 
           /**Mettere // all'inizio di questa linea per attivare i dati test
           //dati test
@@ -297,13 +303,14 @@ function aggiorna(){
 
             })
             .catch(error => console.error(error))  // error handling
-
+/*          commento mobile
             });
             console.log("aggiorno");
         }
         else {
           alert("Geolocation is not supported by this browser, all the functions will not be available");
         }
+        */
 }
 
 /*
