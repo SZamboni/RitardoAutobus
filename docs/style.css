@@ -14,15 +14,7 @@ body{
     font-family: ProximaNova,Arial,Sans-serif;
 }
 
-#map {
-    height: 100%;
-    border-color: black;
-    border-style: solid double;
-    -webkit-box-shadow: 0 10px 10px -6px #0a0809;
-       -moz-box-shadow: 0 10px 10px -6px #0a0809;
-            box-shadow: 0 10px 10px -6px #0a0809;
 
-}
 
 .container{
     display: grid;
@@ -38,7 +30,7 @@ body{
 .containerHeader{
     display: grid;
     grid-area: header;
-    grid-template-columns:25vw 50vw 8vw 17vw;
+    grid-template-columns:26vw 48vw 11vw 15vw;
     position: fixed;
     grid-template-areas:
         "menug header-title search notifiche";
@@ -229,12 +221,20 @@ body{
     margin-right: 25px;
 
 }
+#map {
+    height: 85%;
+    border-color: black;
+    border-style: solid double;
+    -webkit-box-shadow: 0 10px 10px -6px #0a0809;
+       -moz-box-shadow: 0 10px 10px -6px #0a0809;
+            box-shadow: 0 10px 10px -6px #0a0809;
+
+}
 
 /*tabella ritardi fermate*/
 .stops{
     grid-area:fermate;
     margin: auto;
-    margin-top: 70px;
     margin-bottom: 200px;
 }
 
