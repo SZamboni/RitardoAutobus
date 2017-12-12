@@ -149,65 +149,70 @@ var selectQuery = function (query, callback) {
 //Gestione login
 app.post('/login/', function (request, response, next) {
     var primoLogin=false;
-    //Async waterfall mi permette di avviare delle funzioni in sequenza passando
-    //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
-    //chiudere le connsessioni ogni volta
-    async.waterfall([
-        function (callback) {
-            var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='" +
-                    request.body.email + "';";
-            //chiamo la prossima funzione nella sequenza
-            callback(null, query);
-        },
-        selectQuery,
-        function (parser, callback) {
-            if (parser[0].conteggio === 0) {
-                //gestione del primo login
-                //la prima volta che un utente si connette al servizio devo inserirlo
-                //nel nostro database.
-                console.log("devo fare l'utente");
-                var query = "INSERT INTO ritardoautobus.Utente (Nome,Cognome,Email,LinkFoto) VALUES (\'" +
-                        request.body.nome + "\',\'" +
-                        request.body.cognome + "\',\'" +
-                        request.body.email + "\',\'" +
-                        request.body.linkFoto + "\');";
-                primoLogin=true;
-                callback(null, query);
-            } else {
-                //non devo fare l'Inserimento
-                //il primo null è per l'errore, il secondo è per la query vuota
-                callback(null, null);
+    if(request.body.email!=null){
+      //Async waterfall mi permette di avviare delle funzioni in sequenza passando
+      //i parametri man mano. Ottima per eseguire queste query ed essere sicuro di
+      //chiudere le connsessioni ogni volta
+      async.waterfall([
+          function (callback) {
+              var query = "SELECT count(*) as conteggio from ritardoautobus.Utente where Email='" +
+                      request.body.email + "';";
+              //chiamo la prossima funzione nella sequenza
+              callback(null, query);
+          },
+          selectQuery,
+          function (parser, callback) {
+              if (parser[0].conteggio === 0) {
+                  //gestione del primo login
+                  //la prima volta che un utente si connette al servizio devo inserirlo
+                  //nel nostro database.
+                  console.log("devo fare l'utente");
+                  var query = "INSERT INTO ritardoautobus.Utente (Nome,Cognome,Email,LinkFoto) VALUES (\'" +
+                          request.body.nome + "\',\'" +
+                          request.body.cognome + "\',\'" +
+                          request.body.email + "\',\'" +
+                          request.body.linkFoto + "\');";
+                  primoLogin=true;
+                  callback(null, query);
+              } else {
+                  //non devo fare l'Inserimento
+                  //il primo null è per l'errore, il secondo è per la query vuota
+                  callback(null, null);
+              }
+          },
+          insertQuery,
+          function (callback) {
+              /**
+              Ora che sono sicuro che l'utente si trova all'interno del database
+              richiedo al mio database il suo id da salvare in un cookie per
+              semplificare tutte le query successive
+              **/
+              query = "SELECT UserId as id FROM ritardoautobus.Utente where Email=\'" +
+                      request.body.email + "\';";
+              callback(null,query);
+          },
+          selectQuery,
+          function(parser,callback){
+            //creo il JSON
+            var data = {
+              'id' : parser[0].id,
+              'primoLogin' : primoLogin
             }
-        },
-        insertQuery,
-        function (callback) {
-            /**
-            Ora che sono sicuro che l'utente si trova all'interno del database
-            richiedo al mio database il suo id da salvare in un cookie per
-            semplificare tutte le query successive
-            **/
-            query = "SELECT UserId as id FROM ritardoautobus.Utente where Email=\'" +
-                    request.body.email + "\';";
-            callback(null,query);
-        },
-        selectQuery,
-        function(parser,callback){
-          //creo il JSON
-          var data = {
-            'id' : parser[0].id,
-            'primoLogin' : primoLogin
+            response.send(JSON.stringify(data));
           }
-          response.send(JSON.stringify(data));
-        }
-    ], function (errore) {
-        if (!errore) {
-            console.log('appost');
-        } else {
-            console.log('Errore nella waterfall.');
-            console.log(errore);
-            response.sendStatus(500);
-        }
-    });
+      ], function (errore) {
+          if (!errore) {
+              console.log('appost');
+          } else {
+              console.log('Errore nella waterfall.');
+              console.log(errore);
+              response.sendStatus(500);
+          }
+      });
+  }else{
+    //mancano dei parametri, quindi invio 400
+    response.sendStatus(400);
+  }
 });
 
 //funzione che aggiunge il WorkerId al database se è la prima volta che l'utente effettua il login
