@@ -38,7 +38,7 @@ body{
 .containerHeader{
     display: grid;
     grid-area: header;
-    grid-template-columns:20vw 60vw 8vw 12vw;
+    grid-template-columns:25vw 50vw 8vw 17vw;
     position: fixed;
     grid-template-areas:
         "menug header-title search notifiche";
@@ -201,6 +201,13 @@ body{
 @media screen and (max-height: 450px) {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
+}
+
+#areaRemunerazioni{
+  display:table;
+  width:auto;
+  border:1px;
+  /*solid #666;*/
 }
 
 /*bottone notifiche*/

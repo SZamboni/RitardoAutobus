@@ -65,7 +65,6 @@
                                 Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
 
                               </div>
-
                                 <a onclick = "applySettings()">Applica</a>
                             </div>
 
@@ -148,16 +147,18 @@
             });*/
 
             function openNav() {
+              closeNavr();
                 var width = window.innerWidth;
                 if (width < 400) {
                   document.getElementById("mySidenav").style.width = "60vw";
                 }else {
-                  document.getElementById("mySidenav").style.width = "auto";
+                  document.getElementById("mySidenav").style.width = "500px";
                 }
 
             }
 
             function openNavr() { //sidenav per le notifiche
+              closeNav();
                 var width = window.innerWidth;
                 if (width < 400) {
                   document.getElementById("mySidenavr").style.width = "60vw";

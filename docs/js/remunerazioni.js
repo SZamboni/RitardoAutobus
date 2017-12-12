@@ -80,7 +80,7 @@ function load_info_remunerazioni() {
         var dataIntestazione=document.createElement("div");
         var valoreIntestazione=document.createElement("div");
         //stilizzo i miei elementi
-        rigaIntestazione.setAttribute("style","display:table-row; width:auto; background-color:#FFFFD0;");
+        rigaIntestazione.setAttribute("style","display:table-row; width:auto; background-color:#878787;");
         dataIntestazione.setAttribute("style","float:left;display:table-column;width:200px;");
         valoreIntestazione.setAttribute("style","float:left;display:table-column;");
         //popolo l'intestazione
@@ -92,7 +92,7 @@ function load_info_remunerazioni() {
         areaRemunerazioni.appendChild(rigaIntestazione);
         for(i=0;i<data.length;i++){
           //creo i miei elementi
-          var rigaHit=document.createElement("div")
+          var rigaHit=document.createElement("div");
           var dataRemun=document.createElement("div");
           var valoreRemun=document.createElement("div");
           //stilizzo gli elementi
@@ -107,7 +107,7 @@ function load_info_remunerazioni() {
             this.style.background="#D3D3D3";
           };
           rigaHit.onmouseleave=function(){
-            this.style.background="#FFF";
+            this.style.background="#111";
           };
 
           rigaHit.utentiHitId=data[i].UtentiHitId;
