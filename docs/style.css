@@ -201,6 +201,16 @@ body{
   border:1px;
   /*solid #666;*/
 }
+#datanotifica{
+  float:left;
+  display:table-column;
+  width:200px;
+}
+#dataremunerazione{
+  float:left;
+  display:table-column;
+  width:200px;
+}
 
 /*bottone notifiche*/
 
@@ -287,9 +297,11 @@ body{
 }
 .next > div{
   grid-area: arrivo;
+  float: right;
 }
 .delay > div{
   grid-area: ritardobus;
+  float: right;
 }
 
 /*#fermataContainer{
@@ -308,28 +320,17 @@ body{
     height: 0;
     overflow: hidden;
   }
-#rigadelay{
+#rigadelayBot{
   display: grid;
   grid-template-columns: 400px 75px 75px 100px;
   grid-template-areas:
       "direzione" "arrivo" "ritardobus" "bottone_segnala";
 }
-
-/*#fermataname{
-  grid-area: stopname;
-}
-#tratta{
-  grid-area: direzione;
-}
-#orario{
-  grid-area: arrivo;
-}
-#ritardo{
-  grid-area: ritardobus;
-}
-/*
-#bottonesegnala{
-  grid-area: bottone_segnala;
+#rigadelayNoBot{
+  display: grid;
+  grid-template-columns: 500px 75px 75px;
+  grid-template-areas:
+      "direzione" "arrivo" "ritardobus";
 }
 /*tabella ritardi fermate*/
 

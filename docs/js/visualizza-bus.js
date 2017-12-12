@@ -391,8 +391,7 @@ function visualize() {
         for(var j = 0; j < stops[i].lineeRitardi.length; j++) {
 
             var rigaRitardo = document.createElement('div');
-            rigaRitardo.classList.add('rigaRitardo')
-            rigaRitardo.id= "rigadelay"
+            rigaRitardo.classList.add('rigaRitardo');
             var bus = document.createElement("div");
             bus.id= "tratta"
             bus.innerHTML = stops[i].lineeRitardi[j].nomeLinea;
@@ -440,6 +439,9 @@ function visualize() {
               button.innerHTML = "Segnala Salita";
               buttoncell.appendChild(button);
               rigaRitardo.appendChild(buttoncell);
+              rigaRitardo.id= "rigadelayBot";
+            }else{
+              rigaRitardo.id= "rigadelayNoBot";
             }
             fermataSizer.appendChild(rigaRitardo);
         }

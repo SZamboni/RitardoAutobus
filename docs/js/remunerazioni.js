@@ -81,7 +81,7 @@ function load_info_remunerazioni() {
         var valoreIntestazione=document.createElement("div");
         //stilizzo i miei elementi
         rigaIntestazione.setAttribute("style","display:table-row; width:auto; background-color:#878787;");
-        dataIntestazione.setAttribute("style","float:left;display:table-column;width:200px;");
+        dataIntestazione.id="datanotifica";
         valoreIntestazione.setAttribute("style","float:left;display:table-column;");
         //popolo l'intestazione
         dataIntestazione.innerHTML="Data remunerazione";
@@ -97,7 +97,7 @@ function load_info_remunerazioni() {
           var valoreRemun=document.createElement("div");
           //stilizzo gli elementi
           rigaHit.setAttribute("style","display:table-row; width:auto; cursor:pointer;");
-          dataRemun.setAttribute("style","float:left;display:table-column;width:200px;");
+          dataRemun.id="dataremunerazione";
           valoreRemun.setAttribute("style","float:left;display:table-column;");
 
           //console.log(data[i]);
