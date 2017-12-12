@@ -1,10 +1,10 @@
-/*
+
  var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
  var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
-*/
+/*
  var serverLocation = "http://localhost:8080/";
  var nodeLocation = "http://localhost:8080/";
-
+*/
 /**
  * Function that given a cookie name controls if there is that cookie
  */
@@ -33,28 +33,22 @@ function leggiCookie(nomeCookie) {
 /**
  * Function that ckeck if the user is logged in
  */
-function load() {
+function loadRemunerazioni() {
     var id = leggiCookie("userId");
 
     if(id == undefined) {
         console.log("User not logged in");
-        document.location.href = serverLocation;
+        //document.location.href = serverLocation;
     } else {
         console.log("User logged in");
+        load_info_remunerazioni();
     }
-
-    load_info();
 }
 
 /**
  * Function called when the page is loaded
  */
-function load_info() {
-    var title = document.getElementById("title");
-    title.innerHTML += leggiCookie("email");
-
-    var image = document.getElementById("icona_utente");
-    image.src = leggiCookie("linkFoto");
+function load_info_remunerazioni() {
     var areaRemunerazioni = document.getElementById("areaRemunerazioni");
 
     var url=nodeLocation+"hits/?userId="+leggiCookie("userId");
@@ -80,9 +74,9 @@ function load_info() {
         var dataIntestazione=document.createElement("div");
         var valoreIntestazione=document.createElement("div");
         //stilizzo i miei elementi
-        rigaIntestazione.setAttribute("style","display:table-row; width:auto; background-color:#FFFFD0;");
-        dataIntestazione.setAttribute("style","float:left;display:table-column;width:200px;");
-        valoreIntestazione.setAttribute("style","float:left;display:table-column;");
+        rigaIntestazione.id="rigaheader";
+        dataIntestazione.id="datanotifica";
+        valoreIntestazione.id= "valoreheader";
         //popolo l'intestazione
         dataIntestazione.innerHTML="Data remunerazione";
         valoreIntestazione.innerHTML="Valore remunerazione";
@@ -92,13 +86,13 @@ function load_info() {
         areaRemunerazioni.appendChild(rigaIntestazione);
         for(i=0;i<data.length;i++){
           //creo i miei elementi
-          var rigaHit=document.createElement("div")
+          var rigaHit=document.createElement("div");
           var dataRemun=document.createElement("div");
           var valoreRemun=document.createElement("div");
           //stilizzo gli elementi
-          rigaHit.setAttribute("style","display:table-row; width:auto; cursor:pointer;");
-          dataRemun.setAttribute("style","float:left;display:table-column;width:200px;");
-          valoreRemun.setAttribute("style","float:left;display:table-column;");
+          rigaHit.id= "rigaHit";
+          dataRemun.id="dataremunerazione";
+          valoreRemun.id= "valoreRemun";
 
           //console.log(data[i]);
           //rendo la riga cliccabile
@@ -107,7 +101,7 @@ function load_info() {
             this.style.background="#D3D3D3";
           };
           rigaHit.onmouseleave=function(){
-            this.style.background="#FFF";
+            this.style.background="#111";
           };
 
           rigaHit.utentiHitId=data[i].UtentiHitId;
@@ -144,11 +138,4 @@ function load_info() {
         }
       }
     });
-}
-
-/**
- * Function called when the user click on the back button
- */
-function back() {
-    document.location.href = serverLocation;
 }

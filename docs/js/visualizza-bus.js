@@ -1,13 +1,13 @@
 /**
  * Function that returns a value of a defined cookie or undefined if that cookie is not found
  */
- /*
+
   var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
   var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
- */
+ /*
   var serverLocation = "http://localhost:8080/";
   var nodeLocation = "http://localhost:8080/";
-
+ */
 var stops;
 var map = null;
 var marker = null;
@@ -45,9 +45,9 @@ function load() {
     console.log(id);
     if(id == undefined) {
         console.log("User not logged in");
-
         //creo login button
-        var loginbtn = document.createElement("BUTTON");        // Create a <button> element
+        var loginbtn = document.createElement("BUTTON");
+        loginbtn.className += "searchbar";        // Create a <button> element
         var t = document.createTextNode("LOG IN");
         loginbtn.appendChild(t);
         loginbtn.onclick = openLogin;
@@ -58,35 +58,44 @@ function load() {
             old_button.parentNode.removeChild(old_button);
         }*/
     } else {
+      settingsLoad();
+      loadRemunerazioni();
       console.log("User logged in");
-
-      var notify = document.getElementById("notify");
+      var menuImpostazioni = document.getElementById("menuImpostazioni");
+      menuImpostazioni.style.display= "block";
+      var menuNotifiche = document.getElementById("menuNotifiche");
+      menuNotifiche.style.display= "block";
+      var notify = document.getElementById("menuNotifiche").firstChild;
       fetch(nodeLocation+"hits/unreadamount/?userId="+id).then((response)=>{
         data=response.json();
         return data;
       }).then((data)=>{
         //console.log(data);
         //console.log(data.Conteggio);
+        notify.innerHTML = "&#9776; NOTIFICHE ("+data.Conteggio+")";/*
         if(data.Conteggio!=0){
           notify.innerHTML="Hai "+data.Conteggio+" notifiche da leggere.";
         }else{
           notify.innerHTML="Nessuna notifica da leggere."
         }
+        */
       });
 
       //creo logout button
-      var logoutbtn = document.createElement("BUTTON");        // Create a <button> element
+      var logoutbtn = document.createElement("BUTTON");
+      logoutbtn.className += "searchbar";        // Create a <button> element
       var t = document.createTextNode("LOG OUT");
       logoutbtn.appendChild(t);
       logoutbtn.onclick = signOut;
       document.getElementById("logDiv").appendChild(logoutbtn);
-
+      /*
       //creo pulsante impostazioni
       var impostazionibtn = document.createElement("BUTTON");        // Create a <button> element
       var t = document.createTextNode("impostazioni");
       impostazionibtn.appendChild(t);
       impostazionibtn.onclick = clickImpostazioni;
       document.getElementById("impostazioniDiv").appendChild(impostazionibtn);
+      */
     }
 
 }
@@ -99,10 +108,11 @@ function initMap() {
     // check if the geolocation is enabled
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition( function(position) {
-
             // get the coordinates
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
+            var latitude = position.coords.latitude;   //position.coords.latitude
+            var longitude = position.coords.longitude;   //position.coords.longitude
+            //var latitude = 46.0667069;
+            //var longitude = 11.1655039;
 
             var myLatLng = {lat: latitude, lng: longitude};
             map = new google.maps.Map(document.getElementById('map'), {
@@ -111,6 +121,7 @@ function initMap() {
             });
             aggiorna();
       });
+
     } else {
         alert("Geolocation is not supported by this browser, all the functions will not be available");
 
@@ -120,7 +131,6 @@ function initMap() {
         });
 
     }
-
 }
 
 /**
@@ -179,13 +189,13 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
 
     var data = new Date(Date.now());
     data.setHours(data.getHours() + 1); //fix alla timezone
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition( function(position) {
-
             // get the coordinates
             var latitude = position.coords.latitude;   //position.coords.latitude
             var longitude = position.coords.longitude;   //position.coords.longitude
+            //var latitude = 46.0667069;
+            //var longitude = 11.1655039;
 
             /**Mettere // all'inizio di questa linea per attivare i dati test
             //dati test
@@ -224,19 +234,19 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
                 body: JSON.stringify(informations)
             })
             .then((response) => { // function executed when the request is finisced
-
+                alert("Segnalazione ricevuta");
             });
         })
     }
-
-
 }
 function aggiorna(){
   if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition( function(position) {
           // get the coordinates
-          var latitude = position.coords.latitude;
-          var longitude = position.coords.longitude;
+          var latitude = position.coords.latitude;   //position.coords.latitude
+          var longitude = position.coords.longitude;   //position.coords.longitude
+          //var latitude = 46.0667069;
+          //var longitude = 11.1655039;
 
           /**Mettere // all'inizio di questa linea per attivare i dati test
           //dati test
@@ -280,7 +290,6 @@ function aggiorna(){
 
             })
             .catch(error => console.error(error))  // error handling
-
             });
             console.log("aggiorno");
         }
@@ -319,56 +328,101 @@ function placeMarker(location,scanRange) {
       });
     }else{
       cerchioPosizione.setCenter(location);
+      cerchioPosizione.setRadius(scanRange*1000);
+    }
+  }
+/*
+Funzione che gestisce il collapse dei ritardi
+*/
+/*
+function collapse(){
+    var collapser=this.parentNode.lastChild;
+    var sizer= collapser.firstChild;
+    if(collapser.clientHeight){
+      collapser.style.height = 0;
+    }else{
+      collapser.style.height = sizer.clientHeight + "px";
     }
 }
+*/
 /**
  * Function that visualize stops and bus
  */
 function visualize() {
 
     // remove the old visualization
-    var old_div = document.getElementById("parent");
+    var old_div = document.getElementById("tabellaFermate");
+    var original = document.getElementById("selezione-fermate");
     if(old_div != undefined) {
-        old_div.parentNode.removeChild(old_div);
+        original.removeChild(old_div);
     }
 
-    original = document.getElementById("selezione-fermate");
-
-    parent = document.createElement('div');
-    parent.id = "parent";
+    var tabellaFermate = document.createElement('div');
+    tabellaFermate.id = "tabellaFermate";
 
     for(var i = 0; i < stops.length; i++) {
-
-        var div = document.createElement('div');
-        div.innerHTML = stops[i].nomeFermata;
-        div.id = stops[i].idFermata;
-
-        var table = document.createElement('table');
-
-
-
+        var fermataContainer = document.createElement('div');
+        fermataContainer.classList.add('fermataContainer');
+        var fermataSizer = document.createElement('div');
+        fermataSizer.classList.add('fermataSizer');
+        var fermataHead = document.createElement('div');
+        fermataHead.id= "fermataname"
+        fermataHead.classList.add('fermataHead');
+        fermataHead.innerHTML = stops[i].nomeFermata;
+        fermataHead.id = stops[i].idFermata;
+        fermataHead.onclick = function(){
+          var collapser=this.parentNode.lastChild;
+          var sizer= collapser.firstChild;
+          if(collapser.clientHeight){
+            collapser.style.height = 0;
+          }else{
+            collapser.style.height = sizer.clientHeight + "px";
+          }
+        };
+        fermataContainer.appendChild(fermataHead);
         for(var j = 0; j < stops[i].lineeRitardi.length; j++) {
 
-            var tr = document.createElement('tr');
-
-            var bus = document.createElement("td");
+            var rigaRitardo = document.createElement('div');
+            rigaRitardo.classList.add('rigaRitardo');
+            var bus = document.createElement("div");
+            bus.id= "tratta"
             bus.innerHTML = stops[i].lineeRitardi[j].nomeLinea;
-            tr.appendChild(bus);
+            rigaRitardo.appendChild(bus);
 
-            var next = document.createElement("td");
-            next.innerHTML = stops[i].lineeRitardi[j].orario;
-            tr.appendChild(next);
+            var next = document.createElement("div");
+            next.id= "orario"
+            var orario = stops[i].lineeRitardi[j].orario.split(":");
+            next.innerHTML = orario[0]+":"+orario[1];
+            rigaRitardo.appendChild(next);
 
-            var delay = document.createElement("td");
-            delay.innerHTML = stops[i].lineeRitardi[j].ritardo + " min";
-            tr.appendChild(delay);
+            var delay = document.createElement("div");
+            delay.id= "ritardo"
+            var testoRitardo="";
+            var ritardo = stops[i].lineeRitardi[j].ritardo.split(":");
+            var coloreRitardo = "#FF3300";
+            if(parseInt(ritardo[1])<5){
+              coloreRitard="#FF9900";
+            }
+            if(parseInt(ritardo[1])<2){
+              coloreRitardo="#00CC00";
+            }
+            if(stops[i].lineeRitardi[j].ritardo[0]=="-"){
+              testoRitardo = testoRitardo + "-";
+            }else{
+              testoRitardo = testoRitardo + "+";
+            }
+            testoRitardo = testoRitardo + parseInt(ritardo[1])+ ":"+ritardo[2];
+            delay.innerHTML = testoRitardo + " min";
+            delay.style.color = coloreRitardo;
+            rigaRitardo.appendChild(delay);
 
             if(leggiCookie("userId") != undefined) {
-              var buttoncell = document.createElement("td");
+              var buttoncell = document.createElement("div");
+              buttoncell.id="bottonesegnala"
               var button = document.createElement('button');
               button.idFermata = stops[i].idFermata;
               button.idLinea = stops[i].lineeRitardi[j].idLinea;
-              button.idCorsa = stops[i].idCorsa;
+              button.idCorsa = stops[i].lineeRitardi[j].idCorsa;
               button.latFermata = stops[i].latitudine;
               button.lonFermata = stops[i].longitudine;
               button.onclick = function () {   // the function called when the button is press
@@ -376,18 +430,27 @@ function visualize() {
               };
               button.innerHTML = "Segnala Salita";
               buttoncell.appendChild(button);
-              tr.appendChild(buttoncell);
+              rigaRitardo.appendChild(buttoncell);
+              rigaRitardo.id= "rigadelayBot";
+            }else{
+              rigaRitardo.id= "rigadelayNoBot";
             }
-
-            table.appendChild(tr);
+            fermataSizer.appendChild(rigaRitardo);
+        }
+        if(stops[i].lineeRitardi.length==0){
+            var nessunaCorsa = document.createElement("div");
+            nessunaCorsa.classList.add("nessunaCorsa");
+            nessunaCorsa.innerHTML = "Nessuna corsa programmata per la fermata."
+            fermataSizer.appendChild(nessunaCorsa);
         }
 
-        div.appendChild(table);
-
-        parent.appendChild(div);
-        original.appendChild(parent);
+        var fermataCollapser = document.createElement("div");
+        fermataCollapser.classList.add("fermataCollapser");
+        fermataCollapser.appendChild(fermataSizer);
+        fermataContainer.appendChild(fermataCollapser);
+        tabellaFermate.appendChild(fermataContainer);
     }
-
+    original.appendChild(tabellaFermate);
 
 }
 

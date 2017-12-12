@@ -19,7 +19,7 @@
   "dependencies": {
     "amt": "^0.1.4",
     "async": "^2.6.0",
-    "aws-sdk": "^2.166.0",
+    "aws-sdk": "^2.167.0",
     "body-parser": "^1.18.2",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",

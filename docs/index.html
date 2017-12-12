@@ -3,11 +3,8 @@
     <head>
         <title> When is my bus </title>
         <style>
-            /* Always set the map height explicitly to define the size of the div element that contains the map. */
-            #map {
-                height: 50%;
-            }
-            /* Optional: Makes the sample page fill the window. */
+
+            /* Optional: Makes the sample page fill the window.*/
             html, body {
                 height: 100%;
                 margin: 0;
@@ -19,34 +16,133 @@
         <meta name="google-signin-client_id" content="357283213666-8s2b8eiguf5abidvemu4f39aucupgggk.apps.googleusercontent.com">
         <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+        <!--collapse per le fermate-->
+        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
         <script type="text/javascript" src="js/googleLog.js"></script>
         <script type="text/javascript" src="js/visualizza-bus.js"></script>
+        <script type="text/javascript" src="js/impostazioni.js"></script>
+        <script type="text/javascript" src="js/remunerazioni.js"></script>
 
         <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
         </script>
+        <!--<link href="style.css" rel="stylesheet" type="text/css"/>-->
+        <link href="style.css" media="only screen and (min-width: 1081px)" rel="stylesheet" type="text/css"/>
+        <link href="mobile.css" media="only screen and (max-width: 1080px)" rel="stylesheet" type="text/css"/>
+      <!--  <link href="mobilehor.css" media="only screen and (max-width: 1920px)" rel="stylesheet" type="text/css"/>-->
 
     </head>
 
     <body onload="load()">
-      <div>
-        <h1>Visualizzazione ritardi Autobus</h1>
-        <a id="notify" href="remunerazioni.html"></a>
-        <div id="impostazioniDiv"></div>
 
-        <div id="logDiv"></div>
-      </div>
+        <!--________________________________________________________________________-->
+        <div class="container">
+            <div class="containerHeader">
 
-        <h2>La tua posizione:</h2>
-        <div id="map"></div><br>
-        <h3 id="selezione-fermate">Fermate vicino a te:</h3>
+                <div id="mySidenav" class="sidenav"> <!--menu-->
+                    <a onclick="closeNav()">&times;</a>
 
-        <h3 id="bus-e-ritardi"></h3><br>
+                            <h1>Impostazioni utente </h1>
+                            <h1 id = "title"></h1>
+
+                            <!--<img id = "icona_utente"></img>
+
+                            <h3>Modifica le tue impostazioni</h3>-->
+
+                            <div>
+                              <div class="bordi_menu">
+                                <img id = "icona_utente"></img>
+
+                                <h3>Modifica le tue impostazioni</h3>
+
+                                Modifica raggio di ricerca (metri)<br>
+                                <input type="range" min=50 max=1000 id="scanSlider"> </input> <label id="scanRangeLabel"></label><br>
+                                Modifica range temporale di ricerca (minuti)<br>
+                                <input type="range" min=5 max=120 id="timeSlider"> </input> <label id="timeRangeLabel"></label><br>
+                                Modifica il tuo ID Amazon Mechanical Turk: <input type="text" id="id_turk"></input><br>
+
+                              </div>
+                                <a onclick = "applySettings()">Applica</a>
+                            </div>
+
+                </div>
+                <div class="menu" id="menuImpostazioni"><a onclick="openNav()">&#9776; impostazioni</a></div>
+
+                <div class="titolo">
+                    WHEN IS MY BUS!
+                </div>
+
+                <div class="searchbar">
+                    <div id="logDiv"></div> <!--bottone di login-->
+                </div>
+
+                <div id="mySidenavr" class="sidenavr"> <!--notifiche-->
+                  <div class="bordi_menu">
+                    <a onclick="closeNavr()">&times;</a>
+                    <h1 id = "title">Lista remunerazioni utente </h1>
+
+                    <img id = "icona_utente"></img>
+                    <div id = "areaRemunerazioni" style="display:table; width:auto;border:1px solid #666;">
+                    </div>
+                  </div>
+                </div>
+                <div class="notify" id="menuNotifiche"><a onclick="openNavr()">&#9776; NOTIFICHE</a></div>
+
+            </div>
+
+            <div class="mapp">
+              <div id="map"></div>
+            </div>
+
+            <div class="stops">
+
+              <h3>Fermate vicino a te:</h3>
+              <div id="selezione-fermate"></div>
+              <br><br><br>
+
+            </div>
 
 
-        <div id="footer">
-            <p>Ritardo autobus &#174;</p>
+        </div>
+        <div class="navbar" id="myNavbar">
+            When is my bus &#174; - 2017
+            <!--<a id="notify" href="remunerazioni.html">NOTIFICHE</a>-->
         </div>
 
+        <script>
+
+            function openNav() {
+              closeNavr();
+                var width = window.innerWidth;
+                if (width < 400) {
+                  document.getElementById("mySidenav").style.width = "60vw";
+                }else {
+                  document.getElementById("mySidenav").style.width = "500px";
+                }
+
+            }
+
+            function openNavr() { //sidenav per le notifiche
+              closeNav();
+                var width = window.innerWidth;
+                if (width < 400) {
+                  document.getElementById("mySidenavr").style.width = "60vw";
+                }else {
+                  document.getElementById("mySidenavr").style.width = "500px";
+                }
+
+            }
+
+            function closeNav() {
+                document.getElementById("mySidenav").style.width = "0";
+            }
+            function closeNavr() { //sidenav per le notifiche
+                document.getElementById("mySidenavr").style.width = "0";
+            }
+        </script>
+        <!--________________________________________________________________________-->
     </body>
 </html>
