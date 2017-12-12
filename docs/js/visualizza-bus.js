@@ -239,7 +239,7 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
                 body: JSON.stringify(informations)
             })
             .then((response) => { // function executed when the request is finisced
-
+                alert("Segnalazione ricevuta");
             });
         })
     }
