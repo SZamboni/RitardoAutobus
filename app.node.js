@@ -834,7 +834,14 @@ app.get("/admin/update/",function(request,response){
   response.sendStatus(200);
 });
 app.get("/admin/reset/",function(request,response){
-  resetRitardi();
+  //eseguo il reset solo se necessario
+  var query="SELECT if(count(*)>1,TRUE,FALSE) As NRitardi FROM Ritardo Where DataRitardo=curdate();";
+  selectQuery(query,function(errore,parser){
+    if(parser[0].NRitardi!=1){
+      resetRitardi();
+    }
+  });
+  //resetRitardi();
   response.sendStatus(200);
 });
 app.get("/admin/creazioneHit/", function(request,response) {
