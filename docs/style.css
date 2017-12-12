@@ -301,9 +301,24 @@ body{
 
 .rigaRitardo button {
   grid-area: bottone_segnala;
-  background-color: red;
+  background-color: #7CAF90;
   color: white;
+  border:none;
   padding: 2px;
+  margin : 2px;
+  margin-top: 0;
+  cursor:pointer;
+  text-align: center;
+}
+.rigaRitardo button:hover {
+  grid-area: bottone_segnala;
+  background-color: #157a3d;
+  color: white;
+  border:none;
+  padding: 2px;
+  margin : 2px;
+  margin-top: 0;
+  cursor:pointer;
   text-align: center;
 }
 
