@@ -7,8 +7,8 @@
   var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
  */
 
-  var serverLocation = "http://192.168.1.8:8080/";
-  var nodeLocation = "http://192.168.1.8:8080/";
+  var serverLocation = "http://192.168.1.10:8080/";
+  var nodeLocation = "http://192.168.1.10:8080/";
 
 var stops;
 var map = null;
@@ -247,8 +247,7 @@ function click(_idFermata,_idLinea, _idCorsa, _latFermata, _lonFermata) {
             /*COMMENTO MOBILE
         })
     }
-    /*
-
+    */
 }
 function aggiorna(){
   /* Commento mobile

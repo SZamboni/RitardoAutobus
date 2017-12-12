@@ -8,8 +8,8 @@
   var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";
  */
 
-  var serverLocation = "http://192.168.1.8:8080/";
-  var nodeLocation = "http://192.168.1.8:8080/";
+  var serverLocation = "http://192.168.1.10:8080/";
+  var nodeLocation = "http://192.168.1.10:8080/";
 
 /**
  * Function that given a cookie name controls if there is that cookie
