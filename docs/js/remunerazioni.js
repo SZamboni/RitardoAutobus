@@ -55,11 +55,6 @@ function loadRemunerazioni() {
  * Function called when the page is loaded
  */
 function load_info_remunerazioni() {
-    var title = document.getElementById("title");
-    title.innerHTML += leggiCookie("email");
-
-    var image = document.getElementById("icona_utente");
-    image.src = leggiCookie("linkFoto");
     var areaRemunerazioni = document.getElementById("areaRemunerazioni");
 
     var url=nodeLocation+"hits/?userId="+leggiCookie("userId");
