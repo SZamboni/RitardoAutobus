@@ -29,10 +29,10 @@
         <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5tn1W5P598hwG0eH5k4u9VCvetSn1XR0&callback=initMap">
         </script>
-        <link href="style.css" rel="stylesheet" type="text/css"/>
-        <link href="style.css" media="only screen and (min-width: 801px)" rel="stylesheet" type="text/css"/>
-        <link href="mobilehor.css" media="only screen and (max-width: 800px)" rel="stylesheet" type="text/css"/>
-        <link href="mobile.css" media="only screen and (max-width: 400px)" rel="stylesheet" type="text/css"/>
+        <!--<link href="style.css" rel="stylesheet" type="text/css"/>-->
+        <link href="style.css" media="only screen and (min-width: 1081px)" rel="stylesheet" type="text/css"/>
+        <link href="mobile.css" media="only screen and (max-width: 1080px)" rel="stylesheet" type="text/css"/>
+      <!--  <link href="mobilehor.css" media="only screen and (max-width: 1920px)" rel="stylesheet" type="text/css"/>-->
 
     </head>
 
@@ -98,14 +98,11 @@
             </div>
 
             <div class="stops">
-              <!--<div id="impostazioniDiv"></div>-->
+
               <h3>Fermate vicino a te:</h3>
               <div id="selezione-fermate"></div>
               <br><br><br>
-              <!--<div id="impostazioniDiv"></div>
-              <div id="footer">
-                  <p>Ritardo autobus &#174;</p>
-              </div>-->
+
             </div>
 
 
@@ -116,35 +113,6 @@
         </div>
 
         <script>
-            //funzioni per il menu a comparsa
-
-            /*var bounds = [
-                {min:0,max:400,func:red},
-                {min:801,func:orange}
-            ];
-
-            // define a resize function. use a closure for the lastBoundry determined.
-            var resizeFn = function(){
-                var lastBoundry; // cache the last boundry used
-                return function(){
-                    var width = window.innerWidth; // get the window's inner width
-                    var boundry, min, max;
-                    for(var i=0; i<bounds.length; i++){
-                        boundry = bounds[i];
-                        min = boundry.min || Number.MIN_VALUE;
-                        max = boundry.max || Number.MAX_VALUE;
-                        if(width > min && width < max
-                           && lastBoundry !== boundry){
-                            lastBoundry = boundry;
-                            return boundry.func.call(boundry);
-                        }
-                    }
-                }
-            };
-            $(window).resize(resizeFn()); // bind the resize event handler
-            $(document).ready(function(){
-                $(window).trigger('resize'); // on load, init the lastBoundry
-            });*/
 
             function openNav() {
               closeNavr();

@@ -30,6 +30,7 @@ body{
 .containerHeader{
     display: grid;
     grid-area: header;
+    vertical-align: middle;
     grid-template-columns:26vw 48vw 11vw 15vw;
     position: fixed;
     grid-template-areas:
@@ -67,7 +68,7 @@ body{
 
 /*menu per il profilo*/
 #menuImpostazioni{
-  display: none;
+  /*display: none;*/
 }
 .menu a{
     grid-area:menug;
@@ -78,7 +79,7 @@ body{
     text-align: center;
     padding: 31px;
     text-decoration: none;
-    font-size: 17px;
+    font-size: 25px;
     cursor: pointer;
 }
 .menu a:hover {
@@ -91,6 +92,7 @@ body{
     position: fixed;
     z-index: 99999999;
     color: white;
+    font-size: 25px;
     top: 0;
     left: 0;
     background-color: #111;
@@ -133,7 +135,7 @@ body{
 /*bottone notifiche*/
 /*r sta per right */
 #menuNotifiche{
-  display: none;
+  /*display: none;*/
 }
 .notify a{
     grid-area:notifiche;
@@ -159,6 +161,7 @@ body{
     color: white;
     top: 0;
     right: 0;
+    font-size: 25px;
     background-color: #111;
     overflow-x: hidden;
     transition: 0.5s;
@@ -226,13 +229,12 @@ body{
   float:left;display:table-column;
 }
 /*tabella remunerazioni*/
-
 /*bottone notifiche*/
 
 .titolo{
     display: table-cell;
     grid-area:header-title;
-    font-size: 70px;
+    font-size: 57px;
     color:white;
     text-align: center;
     vertical-align: middle;
@@ -240,7 +242,7 @@ body{
 
 .mapp{
     grid-area:mappa;
-    margin-top: 50px;
+    margin-top: 75px;
     height: 100%;
     margin-left: 25px;
     margin-right: 25px;
@@ -261,6 +263,7 @@ body{
     grid-area:fermate;
     margin: auto;
     margin-bottom: 200px;
+    font-size: 30px;
 }
 
 .selezione-fermate{
@@ -282,17 +285,18 @@ body{
   display: block;
   text-indent: 5px;
   width: 100%;
-  height: 25px;
+  height: 50px;
   text-decoration: none;
   margin-bottom: 7px;
   margin-top: 7px;
-  font-size: 17px;
+  font-size: 35px;
 }
 
 .rigaRitardo > div {
   /*float: left;
   display: table-cell;*/
   width: auto;
+  font-size: 30px;
   /*display: grid;
   grid-template-columns: 500px 50px 50px 100px;
   grid-template-areas:
@@ -307,6 +311,7 @@ body{
   padding: 2px;
   margin : 2px;
   margin-top: 0;
+  font-size: 25px;
   cursor:pointer;
   text-align: center;
 }
@@ -352,13 +357,13 @@ body{
   }
 #rigadelayBot{
   display: grid;
-  grid-template-columns: 400px 75px 75px 100px;
+  grid-template-columns: 580px 100px 140px 100px;
   grid-template-areas:
       "direzione" "arrivo" "ritardobus" "bottone_segnala";
 }
 #rigadelayNoBot{
   display: grid;
-  grid-template-columns: 500px 75px 75px;
+  grid-template-columns: 680px 100px 140px;
   grid-template-areas:
       "direzione" "arrivo" "ritardobus";
 }
