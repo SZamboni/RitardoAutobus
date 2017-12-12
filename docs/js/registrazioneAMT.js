@@ -1,4 +1,3 @@
-
 /*
  var serverLocation = "https://michelebonapace.github.io/RitardoAutobus/";
  var nodeLocation = "https://floating-eyrie-45682.herokuapp.com/";

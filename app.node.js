@@ -713,7 +713,10 @@ var resetRitardi = function(){
     }
   })
 };
-var scheduleRitardi = schedule.scheduleJob('1 0 */1 * *',resetRitardi);
+var rule = new schedule.RecurrenceRule();
+rule.hour = 1;
+rule.minute = 30;
+var scheduleRitardi = schedule.scheduleJob(rule,resetRitardi);
 /**
 Funzione che viene chiamata ogni intervalloRitardi millisecondi per aggiornare
 la tabella dei ritardi a partire dalla tabella delle segnalazioni.
@@ -831,7 +834,14 @@ app.get("/admin/update/",function(request,response){
   response.sendStatus(200);
 });
 app.get("/admin/reset/",function(request,response){
-  resetRitardi();
+  //eseguo il reset solo se necessario
+  var query="SELECT if(count(*)>1,TRUE,FALSE) As NRitardi FROM Ritardo Where DataRitardo=curdate();";
+  selectQuery(query,function(errore,parser){
+    if(parser[0].NRitardi!=1){
+      resetRitardi();
+    }
+  });
+  //resetRitardi();
   response.sendStatus(200);
 });
 app.get("/admin/creazioneHit/", function(request,response) {
