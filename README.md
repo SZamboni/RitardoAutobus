@@ -1,2 +1,4 @@
 # RitardoAutobus
-Progetto di ingegneria del software 2 per la gestione del ritardo degli autobus
+Software Engineering 2 project. Made during the academic year 2017/2018 at the University of Trento under the directions of professor Fabio Casati.
+This was a group project with the aim to show the user a map with the nearby bus stops in Trento, the possibility to view the buses that will pass in that bus stop. The data about bus stops and buses are extracted from the open data of Trentino Trasporti Esercizio. When a user take a specific bus at a specific bus stop he or she can send this information to us so that we can calculate the correct time the bus will pass in the other bus stops. The user is rewarded whith a payment using the Amazon Mechanical Turk system when he or she gives the right information. Also the user is identify with his or her Google account.
+For some reason Github won't show in the contributor my commits but if you search my username in the list of all commit you will find it. I code mainly the front-end in javascript.
